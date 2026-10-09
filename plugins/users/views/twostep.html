@@ -1,0 +1,53 @@
+<ui-plugin path="twostep">
+<ui-component name="modal" path="mail.window" config="if:twostep;width:520;center:true;cancel:twostep/close" id="twostep" class="settings-modal settings-hub hidden" role="dialog" aria-modal="true" aria-labelledby="twostep-title">
+	<div class="settings-heading">
+		<div class="modal-heading-content">
+			<div><span class="eyebrow">@(USER PROFILE)</span><h2 id="twostep-title">@(Two-step verification)</h2></div>
+			<button class="icon-button exec" data-exec="twostep/close" aria-label="@(Close)"><i class="ti ti-times" aria-hidden="true"></i></button>
+		</div>
+	</div>
+	<div class="settings-body">
+		<div class="modal-body-content">
+			<ui-component name="qrcode"></ui-component>
+			<ui-bind path="twostep.step" config="show:value==='off';focus:input" class="block">
+				<p>@(Add a second step to signing in: a code from an app on your phone, such as Google Authenticator, Microsoft Authenticator, 1Password or Aegis. A stolen password is then not enough to open your mail.)</p>
+				<ui-component name="input" path="twostep.password" config="label:@(Your password);type:password;maxlength:128;$delay:1"></ui-component>
+				<div class="ts-actions"><button type="button" class="primary-button exec" data-exec="twostep/begin">@(Turn on)</button></div>
+			</ui-bind>
+			<ui-bind path="twostep.step" config="show:value==='setup';focus:input" class="block">
+				<p>@(Scan this code with your authenticator app.)</p>
+				<ui-bind path="twostep.qr" config="src img:value" class="ts-qr block"><img alt="@(Setup code)" width="168" height="168" /></ui-bind>
+				<p class="settings-note">@(Cannot scan it? Type this key into the app:)</p>
+				<ui-bind path="twostep.secret" config="text:value" class="block"><code class="ts-secret"></code></ui-bind>
+				<ui-component name="input" path="twostep.code" config="label:@(The 6-digit code the app shows);maxlength:10;placeholder:123456;$delay:1"></ui-component>
+				<div class="ts-actions">
+					<button type="button" class="primary-button exec" data-exec="twostep/enable">@(Confirm and turn on)</button>
+					<button type="button" class="secondary-button exec" data-exec="twostep/cancel">@(Cancel)</button>
+				</div>
+			</ui-bind>
+			<ui-bind path="twostep.step" config="show:value==='codes';focus:pre" class="block">
+				<p><strong>@(Two-step verification is on.)</strong> @(Keep these recovery codes somewhere safe. If you lose your phone, each one opens your mail once. They will not be shown again.)</p>
+				<ui-bind path="twostep.focuscodes" config="focus:pre" class="block"
+					><ui-bind path="twostep.recovery" config="text pre:value" class="block"><pre class="ts-recovery" tabindex="0" aria-label="@(Recovery codes)"></pre></ui-bind
+				></ui-bind>
+				<div class="ts-actions">
+					<button type="button" class="secondary-button exec" data-exec="twostep/copy">@(Copy)</button>
+					<button type="button" class="secondary-button exec" data-exec="twostep/download">@(Download)</button>
+					<button type="button" class="primary-button exec" data-exec="twostep/done">@(I have saved them)</button>
+				</div>
+			</ui-bind>
+			<ui-bind path="twostep.step" config="show:value==='on';focus:input" class="block">
+				<p><strong>@(Two-step verification is on.)</strong> <ui-bind path="twostep.left" config="text:value"></ui-bind></p>
+				<ui-component name="input" path="twostep.password" config="label:@(Your password);type:password;maxlength:128;$delay:1"></ui-component>
+				<ui-component name="input" path="twostep.code" config="label:@(A code from the app, or a recovery code);maxlength:40;$delay:1"></ui-component>
+				<div class="ts-actions">
+					<button type="button" class="secondary-button exec" data-exec="twostep/recovery">@(New recovery codes)</button>
+					<button type="button" class="secondary-button exec" data-exec="twostep/disable">@(Turn off)</button>
+				</div>
+			</ui-bind>
+			<p class="error-text" role="alert"><ui-bind path="twostep.error" config="text:value"></ui-bind></p>
+		</div>
+	</div>
+	<div class="settings-footer"><div class="modal-footer-content"></div></div>
+</ui-component>
+</ui-plugin>

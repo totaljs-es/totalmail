@@ -1,0 +1,395 @@
+<a class="skip-link" href="#message-list" data-skip>@(Skip to the message list)</a>
+<ui-bind path="mail.ui" config="text:value.announce" id="live-status" class="sr-only" role="status" aria-live="polite"></ui-bind>
+<ui-bind path="mail.ui" config="show:value.undoShown" class="undo-bar" role="status"
+	><span><ui-bind path="mail.ui" config="text:value.undoText"></ui-bind></span
+	><ui-bind path="mail.ui" config="disabled:value.undoBusy" class="contents"><button type="button" class="link-button exec" data-exec="mail/undo">@(Undo)</button></ui-bind></ui-bind
+>
+<div class="app-shell">
+	<aside class="sidebar" aria-label="@(Accounts and folders)">
+		<a class="brand" href="/" aria-label="TotalMail"
+			><span class="brand-mark"><img src="/icons/app-192.png" width="33" height="33" alt="" /></span>Total<span>Mail</span
+			><span class="brand-dot"></span
+		></a>
+		<button class="compose-button exec" data-command="compose" data-exec="mail/click">
+			<i class="ti ti-plus" aria-hidden="true"></i>@(New message)<span class="keyhint">N</span>
+		</button>
+		<div class="accounts-heading"><span class="nav-label">@(MAIL)</span><button class="account-add exec" data-exec="folders/create" aria-label="@(Create folder)" title="@(Create folder)"><i class="ti ti-folder-plus" aria-hidden="true"></i></button></div>
+		<nav aria-label="@(Folders)">
+			<ui-bind path="mail.folders" id="folders" config="template" class="block"
+				><script type="text/html">
+					{{ foreach m in value }}<button
+						class="folder exec{{ if m.active }} active{{ fi }}"
+						data-exec="mail/click"
+						data-folder="{{ m.id }}"
+						aria-label="{{ m.label }}{{ if m.count }}, {{ m.count }}{{ fi }}"
+						{{ if m.active }}aria-current="page"
+						{{ fi }}
+					>
+						<i class="ti ti-{{ m.icon }}" aria-hidden="true"></i
+						><span class="folder-label">{{ m.label }}</span>{{ if m.count }}<span class="folder-count"
+							>{{ m.count }}</span
+						>{{ fi }}</button
+					>{{ end }}
+				</script></ui-bind
+			>
+		</nav>
+		<div class="accounts-heading">
+			<span class="nav-label">@(ACCOUNTS)</span
+			><button
+				class="account-add exec"
+				data-command="account-setup"
+				data-exec="mail/click"
+				aria-label="@(Add mail account)"
+			>
+				<i class="ti ti-plus" aria-hidden="true"></i>
+			</button>
+		</div>
+		<ui-bind path="mail.accounts" id="accounts" config="template" class="block"
+			><script type="text/html">
+				{{ foreach m in value }}<button
+					class="account exec{{ if m.active }} active{{ fi }}"
+					data-exec="mail/click"
+					data-account="{{ m.id }}"
+					aria-label="{{ m.name }}, {{ m.email }}{{ if m.unreadCount }}, {{ m.unreadCount }} @(unread){{ fi }}"
+					aria-pressed="{{ m.active }}"
+				>
+					<span class="account-avatar" style="background:{{ m.color }}">{{ m.initials }}</span>
+					<div>
+						<div class="account-name">{{ m.name }}</div>
+						<div class="account-email">{{ m.email }}</div>
+					</div>
+					{{ if m.unreadCount }}<span class="account-unread" title="@(Unread in the synced inbox window)">{{ m.unreadCount }}</span>{{ fi }}
+					{{ if m.syncFailed }}<span class="account-sync-error" title="{{ m.syncMessage }}" aria-label="{{ m.syncMessage }}">!</span>{{ fi }}
+					{{ if m.active }}<span class="account-dot"></span>{{ fi }}</button
+				>{{ end }}
+			</script></ui-bind
+		>
+		<div class="sidebar-bottom">
+			<div class="demo-label" title="@(Mail is synchronized when you choose and sent only after you confirm it.)"><span class="status-dot"></span>@(Private workspace)</div>
+			<div class="user-row">
+				<button class="user exec" data-exec="users/profile" aria-label="@(My profile)">
+					<ui-bind path="mail.ui" config="text:value.userInitials" class="user-avatar"></ui-bind>
+					<div><strong><ui-bind path="mail.ui" config="text:value.userName"></ui-bind></strong><small><ui-bind path="mail.ui" config="text:value.userEmail"></ui-bind></small></div>
+				</button>
+				<button class="signout exec" data-command="logout" data-exec="mail/click" aria-label="@(Sign out)" title="@(Sign out)">
+					<i class="ti ti-sign-out" aria-hidden="true"></i>
+				</button>
+			</div>
+		</div>
+	</aside>
+	<main class="main">
+		<header class="topbar">
+			<div class="breadcrumb">@(Workspace) <span aria-hidden="true">/</span> @(Mail)</div>
+			<div class="search-wrap">
+				<ui-component
+					name="searchinput"
+					data-label="@(Search your mail)"
+					path="mail.search"
+					config="placeholder:@(Search your mail);exec:mail/search"
+				></ui-component
+				><kbd>/</kbd>
+				<ui-bind path="mail.search" config="show:value&&value.trim()" class="search-clear"><button type="button" class="exec" data-exec="mail/clearsearch" aria-label="@(Clear search)" title="@(Clear search)"><i class="ti ti-times" aria-hidden="true"></i></button></ui-bind>
+			</div>
+			<span class="private-badge"><i class="ti ti-shield-check" aria-hidden="true"></i>@(On your server)</span
+			><label class="language-control"
+				><span class="language-label">@(Language)</span
+				><ui-component
+					id="language-select"
+					data-label="@(Language)"
+					name="input"
+					path="mail.language"
+					config="dirsource:mail.languageOptions;dirraw:1;$delay:1"
+				></ui-component></label
+			><button
+				class="icon-button exec workspace-settings"
+				data-exec="mail/click"
+				data-command="settings"
+				aria-label="@(Workspace settings)"
+			>
+				<i class="ti ti-cog" aria-hidden="true"></i>
+			</button>
+		</header>
+		<ui-bind path="mail.ui" element=".workspace" config=".has-reader:value.hasReader"></ui-bind>
+		<ui-bind path="mail.dropping" element="#composer" config=".dropping:value&&GET('mail.window')==='composer'"></ui-bind>
+		<div class="workspace">
+			<section id="message-list" class="mail-list" tabindex="-1" aria-label="@(Message list)">
+				<div class="list-heading">
+					<div>
+						<span class="eyebrow">@(MAILBOX)</span>
+						<h1><ui-bind path="mail.ui" config="text:value.folderTitle"></ui-bind></h1>
+						<p><ui-bind path="mail.ui" config="text:value.folderSubtitle"></ui-bind></p>
+					</div>
+					<span class="list-heading-icon"><i class="ti ti-inbox" aria-hidden="true"></i></span>
+				</div>
+				<div class="list-tabs">
+					<ui-bind path="mail.ui" config=".active button:value.filter==='all';attr aria-pressed button:String(value.filter==='all')" class="contents"
+						><button class="exec" data-filter="all" data-exec="mail/click" aria-pressed="true">
+							@(All) <ui-bind path="mail.ui" config="text:value.totalCount"></ui-bind></button
+					></ui-bind
+					><ui-bind path="mail.ui" config=".active button:value.filter==='unread';attr aria-pressed button:String(value.filter==='unread');disabled:value.unreadOff" class="contents"
+						><button class="exec" data-filter="unread" data-exec="mail/click" aria-pressed="false">
+							@(Unread) <ui-bind path="mail.ui" config="text:value.unreadCount"></ui-bind>
+						</button></ui-bind
+					>
+				</div>
+				<div class="scope-bar">
+					<ui-bind path="mail.ui" config="text:value.accountScope"></ui-bind><ui-bind path="mail.ui" config="text:value.resultsCount"></ui-bind>
+				</div>
+				<ui-bind path="mail.ui" element=".messages" config=".has-checked:value.bulkShown"></ui-bind>
+				<ui-bind path="mail.ui" config="show:value.bulkShown" class="bulk-bar" role="toolbar" aria-label="@(Selected messages)">
+					<ui-bind path="mail.ui" config="exec:mail/bulkstate" class="contents"><input type="checkbox" class="exec" data-exec="mail/bulkall" aria-label="@(Select all messages in this view)" /></ui-bind>
+					<span role="status"><ui-bind path="mail.ui" config="text:value.bulkCount"></ui-bind></span>
+					<span class="bulk-actions">
+						<ui-bind path="mail.ui" config="hide:value.bulkDrafts" class="contents"
+							><button type="button" class="exec" data-exec="mail/bulk" data-bulk="archive" title="@(Archive)" aria-label="@(Archive)"><i class="ti ti-archive" aria-hidden="true"></i></button></ui-bind
+						><button type="button" class="exec" data-exec="mail/bulk" data-bulk="trash" title="@(Move to trash)" aria-label="@(Move to trash)"><i class="ti ti-trash" aria-hidden="true"></i></button
+						><ui-bind path="mail.ui" config="hide:value.bulkDrafts" class="contents"
+							><button type="button" class="exec" data-exec="mail/bulk" data-bulk="read" title="@(Mark as read)" aria-label="@(Mark as read)"><i class="ti ti-envelope-open" aria-hidden="true"></i></button
+							><button type="button" class="exec" data-exec="mail/bulk" data-bulk="unread" title="@(Mark as unread)" aria-label="@(Mark as unread)"><i class="ti ti-envelope" aria-hidden="true"></i></button
+							><button type="button" class="exec" data-exec="mail/bulk" data-bulk="star" title="@(Star)" aria-label="@(Star)"><i class="ti ti-star" aria-hidden="true"></i></button></ui-bind
+						><button type="button" class="exec" data-exec="mail/bulk" data-bulk="clear" title="@(Clear selection)" aria-label="@(Clear selection)"><i class="ti ti-times" aria-hidden="true"></i></button>
+					</span>
+				</ui-bind>
+				<ui-component name="scrollend" config="exec:mail/scrolled" class="messages">
+					<ui-bind path="mail.rows" id="messages" config="template" class="block"
+						><script type="text/html">
+							{{ foreach m in value }}<div class="message-line{{ if m.checked }} checked{{ fi }}"><input type="checkbox" class="row-check exec" data-exec="mail/check" data-row="{{ m.id }}" aria-label="@(Select): {{ m.speak }}"{{ if m.checked }} checked{{ fi }} /><button
+								class="message-row exec{{ if m.unread }} unread{{ fi }}{{ if m.selected }} selected{{ fi }}"
+								data-exec="mail/click"
+								data-message="{{ m.id }}"
+								aria-label="{{ m.speak }}"
+								aria-pressed="{{ m.selected }}"
+							>
+								<div class="message-top">
+									{{ if m.unread }}<span class="unread-dot"></span>{{ fi }}<span class="sender"
+										>{{ m.displaySender }}</span
+									>{{ if m.threaded }}<span class="thread-count" title="@(Messages in this conversation)">{{ m.count }}</span>{{ fi }}<span class="message-time">{{ m.displayTime }}</span>
+								</div>
+								<div class="message-subject">{{ m.displaySubject }}</div>
+								<div class="message-preview">{{ m.preview }}</div>
+								<div class="message-meta">
+									<span class="color-dot" style="background:{{ m.color }}"></span>{{ m.accountName }}{{ if m.label }}<span class="message-label">{{ m.label }}</span>{{ fi }}{{ if m.starred }}<span class="mini-star"
+										><i class="ti ti-star" aria-hidden="true"></i></span
+									>{{ fi }}
+								</div></button
+							></div>{{ end }}
+						</script></ui-bind
+					><ui-component name="template" path="mail.listState"
+						><script type="text/html">
+							{{ if empty }}
+							<div class="empty">
+								<i class="ti ti-{{ if search }}search{{ else }}inbox{{ fi }}" aria-hidden="true"></i><p>{{ message }}</p>{{ if search }}<button type="button" class="secondary-button exec" data-exec="mail/clearsearch">@(Clear search)</button>{{ fi }}{{ if setup }}<button
+									class="secondary-button exec empty-account-button"
+									data-command="account-setup"
+									data-exec="mail/click"
+								>
+									<i class="ti ti-plus" aria-hidden="true"></i>@(Add mail account)</button
+								>{{ fi }}
+							</div>
+							{{ fi }}
+						</script></ui-component
+					>
+					<ui-bind path="mail.ui" config="show:value.moreShown" class="contents"
+						><button type="button" class="secondary-button exec show-more" data-exec="mail/showmore"><ui-bind path="mail.ui" config="text:value.moreLabel"></ui-bind></button></ui-bind
+					><ui-bind path="mail.ui" config="show:value.trashShown;disabled:value.busy" class="contents"
+						><button type="button" class="secondary-button exec load-older" data-command="empty-trash" data-exec="mail/click">
+							<i class="ti ti-trash" aria-hidden="true"></i><ui-bind path="mail.ui" config="text:value.trashLabel"></ui-bind>
+						</button></ui-bind
+					><ui-bind path="mail.ui" config="show:value.searchShown;disabled:value.busy" class="contents"
+						><button type="button" class="secondary-button exec load-older" data-command="server-search" data-exec="mail/click">
+							<i class="ti ti-search" aria-hidden="true"></i><ui-bind path="mail.ui" config="text:value.searchLabel"></ui-bind>
+						</button></ui-bind
+				</ui-component>
+				<ui-bind path="mail.ui" config="show:value.footerShown" class="contents"
+					><footer class="list-footer">
+						<ui-bind path="mail.ui" config="show:value.listStatus" class="list-status"
+							><span class="status-dot"></span><ui-bind path="mail.ui" config="text:value.listStatus"></ui-bind
+						></ui-bind>
+						<ui-bind path="mail.ui" config="show:value.olderShown;disabled:value.busy" class="contents"
+							><button type="button" class="secondary-button load-older exec" data-command="older" data-exec="mail/click">
+								<i class="ti ti-history" aria-hidden="true"></i>@(Load older messages)<small><ui-bind path="mail.ui" config="text:value.olderCount"></ui-bind></small>
+							</button></ui-bind
+						>
+					</footer></ui-bind
+				>
+			</section>
+			<section class="reader" aria-label="@(Message reading)">
+				<div class="reader-toolbar">
+					<button
+						class="back-button icon-button exec"
+						data-command="back"
+						aria-label="@(Back to messages)"
+						data-exec="mail/click"
+					>
+						<i class="ti ti-chevron-left" aria-hidden="true"></i>
+					</button>
+					<div class="toolbar-left">
+						<ui-bind path="mail.ui" config="disabled:value.busy" class="contents"
+							><button
+								class="icon-button exec"
+								data-command="sync"
+								data-exec="mail/click"
+								aria-label="@(Sync mail)"
+								title="@(Sync mail)"
+							>
+								<i class="ti ti-refresh" aria-hidden="true"></i></button
+						></ui-bind
+						><ui-bind path="mail.ui" config="disabled:value.t.archive.off;attr title button:value.t.archive.label;attr aria-label button:value.t.archive.label" class="contents"
+							><button class="icon-button exec" data-command="archive" title="@(Archive message)" aria-label="@(Archive message)" data-exec="mail/click">
+								<i class="ti ti-archive" aria-hidden="true"></i></button
+						></ui-bind
+						><ui-bind path="mail.ui" config="disabled:value.t.star.off;.starred button:value.t.star.starred" class="contents"
+							><button class="icon-button exec" data-command="star" title="@(Star message)" aria-label="@(Star message)" data-exec="mail/click">
+								<i class="ti ti-star" aria-hidden="true"></i>
+							</button></ui-bind
+						>
+						<ui-bind path="mail.ui" config="disabled:value.t.move.off" class="contents"><button class="icon-button exec" data-command="move" data-exec="mail/click" aria-label="@(Move message)" title="@(Move message)"><i class="ti ti-folder" aria-hidden="true"></i></button></ui-bind>
+						<ui-bind path="mail.ui" config="disabled:value.t.trash.off;attr title button:value.t.trash.label;attr aria-label button:value.t.trash.label" class="contents"><button class="icon-button exec" data-command="trash" data-exec="mail/click" aria-label="@(Move to trash)" title="@(Move to trash)"><i class="ti ti-trash" aria-hidden="true"></i></button></ui-bind>
+						<ui-bind path="mail.ui" config="disabled:value.t.unread.off;attr title button:value.t.unread.label;attr aria-label button:value.t.unread.label;attr class i:value.t.unread.icon" class="contents"><button class="icon-button exec" data-command="unread" data-exec="mail/click" aria-label="@(Mark as unread)" title="@(Mark as unread)"><i class="ti ti-envelope" aria-hidden="true"></i></button></ui-bind>
+						<ui-bind path="mail.ui" config="disabled:value.t.print.off" class="contents"><button class="icon-button desktop-only exec" data-command="print" data-exec="mail/click" aria-label="@(Print)" title="@(Print)"><i class="ti ti-print" aria-hidden="true"></i></button></ui-bind>
+						<ui-bind path="mail.ui" config="disabled:value.t.source.off" class="contents"><button class="icon-button exec" data-command="source" data-exec="mail/click" aria-label="@(Download the original message)" title="@(Download the original message)"><i class="ti ti-download" aria-hidden="true"></i></button></ui-bind>
+					</div>
+					<span class="toolbar-note">@(Next message)</span
+					><button
+						class="icon-button exec"
+						data-command="next"
+						title="@(Next message)"
+						aria-label="@(Next message)"
+						data-exec="mail/click"
+					>
+						<i class="ti ti-chevron-right" aria-hidden="true"></i>
+					</button>
+				</div>
+				<div id="reader-content" class="reader-content"
+					><ui-component name="template" path="mail.reader"
+					><script type="text/html">
+						{{ if empty }}
+						{{ if noaccounts }}
+						<div class="reader-empty reader-welcome">
+							<i class="ti ti-envelope" aria-hidden="true"></i>
+							<h2>@(Welcome to TotalMail)</h2>
+							<p>@(Add your first mail account to read and send from here: Gmail, Outlook, iCloud, Yahoo or your own hosting.)</p>
+							<button type="button" class="primary-button exec" data-exec="mail/click" data-command="account-setup"><i class="ti ti-plus" aria-hidden="true"></i>@(Add mail account)</button>
+						</div>
+						{{ else }}
+						<div class="reader-empty">
+							<i class="ti ti-envelope" aria-hidden="true"></i>
+							<h2>@(No message selected)</h2>
+							<p>@(Choose a conversation to get started.)</p>
+							<small>@(Mail is sent only after you review and confirm it.)</small>
+						</div>
+						{{ fi }}
+						{{ else }}
+						<div class="reader-account">
+							<span class="color-dot" style="background:{{ color }}"></span>{{ accountName }}{{ if messageKind }}<span>·</span>{{ messageKind }}{{ fi }}
+						</div>
+						<h2>{{ subject }}</h2>
+						<div class="sender-card">
+							<span class="sender-avatar">{{ initials }}</span>
+							<div><strong>{{ sender }}</strong><small>{{ email }} → {{ accountEmail }}</small></div>
+							<time>{{ time }}</time>
+						</div>
+						{{ if unsubscribe }}
+						<div class="unsub-bar">
+							<i class="ti ti-ban" aria-hidden="true"></i><span>@(This message comes from a mailing list.)</span>
+							{{ if unsubscribe.url }}<a class="secondary-button" href="{{ unsubscribe.url }}" target="_blank" rel="noopener noreferrer nofollow">@(Unsubscribe)</a>{{ else }}<button type="button" class="secondary-button exec" data-exec="mail/click" data-command="unsubscribe-mail">@(Unsubscribe by email)</button>{{ fi }}
+						</div>
+						{{ fi }}
+						{{ if invite }}
+						<div class="invite-card">
+							<i class="ti ti-calendar" aria-hidden="true"></i>
+							<div>
+								<strong>{{ invite.title }}</strong>{{ if invite.cancelled }}<span class="soon">@(Cancelled)</span>{{ fi }}
+								<small>{{ invite.when }}</small>
+								{{ if invite.where }}<small>{{ invite.where }}</small>{{ fi }}
+								{{ if invite.organizer }}<small>@(Organizer): {{ invite.organizer }}</small>{{ fi }}
+								<small>@(Open the attached calendar file to add it to your calendar.)</small>
+							</div>
+						</div>
+						{{ fi }}
+						{{ if thread && thread.length }}
+						<div class="thread" role="group" aria-label="@(Conversation)">
+							<div class="thread-title">@(Conversation)</div>
+							{{ foreach t in thread }}<button type="button" class="thread-item exec{{ if t.current }} current{{ fi }}" data-exec="mail/click" data-message="{{ t.id }}" aria-current="{{ t.current }}"
+								><span class="thread-who">{{ if t.unread }}<span class="unread-dot"></span>{{ fi }}{{ t.who }}</span><span class="thread-when">{{ t.when }}</span><span class="thread-snippet">{{ t.snippet }}</span></button
+							>{{ end }}
+						</div>
+						{{ fi }}
+						{{ if hasHtml }}
+						<div class="view-bar">
+							<button type="button" class="secondary-button exec" data-exec="mail/togglehtml">{{ viewLabel }}</button>
+							{{ if remoteBlocked }}<span class="images-note">@(Remote images are blocked to protect your privacy.)</span><button type="button" class="secondary-button exec" data-exec="mail/showimages">@(Show images)</button>{{ fi }}
+						</div>
+						{{ fi }}
+						{{ if showHtml }}
+						<iframe class="mail-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" src="{{ frameSrc }}" title="@(Message content)"></iframe>
+						{{ else }}
+						<div class="mail-body">{{ body }}</div>
+						{{ fi }}
+						{{ if files && files.length }}
+						<div class="attachments" aria-label="@(Attachments)">
+							{{ foreach f in files }}<a class="attachment" href="{{ f.href }}" download
+								><i class="ti ti-paperclip" aria-hidden="true"></i><span class="attachment-name">{{ f.name }}</span
+								><small>{{ f.size }}</small></a
+							>{{ end }}
+						</div>
+						{{ fi }}
+						{{ if outgoing && sentCopy && sentCopy !== 'saved' }}
+						<p class="settings-note">@(Email sent. The server Sent copy is unconfirmed; a local copy is available. Do not resend.)</p>
+						{{ fi }}
+						<div class="reader-reply">
+							<button class="primary-button exec" data-exec="mail/click" data-command="reply"{{ if welcome }} disabled{{ fi }}>
+								<i class="ti ti-undo" aria-hidden="true"></i>@(Reply)</button
+							><button class="secondary-button exec" data-exec="mail/click" data-command="reply-all"{{ if welcome }} disabled{{ fi }}>
+								<i class="ti ti-undo" aria-hidden="true"></i>@(Reply all)</button
+							><button class="secondary-button exec" data-exec="mail/click" data-command="forward"{{ if welcome }} disabled{{ fi }}>
+								<i class="ti ti-share" aria-hidden="true"></i>@(Forward)
+							</button>
+						</div>
+						{{ fi }}
+					</script></ui-component
+					>
+					<ui-bind path="ai.card" config="show:value.shown" class="ai-card block">
+						<div class="ai-heading"><i class="ti ti-magic" aria-hidden="true"></i><span>@(AI assistant)</span></div>
+						<p><ui-bind path="ai.card" config="text:value.where"></ui-bind></p>
+						<ui-bind path="ai.card" config="show:value.knowledge" class="block"><p class="ai-note">@(A reply from the knowledge base also sends the passages found in your documents to the same server.)</p></ui-bind>
+						<ui-bind path="ai.card" config="disabled:value.busy" class="ai-actions">
+							<button type="button" class="secondary-button exec" data-exec="ai/go" data-task="summarize">@(Summarize conversation)</button>
+							<span class="ai-translate"
+								><ui-component name="input" path="ai.lang" config="dirsource:ai.languages;innerlabel:1;label:@(Translate into);$delay:1" class="ai-language"></ui-component
+								><button type="button" class="secondary-button exec" data-exec="ai/go" data-task="translate">@(Translate)</button></span
+							>
+						</ui-bind>
+						<ui-component name="input" path="ai.instruction" config="maxlength:300;placeholder:@(What the reply should say, if you want);$delay:1"></ui-component>
+						<ui-bind path="ai.card" config="disabled:value.busy" class="ai-actions">
+							<button type="button" class="secondary-button exec" data-exec="ai/go" data-task="reply">@(Draft a reply)</button>
+							<ui-bind path="ai.card" config="show:value.knowledge" class="contents"><button type="button" class="secondary-button exec" data-exec="ai/go" data-task="replyk">@(Draft a reply from the knowledge base)</button></ui-bind>
+						</ui-bind>
+						<div class="ai-result" role="region" aria-live="polite" aria-label="@(Assistant suggestion)">
+							<ui-bind path="ai.card" config="text:value.working" class="block"></ui-bind>
+							<ui-bind path="ai.card" config="show:value.resultShown" class="block">
+								<div class="ai-text" tabindex="0"><ui-bind path="ai.card" config="text:value.text"></ui-bind></div>
+								<ui-bind path="ai.card" config="show:value.warnHidden" class="block"><p class="ai-note ai-warning" role="note">@(This message contains text a reader cannot see. The assistant ignored it: treat the message with care.)</p></ui-bind>
+								<ui-bind path="ai.card" config="show:value.warnLinks" class="block"><p class="ai-note ai-warning" role="note">@(Links or addresses that were not in the original were removed from this suggestion.)</p></ui-bind>
+								<ui-bind path="ai.card" config="show:value.sourcesShown" class="block">
+									<p class="ai-note">@(Passages consulted):</p>
+									<ui-bind path="ai.card.sources" config="template" class="block"
+										><script type="text/html">
+											<ul class="ai-sources" aria-label="@(Passages consulted)">{{ foreach s in value }}<li>{{ s }}</li>{{ end }}</ul>
+										</script></ui-bind
+									>
+								</ui-bind>
+								<div class="ai-actions">
+									<ui-bind path="ai.card" config="show:value.canReply" class="contents"><button type="button" class="primary-button exec" data-exec="ai/use">@(Use as reply)</button></ui-bind>
+									<button type="button" class="secondary-button exec" data-exec="ai/copy">@(Copy)</button>
+									<button type="button" class="secondary-button exec" data-exec="ai/dismiss">@(Dismiss)</button>
+								</div>
+								<p class="ai-note">@(Suggestions can be wrong. Check them before using them.)</p>
+							</ui-bind>
+						</div>
+					</ui-bind>
+				</div>
+			</section>
+		</div>
+	</main>
+</div>

@@ -1,0 +1,17 @@
+# Never part of an image: people, keys, secrets, runtime leftovers, tests and caches.
+database
+logs
+tmp
+node_modules
+.env
+.git
+.DS_Store
+._*
+index.pid
+index.js.json
+index.js.map
+index.yaml
+tests
+.github
+docs
+*.tmp

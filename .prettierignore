@@ -1,0 +1,10 @@
+node_modules
+lib/vendor
+public
+database
+*.min.js
+*.html
+*.css
+*.md
+*.json
+*.resource

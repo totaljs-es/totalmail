@@ -1,0 +1,132 @@
+{
+  "accounts": [
+    {
+      "id": "studio",
+      "name": "Spanish Total.js",
+      "email": "hola@example.com",
+      "color": "#7b6be8",
+      "initials": "ST"
+    },
+    {
+      "id": "support",
+      "name": "@(Support)",
+      "email": "soporte@example.com",
+      "color": "#3b9a90",
+      "initials": "SP"
+    },
+    {
+      "id": "personal",
+      "name": "@(Personal)",
+      "email": "gerag@example.com",
+      "color": "#db9265",
+      "initials": "G"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m1",
+      "accountId": "studio",
+      "sender": "Lucía Martín",
+      "email": "lucia@example.com",
+      "subject": "Una web que nos represente",
+      "body": "Hola Gerag,\n\nHemos estado viendo los proyectos de Spanish Total.js y nos gusta mucho vuestro enfoque. Queremos renovar nuestra web y tener un pequeño espacio privado para clientes.\n\n¿Podríamos hablar esta semana? Nos gustaría conocer las opciones y qué información necesitas para preparar una propuesta.\n\nMuchas gracias,\nLucía",
+      "time": "10:42",
+      "unread": true,
+      "starred": false,
+      "folder": "inbox",
+      "label": "@(Project)"
+    },
+    {
+      "id": "m2",
+      "accountId": "support",
+      "sender": "Daniel Ruiz",
+      "email": "daniel@example.com",
+      "subject": "Consulta sobre Flow y webhooks",
+      "body": "Hola,\n\nEstoy preparando una integración con Flow. ¿Podríais orientarme sobre cómo recibir un webhook y transformar sus datos antes de enviarlos a otro servicio?\n\nTengo un ejemplo de la entrada que puedo compartir cuando lo necesitéis.\n\nUn saludo,\nDaniel",
+      "time": "09:18",
+      "unread": true,
+      "starred": true,
+      "folder": "inbox",
+      "label": "@(Support)"
+    },
+    {
+      "id": "m3",
+      "accountId": "studio",
+      "sender": "Marta Alonso",
+      "email": "marta@example.com",
+      "subject": "Nos vemos el jueves",
+      "body": "Hola Gerag,\n\nPor nuestra parte el jueves a las 11:00 funciona. Si te viene bien, confirmamos esa hora y te envío la invitación.\n\n¡Gracias!\nMarta",
+      "time": "08:56",
+      "unread": true,
+      "starred": false,
+      "folder": "inbox",
+      "label": "@(Meeting)"
+    },
+    {
+      "id": "m4",
+      "accountId": "personal",
+      "sender": "Alex García",
+      "email": "alex@example.com",
+      "subject": "Un café y unas cuantas ideas",
+      "body": "¡Buenas!\n\nTengo un par de ideas que quiero contarte. ¿Nos tomamos un café el fin de semana?\n\nAbrazo,\nAlex",
+      "time": "@(Yesterday)",
+      "unread": false,
+      "starred": false,
+      "folder": "inbox",
+      "label": ""
+    },
+    {
+      "id": "m5",
+      "accountId": "studio",
+      "sender": "Elena Navarro",
+      "email": "elena@example.com",
+      "subject": "Material para la nueva página",
+      "body": "Hola Gerag,\n\nYa tenemos los textos de la página y estamos terminando de seleccionar las fotografías. Te paso todo junto mañana.\n\n¿Prefieres que preparemos también una versión en inglés?\n\nGracias,\nElena",
+      "time": "@(Yesterday)",
+      "unread": false,
+      "starred": true,
+      "folder": "inbox",
+      "label": "@(Project)"
+    },
+    {
+      "id": "m6",
+      "accountId": "support",
+      "sender": "Iván Torres",
+      "email": "ivan@example.com",
+      "subject": "Gracias, ya funciona",
+      "body": "Hola,\n\nLa solución ha funcionado. El flujo está recibiendo los eventos correctamente y ya hemos podido completar las pruebas.\n\nMuchas gracias por la ayuda y por la explicación.\nIván",
+      "time": "@(Yesterday)",
+      "unread": false,
+      "starred": false,
+      "folder": "inbox",
+      "label": "@(Support)"
+    },
+    {
+      "id": "m7",
+      "accountId": "studio",
+      "sender": "Laura Vega",
+      "email": "laura@example.com",
+      "subject": "Propuesta de colaboración",
+      "body": "Hola Gerag,\n\nEstamos organizando un encuentro pequeño de desarrolladores y nos gustaría contar con una charla sobre Total.js.\n\nSi te interesa, te comparto las fechas y el formato que estamos pensando.\n\nUn saludo,\nLaura",
+      "time": "@(Tue)",
+      "unread": false,
+      "starred": false,
+      "folder": "inbox",
+      "label": "@(Community)"
+    },
+    {
+      "id": "m8",
+      "accountId": "studio",
+      "sender": "Pablo Santos",
+      "email": "pablo@example.com",
+      "subject": "Re: Demo del panel",
+      "body": "Hola Gerag,\n\nHe podido ver la demo con el equipo. Nos encaja la estructura y queremos revisar contigo los permisos por usuario.\n\nTe envío nuestras preguntas en el próximo correo.\n\nPablo",
+      "time": "@(Mon)",
+      "unread": false,
+      "starred": false,
+      "folder": "inbox",
+      "label": "@(Project)"
+    }
+  ],
+  "drafts": []
+}

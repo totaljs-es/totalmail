@@ -1,0 +1,33 @@
+<ui-component name="modal" path="mail.window" config="if:profile;width:620;center:true;cancel:users/closeprofile" id="profile" class="settings-modal profile-modal hidden" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+	<div class="settings-heading">
+		<div class="modal-heading-content">
+			<div><span class="eyebrow">@(USER PROFILE)</span><h2 id="profile-title">@(My profile)</h2></div>
+			<button class="icon-button exec" data-exec="users/closeprofile" aria-label="@(Close)"><i class="ti ti-times" aria-hidden="true"></i></button>
+		</div>
+	</div>
+	<div class="settings-body">
+		<div class="modal-body-content">
+			<ui-component name="input" path="users.profileform.name" config="label:@(Full name);maxlength:80;$delay:1"></ui-component>
+			<ui-component name="input" path="users.profileform.email" config="label:@(Login email);type:email;maxlength:254;$delay:1"></ui-component>
+			<p class="settings-note">@(This email is used to sign in. Your mail accounts keep their own addresses.)</p>
+			<div class="settings-grid">
+				<ui-component name="input" path="users.profileform.color" config="label:@(Base color);type:color;$delay:1"></ui-component>
+				<ui-component name="input" path="users.profileform.language" config="label:@(Default language);dirsource:users.languages;dirraw:1;$delay:1"></ui-component>
+			</div>
+			<h3>@(Login security)</h3>
+			<ui-bind path="users.profileform" config="attr autocomplete input:'current-password'" class="block"><ui-component name="input" path="users.profileform.currentPassword" config="label:@(Current password);type:password;maxlength:128;$delay:1"></ui-component></ui-bind>
+			<p class="settings-note">@(Required only when changing your login email or password.)</p>
+			<div class="settings-grid">
+				<ui-bind path="users.profileform" config="attr autocomplete input:'new-password'" class="block"><ui-component name="input" path="users.profileform.newPassword" config="label:@(New password);type:password;maxlength:128;$delay:1"></ui-component></ui-bind>
+				<ui-bind path="users.profileform" config="attr autocomplete input:'new-password'" class="block"><ui-component name="input" path="users.profileform.confirmPassword" config="label:@(Repeat new password);type:password;maxlength:128;$delay:1"></ui-component></ui-bind>
+			</div>
+			<p class="settings-note">@(Leave the new password blank to keep it. Changing login details closes your other sessions.)</p>
+			<button type="button" class="hub-link exec" data-exec="twostep/open" id="profile-twostep"><i class="ti ti-lock" aria-hidden="true"></i><span>@(Two-step verification)</span><small><ui-bind path="twostep.totp" config="text:value ? '@(On)' : '@(Off)'"></ui-bind></small><i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<p class="error-text" role="alert"><ui-bind path="users.profileError" config="text:value"></ui-bind></p>
+		</div>
+	</div>
+	<div class="settings-footer"><div class="modal-footer-content">
+		<button class="secondary-button exec" data-exec="users/closeprofile">@(Cancel)</button>
+		<ui-bind path="users.profileBusy" config="disabled:value"><button class="primary-button exec" data-exec="users/saveprofile"><i class="ti ti-check" aria-hidden="true"></i>@(Save profile)</button></ui-bind>
+	</div></div>
+</ui-component>

@@ -1,0 +1,164 @@
+<ui-component
+	name="modal"
+	path="mail.window"
+	config="if:composer;width:620;center:true;cancel:mail/close"
+	id="composer"
+	class="composer hidden"
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="compose-title"
+	><div class="composer-heading">
+		<div class="modal-heading-content">
+			<div>
+				<span class="eyebrow">@(COMPOSE)</span>
+				<h2 id="compose-title"><ui-bind path="mail.ui" config="text:value.composeTitle"></ui-bind></h2>
+			</div>
+			<button
+				class="icon-button exec"
+				data-command="close-compose"
+				aria-label="@(Save and close)"
+				data-exec="mail/click"
+			>
+				<i class="ti ti-times" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+	<div class="compose-body">
+	<ui-bind path="mail.ui" config="attr readonly input:value.locked;attr readonly textarea:value.locked" class="contents">
+		<div class="drop-hint" aria-hidden="true"><i class="ti ti-paperclip"></i>@(Drop files to attach them)</div>
+		<div class="modal-body-content">
+			<div class="compose-from">
+				<span id="compose-from-label">@(From)</span
+				><ui-component
+					id="compose-account"
+					data-labelledby="compose-from-label"
+					name="input"
+					path="mail.compose.accountId"
+					config="dirsource:mail.accountOptions;$delay:1"
+				></ui-component>
+			</div>
+			<ui-bind path="mail.ui" config="show:value.aliasRow" class="compose-from">
+				<span id="compose-alias-label">@(Send as)</span
+				><ui-component
+					id="compose-alias"
+					data-labelledby="compose-alias-label"
+					name="input"
+					path="mail.compose.from"
+					config="dirsource:mail.fromOptions;$delay:1"
+				></ui-component>
+			</ui-bind>
+			<div class="compose-to">
+			<ui-component name="addresssuggest" path="mail.compose.to" config="source:mail.contacts;label:@(Suggested addresses)"><ui-component
+				name="input"
+				path="mail.compose.to"
+				config="label:@(To);placeholder:@(name@example.com);maxlength:500;$delay:1"
+			></ui-component
+			></ui-component><ui-bind path="mail.ui" config="show:value.ccLink||value.bccLink" class="compose-extra-links"
+				><ui-bind path="mail.ui" config="show:value.ccLink" class="contents"><button type="button" class="link-button exec" data-command="show-cc" data-exec="mail/click">@(Cc)</button></ui-bind
+				><ui-bind path="mail.ui" config="show:value.bccLink" class="contents"><button type="button" class="link-button exec" data-command="show-bcc" data-exec="mail/click">@(Bcc)</button></ui-bind>
+			</ui-bind>
+			</div>
+			<ui-bind path="mail.ui" config="show:!value.ccLink" class="compose-extra"
+				><ui-component name="addresssuggest" path="mail.compose.cc" config="source:mail.contacts;label:@(Suggested addresses)"><ui-component
+					name="input"
+					path="mail.compose.cc"
+					config="label:@(Cc);placeholder:@(name@example.com);maxlength:500;$delay:1"
+				></ui-component></ui-component></ui-bind
+			><ui-bind path="mail.ui" config="show:!value.bccLink" class="compose-extra"
+				><ui-component name="addresssuggest" path="mail.compose.bcc" config="source:mail.contacts;label:@(Suggested addresses)"><ui-component
+					name="input"
+					path="mail.compose.bcc"
+					config="label:@(Bcc);placeholder:@(name@example.com);maxlength:500;$delay:1"
+				></ui-component></ui-component></ui-bind
+			><ui-component
+				name="input"
+				path="mail.compose.subject"
+				config="label:@(Subject);placeholder:@(What the message is about);maxlength:500;$delay:1"
+			></ui-component>
+			<ui-component name="mailbody" path="mail.compose.body" config="paste:mail/pasted"><ui-component
+				name="input"
+				path="mail.compose.body"
+				config="label:@(Message);type:multiline;height:260;maxlength:50000;placeholder:@(Write your message);$delay:1"
+			></ui-component></ui-component>
+			<div class="compose-format" role="toolbar" aria-label="@(Formatting)">
+				<button type="button" class="format-button exec" data-exec="mail/format" data-format="bold" title="@(Bold) (Ctrl/⌘ B)" aria-label="@(Bold)"><i class="ti ti-bold" aria-hidden="true"></i></button
+				><button type="button" class="format-button exec" data-exec="mail/format" data-format="italic" title="@(Italic) (Ctrl/⌘ I)" aria-label="@(Italic)"><i class="ti ti-italic" aria-hidden="true"></i></button
+				><button type="button" class="format-button exec" data-exec="mail/format" data-format="link" title="@(Link) (Ctrl/⌘ K)" aria-label="@(Link)"><i class="ti ti-link" aria-hidden="true"></i></button
+				><button type="button" class="format-button exec" data-exec="mail/format" data-format="ul" title="@(Bulleted list)" aria-label="@(Bulleted list)"><i class="ti ti-list" aria-hidden="true"></i></button
+				><button type="button" class="format-button exec" data-exec="mail/format" data-format="ol" title="@(Numbered list)" aria-label="@(Numbered list)"><i class="ti ti-list-ol" aria-hidden="true"></i></button
+				><button type="button" class="format-button exec" data-exec="mail/format" data-format="quote" title="@(Quote)" aria-label="@(Quote)"><i class="ti ti-quote-right" aria-hidden="true"></i></button
+				><small>@(Formatting is applied when the message is sent.)</small>
+			</div>
+			<div class="compose-attachments">
+				<ui-bind path="mail.compose.files" config="template" class="compose-files"
+					><script type="text/html">
+						{{ foreach f in value }}<span class="attachment"
+							><i class="ti ti-paperclip" aria-hidden="true"></i><span class="attachment-name">{{ f.name }}</span
+							><small>{{ f.size }}</small
+							><button type="button" class="attachment-remove exec" data-exec="mail/click" data-attachment="{{ f.id }}" aria-label="@(Remove attachment)"
+								><i class="ti ti-times" aria-hidden="true"></i></button
+						></span>{{ end }}
+					</script></ui-bind
+				><button id="compose-attach" type="button" class="secondary-button exec" data-command="attach" data-exec="mail/click">
+					<i class="ti ti-paperclip" aria-hidden="true"></i>@(Attach files)
+				</button>
+			</div>
+			<ui-bind path="ai.composer" config="show:value.shown" class="composer-ai block">
+				<div class="ai-heading"><i class="ti ti-magic" aria-hidden="true"></i><span>@(Writing assistant)</span></div>
+				<p class="ai-note"><ui-bind path="ai.composer" config="text:value.where"></ui-bind></p>
+				<ui-component name="input" path="ai.idea" config="maxlength:500;label:@(Write it for me);placeholder:@(Tell me what the message should say);$delay:1"></ui-component>
+				<ui-bind path="ai.composer" config="disabled:value.busy" class="ai-actions">
+					<button type="button" class="primary-button exec" data-exec="ai/write" data-task="compose">@(Write the message)</button>
+				</ui-bind>
+				<ui-bind path="ai.composer" config="disabled:value.busy" class="ai-actions">
+					<button type="button" class="secondary-button exec" data-exec="ai/write" data-task="tone" data-style="clearer">@(Clearer)</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/write" data-task="tone" data-style="shorter">@(Shorter)</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/write" data-task="tone" data-style="formal">@(More formal)</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/write" data-task="tone" data-style="friendly">@(Friendlier)</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/write" data-task="proofread">@(Check spelling)</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/write" data-task="translate">@(Translate)</button>
+					<ui-component name="input" path="ai.lang" config="dirsource:ai.languages;innerlabel:1;label:@(Translate into);$delay:1" class="ai-language"></ui-component>
+				</ui-bind>
+				<div class="ai-result" role="region" aria-live="polite" aria-label="@(Assistant suggestion)">
+					<ui-bind path="ai.composer" config="text:value.working" class="block"></ui-bind>
+					<ui-bind path="ai.composer" config="show:value.resultShown" class="block">
+						<div class="ai-text" tabindex="0"><ui-bind path="ai.composer" config="text:value.text"></ui-bind></div>
+						<ui-bind path="ai.composer" config="show:value.warnHidden" class="block"><p class="ai-note ai-warning" role="note">@(This message contains text a reader cannot see. The assistant ignored it: treat the message with care.)</p></ui-bind>
+						<ui-bind path="ai.composer" config="show:value.warnLinks" class="block"><p class="ai-note ai-warning" role="note">@(Links or addresses that were not in the original were removed from this suggestion.)</p></ui-bind>
+						<div class="ai-actions">
+							<button type="button" class="primary-button exec" data-exec="ai/replace">@(Replace my text)</button>
+							<button type="button" class="secondary-button exec" data-exec="ai/cdismiss">@(Dismiss)</button>
+						</div>
+						<p class="ai-note">@(Suggestions can be wrong. Check them before using them.)</p>
+					</ui-bind>
+					<ui-bind path="ai.composer" config="show:value.replaced" class="block">
+						<p class="ai-note">@(Text replaced.)</p>
+						<button type="button" class="secondary-button exec" data-exec="ai/restore">@(Restore my text)</button>
+					</ui-bind>
+				</div>
+			</ui-bind>
+		</div>
+	</ui-bind>
+	</div>
+	<div class="compose-footer-area">
+		<div class="modal-footer-content">
+			<div class="composer-footer">
+				<ui-bind path="mail.ui" config="disabled:value.locked" class="contents"
+					><button class="secondary-button composer-discard exec" data-command="discard-compose" data-exec="mail/click">
+						<i class="ti ti-trash" aria-hidden="true"></i>@(Discard draft)
+					</button></ui-bind
+				><ui-bind path="mail.ui" config="disabled:value.locked" class="contents"
+					><button class="secondary-button exec" data-command="save-compose" data-exec="mail/click">
+						<i class="ti ti-check" aria-hidden="true"></i>@(Save draft)
+					</button></ui-bind
+				><ui-bind path="mail.ui" config="disabled:value.sendOff" class="contents"
+					><button class="primary-button exec" data-command="preview-send" data-exec="mail/click">
+						<i class="ti ti-envelope" aria-hidden="true"></i>@(Review and send)</button
+				></ui-bind
+				>
+			</div>
+			<p class="composer-status"><ui-bind path="mail.ui" config="text:value.draftStatus;.error-text:value.draftError" id="draft-status" role="status"></ui-bind></p>
+			<p class="composer-note">@(Mail is sent only after you review and confirm the message.)</p>
+		</div>
+	</div></ui-component
+>

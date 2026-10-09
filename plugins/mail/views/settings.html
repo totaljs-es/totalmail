@@ -1,0 +1,60 @@
+<ui-component
+	name="modal"
+	path="mail.window"
+	config="if:settings;width:420;center:true"
+	id="settings"
+	class="settings-modal settings-hub hidden"
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="settings-title"
+	><div class="settings-heading">
+		<div class="modal-heading-content">
+			<h2 id="settings-title">@(Workspace settings)</h2>
+			<button class="icon-button exec" data-command="close-settings" data-exec="mail/click" aria-label="@(Close)">
+				<i class="ti ti-times" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+	<div class="settings-body">
+		<div class="modal-body-content">
+			<h3 class="settings-section">@(Preferences)</h3>
+			@{view('#reception/views/settings', model)}
+			<ui-bind path="mail.ui" config="attr aria-checked button:String(!!value.threads)" class="block"
+				><button type="button" role="switch" aria-checked="true" class="switch-row exec" data-exec="mail/togglethreads">
+					<i class="ti ti-comments" aria-hidden="true"></i
+					><span class="switch-text"><strong>@(Group conversations)</strong><small>@(Messages of the same conversation appear as one line.)</small></span
+					><span class="switch-pill" aria-hidden="true"></span>
+				</button></ui-bind
+			>
+			<ui-bind path="mail.ui" config="attr aria-checked button:String(!!value.notifications)" class="block"
+				><button type="button" role="switch" aria-checked="false" class="switch-row exec" data-exec="mail/togglenotifications">
+					<i class="ti ti-bell" aria-hidden="true"></i
+					><span class="switch-text"><strong>@(Notifications)</strong><small><ui-bind path="mail.notifyHint" config="text"></ui-bind></small></span
+					><span class="switch-pill" aria-hidden="true"></span>
+				</button></ui-bind
+			>
+			<div class="hub-theme">
+				<ui-component name="input" path="mail.theme" config="label:@(Appearance);dirsource:mail.themeOptions;$delay:1"></ui-component>
+			</div>
+			<div class="hub-language">
+				<ui-component name="input" path="mail.language" config="label:@(Language);dirsource:mail.languageOptions;dirraw:1;$delay:1"></ui-component>
+			</div>
+			<h3 class="settings-section">@(Mail)</h3>
+			<button class="hub-link exec" data-command="account-setup" data-exec="mail/click"><i class="ti ti-envelope" aria-hidden="true"></i>@(Mail accounts)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<button class="hub-link exec" data-exec="rules/open"><i class="ti ti-filter" aria-hidden="true"></i>@(Rules)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<button class="hub-link exec" data-exec="folders/create"><i class="ti ti-folder" aria-hidden="true"></i>@(Create folder)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<h3 class="settings-section">@(Account)</h3>
+			<button class="hub-link exec" data-exec="devices/open"><i class="ti ti-phone-laptop" aria-hidden="true"></i>@(My devices)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<button class="hub-link exec" data-exec="users/profile"><i class="ti ti-user" aria-hidden="true"></i>@(My profile)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<button class="hub-link exec" data-command="shortcuts" data-exec="mail/click"><i class="ti ti-keyboard" aria-hidden="true"></i>@(Shortcuts)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<button class="hub-link exec" data-command="logout" data-exec="mail/click"><i class="ti ti-sign-out" aria-hidden="true"></i>@(Sign out)</button>
+			<ui-bind path="mail.ui" config="show:value.admin" class="contents">
+			<h3 class="settings-section">@(Administration)</h3>
+			<button class="hub-link exec" data-command="providers" data-exec="mail/click"><i class="ti ti-key" aria-hidden="true"></i>@(Account types and sign-in)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<button class="hub-link exec" data-command="ai" data-exec="mail/click"><i class="ti ti-magic" aria-hidden="true"></i>@(AI assistant)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			<button class="hub-link exec" data-command="users" data-exec="mail/click"><i class="ti ti-users" aria-hidden="true"></i>@(Company users)<i class="ti ti-angle-right hub-chevron" aria-hidden="true"></i></button>
+			</ui-bind>
+		</div>
+	</div>
+	<div class="settings-footer"><div class="modal-footer-content"></div></div
+></ui-component>

@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image
+        run: docker build -t totalmail .
+      - name: Start it and wait for the health check
+        run: |
+          docker run -d --name totalmail -p 8000:8000 totalmail
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/health/ >/dev/null; then echo "healthy"; exit 0; fi
+            sleep 2
+          done
+          docker logs totalmail
+          exit 1

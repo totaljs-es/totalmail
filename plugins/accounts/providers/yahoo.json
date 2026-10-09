@@ -1,0 +1,38 @@
+{
+	"id": "yahoo",
+	"order": 50,
+	"name": "Yahoo Mail",
+	"icon": "envelope",
+	"auth": "app-password",
+	"summary": "@(Yahoo email addresses.)",
+	"domains": [
+		"yahoo.com",
+		"yahoo.es",
+		"yahoo.co.uk",
+		"ymail.com",
+		"rocketmail.com"
+	],
+	"mx": [
+		".yahoodns.net"
+	],
+	"imap": {
+		"host": "imap.mail.yahoo.com",
+		"port": 993,
+		"security": "tls"
+	},
+	"smtp": {
+		"host": "smtp.mail.yahoo.com",
+		"port": 465,
+		"security": "tls"
+	},
+	"username": "email",
+	"steps": [
+		{
+			"text": "@(Open your Yahoo account security page and generate an app password for TotalMail.)",
+			"url": "https://login.yahoo.com/account/security"
+		},
+		{
+			"text": "@(Paste that password below. Your normal Yahoo password will not work.)"
+		}
+	]
+}

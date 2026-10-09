@@ -1,0 +1,112 @@
+<ui-plugin path="providers">
+	<ui-component
+		name="modal"
+		path="mail.window"
+		config="if:providers;width:720;center:true"
+		id="providers"
+		class="settings-modal hidden"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="providers-title"
+		><div class="settings-heading">
+			<div class="modal-heading-content">
+				<div>
+					<span class="eyebrow">@(THIS INSTALLATION)</span>
+					<h2 id="providers-title">@(Account types and sign-in)</h2>
+				</div>
+				<button class="icon-button exec" data-exec="mail/click" data-command="close-settings" aria-label="@(Close)">
+					<i class="ti ti-times" aria-hidden="true"></i>
+				</button>
+			</div>
+		</div>
+		<div class="settings-body">
+			<div class="modal-body-content">
+				<h3>@(Sign in with Microsoft)</h3>
+				<p class="settings-note" role="status"><ui-bind path="providers.msStatus" config="text:value"></ui-bind></p>
+				<div class="settings-grid">
+					<ui-component name="input" path="providers.ms.clientId" config="label:@(Application ID);maxlength:36;$delay:1"></ui-component
+					><ui-component name="input" path="providers.ms.tenant" config="label:@(Allowed accounts);placeholder:common;maxlength:40;$delay:1"></ui-component>
+				</div>
+				<ui-component name="input" path="providers.ms.clientSecret" config="label:@(Client secret);type:password;maxlength:500;$delay:1"></ui-component>
+				<p class="settings-note">@(Leave the secret empty to keep the one saved. It is stored encrypted and never shown again.)</p>
+				<p class="settings-note">@(Allowed accounts: common for work and personal accounts, organizations, consumers, or the directory ID of a single organization. It must match the registration.)</p>
+				<p class="settings-note">@(Return address to register in Microsoft Entra, under the Web platform.)</p>
+				<div class="admin-link-row">
+					<ui-bind path="providers.msReturn" config="value input:value" class="block"><input type="text" readonly aria-label="@(Return address)" /></ui-bind>
+					<button type="button" class="secondary-button exec" data-exec="providers/copy" data-field="msReturn">@(Copy)</button>
+				</div>
+				<div class="providers-actions">
+					<button type="button" class="primary-button exec" data-exec="providers/saveoauth" id="save-oauth">
+						<i class="ti ti-check" aria-hidden="true"></i>@(Save sign-in settings)
+					</button>
+					<ui-bind path="providers.msSecret" config="enabled:value"><button type="button" class="secondary-button exec" data-exec="providers/clearsecret">@(Remove saved secret)</button></ui-bind>
+				</div>
+
+				<h3>@(Sign in with Google)</h3>
+				<p class="settings-note" role="status"><ui-bind path="providers.googleStatus" config="text:value"></ui-bind></p>
+				<ui-component name="input" path="providers.google.clientId" config="label:@(Client ID);maxlength:120;$delay:1"></ui-component>
+				<ui-component name="input" path="providers.google.clientSecret" config="label:@(Client secret);type:password;maxlength:500;$delay:1"></ui-component>
+				<p class="settings-note">@(Leave the secret empty to keep the one saved. It is stored encrypted and never shown again.)</p>
+				<p class="settings-note">@(Return address to register in Google Cloud, under Authorized redirect URIs.)</p>
+				<div class="admin-link-row">
+					<ui-bind path="providers.googleReturn" config="value input:value" class="block"><input type="text" readonly aria-label="@(Return address)" /></ui-bind>
+					<button type="button" class="secondary-button exec" data-exec="providers/copy" data-field="googleReturn">@(Copy)</button>
+				</div>
+				<div class="providers-actions">
+					<button type="button" class="primary-button exec" data-exec="providers/savegoogle" id="save-google">
+						<i class="ti ti-check" aria-hidden="true"></i>@(Save sign-in settings)
+					</button>
+					<ui-bind path="providers.googleSecret" config="enabled:value"><button type="button" class="secondary-button exec" data-exec="providers/cleargoogle">@(Remove saved secret)</button></ui-bind>
+				</div>
+
+				<h3>@(Account types)</h3>
+				<p class="settings-note">@(These are the types people can choose when they add an account. Hidden types stay in use by existing accounts.)</p>
+				<ui-bind path="providers.items" config="template" class="block"
+					><script type="text/html">
+						{{ foreach t in value }}
+						<div class="type-row">
+							<div class="type-name"><strong>{{ t.name }}</strong>{{ if t.defaultLabel }}<span class="badge">{{ t.defaultLabel }}</span>{{ fi }}{{ if t.hiddenLabel }}<span class="badge">{{ t.hiddenLabel }}</span>{{ fi }}{{ if t.customLabel }}<span class="badge">{{ t.customLabel }}</span>{{ fi }}</div>
+							<div class="type-actions">
+								{{ if t.canDefault }}<button type="button" class="secondary-button exec" data-exec="providers/makedefault" data-id="{{ t.id }}">@(Make default)</button>{{ fi }}
+								{{ if t.canHide }}<button type="button" class="secondary-button exec" data-exec="providers/toggle" data-id="{{ t.id }}">{{ t.toggleLabel }}</button>{{ fi }}
+								{{ if t.custom }}<button type="button" class="secondary-button exec" data-exec="providers/edit" data-id="{{ t.id }}">@(Edit)</button><button type="button" class="secondary-button exec" data-exec="providers/remove" data-id="{{ t.id }}">@(Delete)</button>{{ fi }}
+							</div>
+						</div>
+						{{ end }}
+					</script></ui-bind
+				>
+
+				<h3><ui-bind path="providers.heading" config="text:value"></ui-bind></h3>
+				<p class="settings-note">@(For example your company mail server. People then only enter their address and password.)</p>
+				<div class="settings-grid">
+					<ui-component name="input" path="providers.type.name" config="label:@(Name);maxlength:80;$delay:1"></ui-component
+					><ui-component name="input" path="providers.type.domains" config="label:@(Email domains);placeholder:example.com, example.org;maxlength:1000;$delay:1"></ui-component>
+				</div>
+				<h3>IMAP</h3>
+				<div class="settings-grid">
+					<ui-component name="input" path="providers.type.imapHost" config="label:@(Server hostname);maxlength:253;$delay:1"></ui-component
+					><ui-component name="input" path="providers.type.imapPort" config="label:@(Port);type:number;$delay:1"></ui-component
+					><ui-component name="input" path="providers.type.imapSecurity" config="dirsource:mail.securityOptions;label:@(Connection security);$delay:1"></ui-component>
+				</div>
+				<h3>SMTP</h3>
+				<div class="settings-grid">
+					<ui-component name="input" path="providers.type.smtpHost" config="label:@(Server hostname);maxlength:253;$delay:1"></ui-component
+					><ui-component name="input" path="providers.type.smtpPort" config="label:@(Port);type:number;$delay:1"></ui-component
+					><ui-component name="input" path="providers.type.smtpSecurity" config="dirsource:mail.securityOptions;label:@(Connection security);$delay:1"></ui-component>
+				</div>
+				<ui-component name="input" path="providers.type.auth" config="dirsource:providers.authOptions;label:@(Sign-in with);$delay:1"></ui-component>
+				<ui-component name="input" path="providers.type.summary" config="label:@(Short description);maxlength:200;$delay:1"></ui-component>
+				<ui-component name="input" path="providers.type.steps" config="label:@(Guide steps, one per line. Add | and an https link to attach a page);type:multiline;height:100;maxlength:2000;$delay:1"></ui-component>
+				<ui-component name="input" path="providers.type.note" config="label:@(Note);maxlength:300;$delay:1"></ui-component>
+				<div class="providers-actions">
+					<button type="button" class="primary-button exec" data-exec="providers/savetype" id="save-type">
+						<i class="ti ti-check" aria-hidden="true"></i>@(Save account type)
+					</button>
+					<button type="button" class="secondary-button exec" data-exec="providers/newtype">@(New account type)</button>
+				</div>
+				<p class="error-text" role="alert"><ui-bind path="providers.error" config="text:value"></ui-bind></p>
+			</div>
+		</div>
+		<div class="settings-footer"><div class="modal-footer-content"></div></div></ui-component
+	>
+</ui-plugin>

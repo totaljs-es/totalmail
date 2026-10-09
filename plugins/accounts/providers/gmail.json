@@ -1,0 +1,41 @@
+{
+	"id": "gmail",
+	"order": 20,
+	"name": "Gmail",
+	"icon": "google",
+	"auth": "app-password",
+	"summary": "@(Gmail and Google Workspace accounts.)",
+	"domains": [
+		"gmail.com",
+		"googlemail.com"
+	],
+	"mx": [
+		".google.com",
+		".googlemail.com"
+	],
+	"imap": {
+		"host": "imap.gmail.com",
+		"port": 993,
+		"security": "tls"
+	},
+	"smtp": {
+		"host": "smtp.gmail.com",
+		"port": 465,
+		"security": "tls"
+	},
+	"username": "email",
+	"steps": [
+		{
+			"text": "@(Turn on 2-Step Verification in your Google Account.)",
+			"url": "https://myaccount.google.com/signinoptions/two-step-verification"
+		},
+		{
+			"text": "@(Create an app password for TotalMail and paste it below.)",
+			"url": "https://myaccount.google.com/apppasswords"
+		},
+		{
+			"text": "@(Do not use your normal Google password.)"
+		}
+	],
+	"note": "@(On Google Workspace the administrator can disable app passwords. Ask them if the page is missing.)"
+}

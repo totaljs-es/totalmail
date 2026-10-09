@@ -1,0 +1,38 @@
+@{layout('')}
+<!doctype html>
+<html lang="@{language}">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<meta name="referrer" content="no-referrer" />
+		<base target="_blank" />
+		<title>@{model.subject}</title>
+		<style>
+			body { margin: 0; padding: 16px; font: 14px/1.6 Arial, sans-serif; color: #303030; background: #fff; overflow-wrap: break-word }
+			img { max-width: 100%; height: auto }
+			table { max-width: 100% }
+			a { color: #1a56b0 }
+			blockquote { margin: 8px 0; padding-left: 12px; border-left: 3px solid #ddd; color: #555 }
+			pre { white-space: pre-wrap }
+			.hint { margin: 0 0 16px; padding: 8px 12px; background: #eef3ff; border-radius: 8px; font-size: 13px }
+			h1 { font-size: 20px; margin: 0 0 12px }
+			.details { font-size: 13px; border-collapse: collapse; margin-bottom: 16px }
+			.details td { padding: 2px 0; vertical-align: top }
+			.details td:first-child { color: #606060; padding-right: 12px; white-space: nowrap }
+			hr { border: 0; border-top: 1px solid #ccc; margin: 0 0 16px }
+			@media print { .hint { display: none !important } }
+		</style>
+	</head>
+	<body>
+		<p class="hint">@(Press Ctrl/⌘ P to print this message.)</p>
+		<h1>@{model.subject}</h1>
+		<table class="details">
+			@{if model.from}<tr><td>@(From)</td><td>@{model.from}</td></tr>@{fi}
+			@{if model.to}<tr><td>@(To)</td><td>@{model.to}</td></tr>@{fi}
+			@{if model.cc}<tr><td>Cc</td><td>@{model.cc}</td></tr>@{fi}
+			@{if model.date}<tr><td>@(Date)</td><td>@{model.date}</td></tr>@{fi}
+		</table>
+		<hr />
+		@{if model.html}@{!model.html}@{else}<pre>@{model.text}</pre>@{fi}
+	</body>
+</html>

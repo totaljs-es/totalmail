@@ -1,0 +1,244 @@
+<ui-plugin path="accounts">
+	<ui-component
+		name="modal"
+		path="mail.window"
+		config="if:account-setup;width:680;center:true"
+		id="account-setup"
+		class="settings-modal hidden"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="account-setup-title"
+	>
+		<div class="settings-heading">
+			<div class="modal-heading-content">
+				<div>
+					<span class="eyebrow">@(MAIL ACCOUNTS)</span>
+					<h2 id="account-setup-title">@(Mail accounts)</h2>
+				</div>
+				<button
+					class="icon-button exec"
+					data-exec="mail/click"
+					data-command="close-settings"
+					aria-label="@(Close)"
+				>
+					<i class="ti ti-times" aria-hidden="true"></i>
+				</button>
+			</div>
+		</div>
+		<div class="settings-body">
+			<div class="modal-body-content">
+				<ui-component
+					id="account-edit-select"
+					name="input"
+					path="accounts.form.id"
+					config="dirsource:mail.setupOptions;placeholder:@(New account);label:@(Choose an account);$delay:1"
+				></ui-component>
+				<div id="provider-picker" class="provider-picker">
+					<h3>@(Account type)</h3>
+					<ui-bind path="accounts.providers" config="template" class="block provider-tiles"
+						><script type="text/html">
+							{{ foreach p in value }}<button
+								type="button"
+								class="provider-tile exec{{ if p.active }} active{{ fi }}"
+								data-exec="accounts/pick"
+								data-provider="{{ p.id }}"
+								aria-pressed="{{ p.active }}"
+								><i class="ti ti-{{ p.icon }}" aria-hidden="true"></i><span>{{ p.name }}</span></button
+							>{{ end }}
+						</script></ui-bind
+					>
+					<ui-component name="template" path="accounts.guide"
+						><script type="text/html">
+							{{ if shown }}
+							<div class="provider-guide">
+								<p class="provider-summary">{{ summary }}</p>
+								{{ if steps && steps.length }}<ol>
+									{{ foreach s in steps }}<li>{{ s.text }}{{ if s.url }} <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">@(Open page)<i class="ti ti-external" aria-hidden="true"></i></a>{{ fi }}</li>{{ end }}
+								</ol>{{ fi }}
+								{{ if note }}<p class="provider-note">{{ note }}</p>{{ fi }}
+							</div>
+							{{ fi }}
+						</script></ui-component
+					>
+					<ui-bind path="accounts.ui" config="show:value.linkBlock" class="admin-link-block block">
+						<p class="settings-note"><ui-bind path="accounts.ui" config="text:value.redirectNote"></ui-bind></p>
+						<div class="admin-link-row">
+							<ui-bind path="accounts.ui" config="value input:value.redirectUrl" class="block"><input type="text" readonly aria-label="@(Return address)" /></ui-bind>
+							<button type="button" class="secondary-button exec" data-exec="accounts/copylink" data-field="redirectUrl">@(Copy)</button>
+						</div>
+						<ui-bind path="accounts.ui" config="show:value.linkButton" class="block">
+							<button type="button" class="secondary-button exec" data-exec="accounts/adminlink">
+								<i class="ti ti-key" aria-hidden="true"></i>@(Administrator approval link)
+							</button>
+						</ui-bind>
+						<ui-bind path="accounts.ui" config="show:value.linkResult" class="block">
+							<p class="settings-note">@(If Microsoft says it needs administrator approval, send this link to your administrator.)</p>
+							<div class="admin-link-row">
+								<ui-bind path="accounts.ui" config="value input:value.linkUrl" class="block"><input type="text" readonly aria-label="@(Administrator approval link)" /></ui-bind>
+								<button type="button" class="secondary-button exec" data-exec="accounts/copylink" data-field="linkUrl">@(Copy)</button>
+							</div>
+						</ui-bind>
+					</ui-bind>
+					<ui-bind path="accounts.ui" config="show:value.suggestion" class="block">
+						<p class="settings-note" role="status">
+							<ui-bind path="accounts.ui" config="text:value.suggestionText"></ui-bind>
+							<button type="button" class="secondary-button exec" data-exec="accounts/suggest">@(Use suggestion)</button>
+						</p>
+					</ui-bind>
+				</div>
+				<div class="settings-grid">
+					<ui-component
+						name="input"
+						path="accounts.form.name"
+						config="label:@(Account name);maxlength:80;$delay:1"
+					></ui-component
+					><ui-component
+						name="input"
+						path="accounts.form.email"
+						config="label:@(Email);type:email;maxlength:254;$delay:1"
+					></ui-component>
+				</div>
+				<ui-bind path="accounts.ui" config="hide:value.known" class="block">
+					<ui-bind path="accounts.ui" config="disabled:value.discovering">
+						<button class="secondary-button exec" data-exec="mail/click" data-command="discover-account">
+							<i class="ti ti-search" aria-hidden="true"></i>@(Discover servers)
+						</button>
+					</ui-bind>
+				</ui-bind>
+				<p class="settings-note" role="status"><ui-bind path="accounts.ui" config="text:value.discoveryStatus"></ui-bind></p>
+				<ui-bind path="accounts.ui" config="attr open details:!value.known" class="block">
+				<details class="server-details" open>
+				<summary>@(Server settings)</summary>
+				<h3>IMAP</h3>
+				<div class="settings-grid">
+					<ui-component
+						name="input"
+						path="accounts.form.imapHost"
+						config="label:@(Server hostname);maxlength:253;$delay:1"
+					></ui-component
+					><ui-component
+						name="input"
+						path="accounts.form.imapPort"
+						config="label:@(Port);type:number;$delay:1"
+					></ui-component
+					><ui-component
+						name="input"
+						path="accounts.form.imapSecurity"
+						config="dirsource:mail.securityOptions;label:@(Connection security);$delay:1"
+					></ui-component
+					><ui-component
+						name="input"
+						path="accounts.form.imapUsername"
+						config="label:@(Username);maxlength:254;$delay:1"
+					></ui-component>
+				</div>
+				<h3>SMTP</h3>
+				<div class="settings-grid">
+					<ui-component
+						name="input"
+						path="accounts.form.smtpHost"
+						config="label:@(Server hostname);maxlength:253;$delay:1"
+					></ui-component
+					><ui-component
+						name="input"
+						path="accounts.form.smtpPort"
+						config="label:@(Port);type:number;$delay:1"
+					></ui-component
+					><ui-component
+						name="input"
+						path="accounts.form.smtpSecurity"
+						config="dirsource:mail.securityOptions;label:@(Connection security);$delay:1"
+					></ui-component
+					><ui-component
+						name="input"
+						path="accounts.form.smtpUsername"
+						config="label:@(Username);maxlength:254;$delay:1"
+					></ui-component>
+				</div>
+				<ui-component
+					name="input"
+					path="accounts.form.authType"
+					config="dirsource:mail.authOptions;label:@(Authentication);$delay:1"
+				></ui-component>
+				</details>
+				</ui-bind>
+				<ui-component name="input" path="accounts.form.signature" config="label:@(Signature);type:multiline;height:80;maxlength:1000;placeholder:@(Added below new messages and replies from this account.);$delay:1"></ui-component>
+				<ui-component name="input" path="accounts.form.aliases" config="label:@(Other addresses you send from);placeholder:@(sales@example.com, support@example.com);maxlength:1500;$delay:1"></ui-component>
+				<ui-bind path="accounts.ui" config="show:value.assistantShown;attr aria-checked button:String(value.assistant)" class="block">
+					<button type="button" role="switch" aria-checked="true" class="switch-row exec" data-exec="accounts/toggleassistant">
+						<i class="ti ti-magic" aria-hidden="true"></i
+						><span class="switch-text"><strong>@(Use the assistant with this account)</strong><small>@(Conversations of this account reach the assistant only when someone asks for a summary, a reply or a tone change.)</small></span
+						><span class="switch-pill" aria-hidden="true"></span>
+					</button>
+				</ui-bind>
+				<ui-bind path="accounts.ui" config="hide:value.oauth" class="block">
+				<ui-component
+					name="input"
+					path="accounts.form.password"
+					config="label:@(Mail password or app password);type:password;maxlength:500;$delay:1"
+				></ui-component>
+				<ui-bind path="accounts.ui" config="show:value.appPassword" class="block"><p class="settings-note">
+					@(This provider needs an app password, not your normal password.)
+				</p></ui-bind>
+				<p class="settings-note">
+					@(Leave the password blank to keep it unchanged. Credentials are encrypted on this server.)
+				</p>
+				</ui-bind>
+				<ui-bind path="accounts.ui" config="show:value.oauthNote" class="block"><p class="settings-note">
+					@(This provider uses OAuth. Choose its account type above to sign in.)
+				</p></ui-bind>
+				<p class="settings-note">
+					@(Saving settings does not contact the mail server. Verify when you are ready.)
+				</p>
+				<p class="error-text" role="alert"><ui-bind path="accounts.error" config="text:value"></ui-bind></p>
+				<ui-bind path="accounts.form.id" config="show:value" class="block">
+					<h3>@(If something does not work)</h3>
+					<p class="settings-note">@(This checks the servers, their encryption and the sign-in one step at a time, and says what to change. It does not change anything.)</p>
+					<div class="providers-actions">
+						<ui-bind path="accounts.ui" config="disabled:value.diagnosing||value.blocked" class="contents"
+							><button type="button" class="secondary-button exec" data-exec="accounts/diagnose"><i class="ti ti-monitor-heart-rate" aria-hidden="true"></i>@(Check the connection step by step)</button></ui-bind
+						>
+					</div>
+					<ui-bind path="accounts.diagnosis" config="template" class="block" role="region" aria-label="@(Connection check)"
+						><script type="text/html">
+							{{ if value }}
+							<p class="settings-note"><strong>{{ value.summary }}</strong></p>
+							{{ foreach group in value.groups }}
+							<h4 class="check-group">{{ group.title }}</h4>
+							<ul class="check-list">
+								{{ foreach c in group.items }}
+								<li class="check check-{{ c.status }}"><i class="{{ c.icon }}" aria-hidden="true"></i
+									><div><span class="sr-only">{{ c.label }}: </span>{{ c.title }}{{ if c.advice }}<small>{{ c.advice }}</small>{{ fi }}</div></li>
+								{{ end }}
+							</ul>
+							{{ end }}
+							{{ fi }}
+						</script></ui-bind
+					>
+				</ui-bind>
+			</div>
+		</div>
+		<div class="settings-footer">
+			<div class="modal-footer-content">
+				<ui-bind path="accounts.form.id" config="show:value" class="contents"
+					><button class="secondary-button danger-button exec" data-exec="accounts/remove"><i class="ti ti-trash" aria-hidden="true"></i>@(Remove account)</button></ui-bind
+				><ui-bind path="accounts.ui" config="hide:value.signin;disabled:value.blocked||value.verifying||!value.saved" class="contents"
+					><button class="secondary-button exec" data-exec="mail/click" data-command="verify-account">@(Verify IMAP and SMTP)</button></ui-bind
+				><ui-bind path="mail.ui" config="disabled:value.busy||!value.accountSaved" class="contents"
+					><ui-bind path="accounts.ui" config="hide:value.signin" class="contents"
+						><button class="secondary-button exec" data-exec="mail/click" data-command="sync-account">@(Sync inbox)</button></ui-bind
+					></ui-bind
+				><ui-bind path="accounts.ui" config="show:value.start" class="contents"
+					><button class="primary-button exec" data-exec="accounts/oauth" data-again="0">
+						<ui-bind path="accounts.ui" config="attr class i:value.startIcon" class="contents"><i class="ti ti-microsoft" aria-hidden="true"></i></ui-bind
+						><ui-bind path="accounts.ui" config="text:value.startLabel"></ui-bind></button
+				></ui-bind
+				><ui-bind path="accounts.ui" config="show:value.again" class="contents"
+					><button class="secondary-button exec" data-exec="accounts/oauth" data-again="1"><i class="ti ti-refresh" aria-hidden="true"></i>@(Sign in again)</button></ui-bind
+				><ui-bind path="accounts.ui" config="hide:value.signin;disabled:value.blocked||value.saving" class="contents"
+					><button class="primary-button exec" data-exec="mail/click" data-command="save-account"><i class="ti ti-check" aria-hidden="true"></i>@(Save account)</button></ui-bind
+				>
+			</div>
+		</div></ui-component
+	>
+</ui-plugin>

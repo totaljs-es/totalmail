@@ -1,0 +1,17 @@
+// TotalMail: public defaults, ready to run. Keep credentials out of this file.
+// Mail passwords, OAuth secrets and assistant keys are entered in the app and encrypted in database/.
+
+name : TotalMail
+
+// Development uses the Total.js watcher. For a hosted instance, use true, NODE_ENV=production or --release.
+production : false
+
+// Without a fixed port, Total.js uses PORT, the numeric command-line argument, then 8000.
+// $port : 8000
+$ip : 0.0.0.0
+
+// The normal deployment is behind an HTTPS reverse proxy. Use false when connecting directly without a proxy.
+trust_proxy : true
+
+// Only needed when the public address cannot be inferred from the proxy's request.
+// oauth_base_url : https://mail.example.com

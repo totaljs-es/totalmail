@@ -1,0 +1,54 @@
+<ui-component
+	name="modal"
+	path="mail.window"
+	config="if:send-confirm;width:620;center:true"
+	id="send-confirm"
+	class="settings-modal hidden"
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="send-title"
+	><div class="settings-heading">
+		<div class="modal-heading-content">
+			<h2 id="send-title">@(Review before sending)</h2>
+			<ui-bind path="mail.ui" config="disabled:value.editSendOff" class="contents"
+				><button
+					class="icon-button exec"
+					data-command="edit-send"
+					data-exec="mail/click"
+					aria-label="@(Back to editor)"
+				>
+					<i class="ti ti-chevron-left" aria-hidden="true"></i>
+				</button></ui-bind
+			>
+		</div>
+	</div>
+	<div class="settings-body">
+		<div class="modal-body-content">
+			<ui-component name="template" path="mail.sendPreview"
+				><script type="text/html">
+					<div class="send-detail">
+						<strong>@(From)</strong><span>{{ from }}</span><strong>@(To)</strong><span>{{ to }}</span
+						>{{ if cc }}<strong>@(Cc)</strong><span>{{ cc }}</span>{{ fi }}{{ if bcc }}<strong>@(Bcc)</strong><span>{{ bcc }}</span>{{ fi }}<strong>@(Subject)</strong><span>{{ subject }}</span
+						>{{ if files && files.length }}<strong>@(Attachments)</strong><span>{{ foreach f in files }}<div>{{ f.name }} <small>{{ f.size }}</small></div>{{ end }}</span>{{ fi }}
+					</div>
+					{{ if html }}
+					<iframe class="send-frame" sandbox srcdoc="{{ html }}" referrerpolicy="no-referrer" title="@(The message as it will arrive)"></iframe>
+					<p class="settings-note">@(It is formatted as you see it, and also sent as plain text for apps that cannot show formatting.)</p>
+					{{ else }}
+					<pre class="send-body">{{ body }}</pre>
+					{{ fi }}
+				</script></ui-component
+			>
+			<p class="settings-note">@(This will send a real email to the recipients shown above.)</p>
+			<p class="error-text" role="alert"><ui-bind path="mail.ui" config="text:value.sendError"></ui-bind></p>
+		</div>
+	</div>
+	<div class="settings-footer">
+		<div class="modal-footer-content">
+			<ui-bind path="mail.ui" config="disabled:value.confirmOff" class="contents"
+				><button class="primary-button exec" data-exec="mail/click" data-command="confirm-send">
+					@(Send email)<i class="ti ti-envelope" aria-hidden="true"></i>
+				</button></ui-bind
+			>
+		</div></div
+></ui-component>

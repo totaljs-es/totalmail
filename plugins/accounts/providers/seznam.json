@@ -1,0 +1,40 @@
+{
+	"id": "seznam",
+	"order": 40,
+	"name": "Seznam",
+	"icon": "envelope",
+	"auth": "password",
+	"summary": "@(Seznam.cz email addresses.)",
+	"domains": [
+		"seznam.cz",
+		"email.cz",
+		"post.cz",
+		"spoluzaci.cz",
+		"stream.cz",
+		"firmy.cz"
+	],
+	"mx": [
+		".seznam.cz"
+	],
+	"imap": {
+		"host": "imap.seznam.cz",
+		"port": 993,
+		"security": "tls"
+	},
+	"smtp": {
+		"host": "smtp.seznam.cz",
+		"port": 465,
+		"security": "tls"
+	},
+	"username": "email",
+	"steps": [
+		{
+			"text": "@(Open Seznam Email, then Settings, and allow access from external mail programs.)",
+			"url": "https://email.seznam.cz"
+		},
+		{
+			"text": "@(Use your Seznam address and password below.)"
+		}
+	],
+	"note": "@(If sign-in fails and you use two-step verification, create an application password in your Seznam account.)"
+}

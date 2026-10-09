@@ -1,0 +1,74 @@
+<ui-plugin path="rules">
+	<ui-component
+		name="modal"
+		path="mail.window"
+		config="if:rules;width:640;center:true"
+		id="rules"
+		class="settings-modal hidden"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="rules-title"
+		><div class="settings-heading">
+			<div class="modal-heading-content">
+				<div>
+					<span class="eyebrow">@(NEW MAIL)</span>
+					<h2 id="rules-title">@(Rules)</h2>
+				</div>
+				<button class="icon-button exec" data-exec="mail/click" data-command="close-settings" aria-label="@(Close)">
+					<i class="ti ti-times" aria-hidden="true"></i>
+				</button>
+			</div>
+		</div>
+		<div class="settings-body">
+			<div class="modal-body-content">
+				<p class="settings-note">@(A rule acts on mail that arrives in the inbox while TotalMail is open. The first rule that matches decides. Rules never send mail.)</p>
+				<ui-component name="input" path="rules.accountId" config="dirsource:mail.accountOptions;label:@(Account);$delay:1"></ui-component>
+				<ui-bind path="rules.items" config="template" class="block"
+					><script type="text/html">
+						{{ foreach r in value }}
+						<div class="type-row">
+							<div class="type-name"><strong>{{ r.name }}</strong><span class="badge">{{ r.summary }}</span>{{ if r.offLabel }}<span class="badge">{{ r.offLabel }}</span>{{ fi }}</div>
+							<div class="type-actions">
+								<button type="button" class="secondary-button exec" data-exec="rules/toggle" data-id="{{ r.id }}">{{ r.toggleLabel }}</button>
+								<button type="button" class="secondary-button exec" data-exec="rules/edit" data-id="{{ r.id }}">@(Edit)</button>
+								<button type="button" class="secondary-button exec" data-exec="rules/remove" data-id="{{ r.id }}">@(Delete)</button>
+							</div>
+						</div>
+						{{ end }}
+					</script></ui-bind
+				>
+				<ui-bind path="rules.items" config="hide:value&&value.length>0" class="block"><p class="settings-note">@(This account has no rules yet.)</p></ui-bind>
+
+				<h3><ui-bind path="rules.heading" config="text:value"></ui-bind></h3>
+				<ui-component name="input" path="rules.form.name" config="label:@(Name);maxlength:60;$delay:1"></ui-component>
+				<div class="settings-grid">
+					<ui-component name="input" path="rules.form.field" config="dirsource:rules.fieldOptions;label:@(Check);$delay:1"></ui-component
+					><ui-component name="input" path="rules.form.op" config="dirsource:rules.opOptions;label:@(Condition);$delay:1"></ui-component>
+				</div>
+				<ui-component name="input" path="rules.form.value" config="label:@(Text to look for);maxlength:100;$delay:1"></ui-component>
+				<div class="settings-grid">
+					<ui-component name="input" path="rules.form.action" config="dirsource:rules.actionOptions;label:@(Action);$delay:1"></ui-component
+					><ui-component name="input" path="rules.form.path" config="dirsource:rules.folderOptions;label:@(Move to folder);$delay:1"></ui-component>
+				</div>
+				<p class="settings-note" role="status"><ui-bind path="rules.test" config="text:value"></ui-bind></p>
+				<div class="providers-actions">
+					<button type="button" class="secondary-button exec" data-exec="rules/test">@(Test on the current inbox)</button>
+					<button type="button" class="primary-button exec" data-exec="rules/save" id="save-rule"><i class="ti ti-check" aria-hidden="true"></i>@(Save rule)</button>
+					<button type="button" class="secondary-button exec" data-exec="rules/clear">@(New rule)</button>
+				</div>
+				<p class="error-text" role="alert"><ui-bind path="rules.error" config="text:value"></ui-bind></p>
+
+				<h3>@(Recent activity)</h3>
+				<ui-bind path="rules.log" config="template" class="block"
+					><script type="text/html">
+						{{ foreach l in value }}
+						<div class="type-row"><div class="type-name"><strong>{{ l.rule }}</strong><span class="badge">{{ l.action }}</span>{{ if l.failed }}<span class="badge">{{ l.failed }}</span>{{ fi }}</div><small>{{ l.when }} · {{ l.subject }}</small></div>
+						{{ end }}
+					</script></ui-bind
+				>
+				<ui-bind path="rules.log" config="hide:value&&value.length>0" class="block"><p class="settings-note">@(No activity yet.)</p></ui-bind>
+			</div>
+		</div>
+		<div class="settings-footer"><div class="modal-footer-content"></div></div></ui-component
+	>
+</ui-plugin>

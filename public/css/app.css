@@ -1,0 +1,787 @@
+/*auto*/
+: root { --radius: 4px; --ink: #303030; --muted: #878787; --color: #4285F4; --line: #E0E0E0; --sidebar: #252525}
+* { box-sizing: border-box}
+body { margin: 0; background: var(--surface-soft); color: var(--ink); font: 14px -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
+button,input,textarea,select { font: inherit}
+button { cursor: pointer}
+button: focus-visible,a: focus-visible,select: focus-visible { outline: 3px solid #d4d4d4; outline-offset: 3px}
+button { border: 0; background: none; color: inherit}
+.ti { display: inline-block; font-size: 20px; line-height: 1; vertical-align: middle}
+a { text-decoration: none; color: inherit}
+.app-shell { display: flex; height: 100dvh; min-height: 0; overflow: hidden}
+.sidebar { width: 238px; flex-shrink: 0; background: var(--sidebar); color: #cecece; padding: 32px 18px 16px; display: flex; flex-direction: column}
+.brand { display: flex; align-items: center; font-size: 23px; font-weight: 650; letter-spacing: -.8px; color: #fff; padding: 0 12px}
+.brand>span: not(.brand-mark): not(.brand-dot) { font-weight: 350}
+.brand-mark { display: grid; place-items: center; margin-right: 10px; width: 33px; height: 33px; border-radius: var(--radius); background: var(--color)}
+.brand-mark .ti { width: 21px}
+.brand-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color); align-self: flex-end; margin: 0 0 7px 3px}
+.compose-button { margin: 34px 4px 34px; background: var(--color); border-radius: var(--radius); display: flex; gap: 10px; align-items: center; padding: 13px 14px; color: white; font-weight: 600; text-align: left; box-shadow: 0 5px 18px #181a2928}
+.compose-button: hover { background: var(--color)}
+.keyhint { margin-left: auto; font-size: 11px; opacity: .6; border: 1px solid #ffffff50; padding: 1px 4px; border-radius: 3px}
+.nav-label { font-size: 11px; letter-spacing: 1.5px; font-weight: 650; color: #a3a3a3; margin: 0 14px 12px}
+.folder { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin: 3px 0; border-radius: var(--radius); color: #c8c8c8; text-align: left}
+.folder .ti { width: 18px; height: 18px}
+.folder.active { background: #414141; color: white}
+.folder: hover { background: #3c3c3c}
+.folder.active .ti { color: #d2d2d2}
+.folder-count { margin-left: auto; font-size: 11px; color: #a9a9a9}
+.folder.active .folder-count { color: #E0E0E0; background: #595959; padding: 1px 6px; border-radius: var(--radius)}
+.accounts-heading { display: flex; align-items: center; margin-top: 36px}
+.accounts-heading .nav-label { margin-bottom: 0}
+.small-label { font-size: 8px; letter-spacing: .8px; margin-left: auto; margin-right: 12px; color: #a9a9a9; border: 1px solid #525252; padding: 2px 4px; border-radius: 3px}
+#accounts { margin-top: 12px}
+.account { display: flex; width: 100%; align-items: center; text-align: left; gap: 10px; padding: 10px 12px; border-radius: var(--radius)}
+.account.active,.account: hover { background: #3c3c3c}
+.account-avatar { width: 28px; height: 28px; border-radius: var(--radius); display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 600; flex-shrink: 0}
+.account-name { font-size: 12px; color: #dedede}
+.account-email { font-size: 11px; color: #a1a1a1; margin-top: 3px}
+.account-dot { margin-left: auto; width: 5px; height: 5px; border-radius: 50%; background: var(--color)}
+.sidebar-bottom { margin-top: auto; padding-top: 25px}
+.demo-label { font-size: 11px; display: flex; align-items: center; gap: 7px; padding: 0 13px}
+.status-dot { width: 5px; height: 5px; display: inline-block; border-radius: 50%; background: #74aa98; flex-shrink: 0}
+.sidebar-bottom>p { font-size: 11px; line-height: 1.6; color: #a1a1a1; margin: 8px 13px 18px}
+.settings-button { display: flex; align-items: center; gap: 10px; color: #c0c0c0; width: 100%; padding: 10px 13px; text-align: left; font-size: 12px}
+.settings-button .ti { width: 16px}
+.user { display: flex; gap: 10px; align-items: center; border-top: 1px solid #434343; margin-top: 15px; padding: 18px 12px 0}
+.user-avatar { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #4c4c4c; color: #e4d9d0}
+.user strong { display: block; color: #E0E0E0; font-size: 11px; font-weight: 500}
+.user small { display: block; font-size: 11px; margin-top: 4px; color: #9d9d9d}
+.tiny-heart { margin-left: auto; color: #acacac; font-size: 20px}
+.main { min-width: 0; flex: 1; display: flex; flex-direction: column; background: var(--surface)}
+.topbar { height: 76px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 24px; padding: 0 30px; flex-shrink: 0}
+.breadcrumb { font-size: 12px; color: var(--muted-ink); white-space: nowrap}
+.breadcrumb span { margin: 0 12px; color: #c8c8c8}
+.search-wrap { margin-left: auto; width: 300px; position: relative}
+.search-wrap kbd { position: absolute; right: 12px; top: 10px; font-size: 10px; color: var(--muted-ink); border: 1px solid var(--line); border-radius: var(--radius); padding: 1px 5px}
+.ui-searchinput { height: 36px!important; border: 0!important; border-radius: var(--radius); background: var(--surface-soft)}
+.ui-searchinput input { height: 36px; font-size: 12px; padding-right: 35px}
+.ui-searchinput span { width: 34px; line-height: 36px}
+.ui-searchinput-left>div { margin-left: 34px}
+.private-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted-ink); white-space: nowrap}
+.private-badge .ti { width: 14px; height: 14px}
+.workspace { display: flex; flex: 1; min-height: 0}
+.mail-list { width: 372px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 1px solid var(--line); background: var(--surface-soft)}
+.list-heading { display: flex; align-items: center; justify-content: space-between; padding: 30px 24px 23px}
+.eyebrow { font-size: 11px; letter-spacing: 1.5px; color: var(--muted-ink); font-weight: 600}
+h1 { font-size: 23px; letter-spacing: -.8px; line-height: 1.3; margin: 9px 0 7px; font-weight: 620}
+.list-heading p { font-size: 11px; color: var(--muted-ink); margin: 0}
+.list-heading-icon { width: 36px; height: 36px; display: grid; place-items: center; background: var(--surface-soft); color: var(--color); border-radius: var(--radius)}
+.list-tabs { display: flex; gap: 23px; padding: 0 24px; border-bottom: 1px solid var(--line)}
+.list-tabs button { padding: 0 0 15px; font-size: 12px; color: var(--muted-ink); position: relative}
+.list-tabs button.active { color: var(--color); font-weight: 600}
+.list-tabs button.active: after { position: absolute; content: ''; height: 2px; background: var(--color); bottom: -1px; left: 0; right: 0}
+.list-tabs button span { font-size: 11px; border-radius: var(--radius); padding: 2px 5px; margin-left: 5px; background: var(--surface-soft); color: var(--muted-ink)}
+.scope-bar { display: flex; justify-content: space-between; padding: 15px 24px; font-size: 11px; color: var(--muted-ink)}
+.scope-bar #account-scope { color: var(--muted-ink)}
+.messages { flex: 1; overflow: auto; padding: 0 12px 16px}
+.message-row { display: block; width: 100%; position: relative; text-align: left; padding: 17px 15px 16px; border-radius: var(--radius); border: 1px solid transparent; margin-bottom: 3px}
+.message-row: hover { background: var(--surface-soft)}
+.message-row.selected { background: var(--surface-soft); border-color: var(--line)}
+.message-top { display: flex; align-items: center; gap: 8px; margin-bottom: 9px}
+.sender { font-size: 12px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
+.message-row.unread .sender,.message-row.unread .message-subject { font-weight: 650}
+.message-time { font-size: 11px; color: var(--muted-ink); margin-left: auto; flex-shrink: 0}
+.unread-dot { width: 5px; height: 5px; background: var(--color); border-radius: 50%; flex-shrink: 0}
+.message-subject { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 7px}
+.message-preview { font-size: 11px; line-height: 1.65; color: var(--muted-ink); /* line-clamp has no unprefixed form yet */ display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden}
+.message-meta { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 11px; color: var(--muted-ink)}
+.color-dot { width: 5px; height: 5px; border-radius: 50%}
+.message-label { margin-left: auto; background: var(--chip); color: var(--muted-ink); border-radius: 3px; padding: 2px 5px}
+.mini-star { color: #8f7a35; margin-left: 5px}
+.mini-star .ti { width: 12px; height: 12px}
+.list-footer { padding: 10px 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; align-items: stretch; font-size: 11px; color: var(--muted-ink)}
+.list-status { display: flex; gap: 6px; align-items: center; padding: 3px 8px}
+.list-footer .load-older { margin: 0; width: 100%}
+.reader { flex: 1; min-width: 0; display: flex; flex-direction: column}
+.reader-toolbar { display: flex; height: 63px; padding: 0 25px; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-shrink: 0}
+.toolbar-left { display: flex; gap: 8px}
+.icon-button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius); color: var(--muted-ink)}
+.icon-button: hover { background: var(--surface-soft); color: var(--color)}
+.icon-button .ti { width: 18px; height: 18px}
+.toolbar-note { margin-left: auto; font-size: 11px; color: var(--muted-ink); margin-right: 10px}
+.reader-content { overflow: auto; flex: 1; padding: 38px 42px}
+.reader-account { font-size: 11px; color: var(--muted-ink); display: flex; align-items: center; gap: 6px; margin-bottom: 18px}
+.reader h2 { font-size: 27px; font-weight: 600; line-height: 1.3; letter-spacing: -.7px; margin: 0 0 28px}
+.sender-card { display: flex; gap: 12px; align-items: center; margin-bottom: 28px}
+.sender-avatar { width: 39px; height: 39px; border-radius: 50%; display: grid; place-items: center; background: var(--chip); color: var(--avatar-ink); font-size: 12px}
+.sender-card strong { font-size: 12px; font-weight: 600}
+.sender-card small { display: block; color: var(--muted-ink); font-size: 11px; margin-top: 5px}
+.sender-card time { margin-left: auto; font-size: 11px; color: var(--muted-ink)}
+.mail-body { white-space: pre-wrap; font-size: 13px; line-height: 1.95; color: var(--muted-ink); padding-bottom: 25px}
+.load-older { margin: 12px auto 16px; justify-content: center}
+.load-older[hidden] { display: none}
+.load-older small { color: var(--muted-ink); font-size: 11px}
+.attachments { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px}
+.attachment { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 8px 11px; font-size: 11px; color: var(--muted-ink); text-decoration: none}
+.attachment:hover { border-color: var(--color)}
+.attachment .ti { color: var(--color)}
+.attachment-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
+.attachment small { color: var(--muted-ink); font-size: 11px}
+.ai-card { background: var(--surface-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 19px 20px; margin-top: 7px}
+.ai-heading { display: flex; gap: 9px; align-items: center; font-size: 12px; font-weight: 600; color: var(--muted-ink)}
+.ai-heading .ti { width: 17px}
+.ai-heading .soon { margin-left: auto; font-weight: 400; font-size: 11px; color: var(--muted-ink); background: var(--chip); padding: 3px 6px; border-radius: var(--radius)}
+.ai-card p { font-size: 11px; color: var(--muted-ink); line-height: 1.7; margin: 10px 0 15px}
+.ai-actions { display: flex; gap: 7px; flex-wrap: wrap}
+.ai-actions button { font-size: 12px; padding: 8px 12px}
+.ai-instruction { width: 100%; margin: 12px 0 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: var(--radius); font-size: 12px; background: var(--surface); color: var(--ink)}
+.ai-result { font-size: 12px; color: var(--muted-ink)}
+.ai-result > ui-bind:not(.hidden):not(:empty) { margin-top: 14px}
+.ai-text { white-space: pre-wrap; line-height: 1.65; font-size: 13px; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; max-height: 320px; overflow: auto}
+.ai-note { font-size: 11px; color: var(--muted-ink); line-height: 1.6; margin: 10px 0 0}
+.reader-reply { display: flex; gap: 9px; margin-top: 25px}
+.primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 17px; background: var(--color); color: white; border-radius: var(--radius); font-size: 11px; font-weight: 600}
+.primary-button: hover { background: var(--color)}
+.primary-button .ti { width: 15px; height: 15px}
+.secondary-button { border: 1px solid var(--line); background: var(--surface); color: var(--muted-ink); display: flex; align-items: center; gap: 7px; padding: 10px 14px; border-radius: var(--radius); font-size: 11px}
+.secondary-button .ti { width: 15px}
+.empty { padding: 50px 20px; text-align: center; color: var(--muted-ink); font-size: 12px; line-height: 1.8}
+.reader-empty { height: 100%; display: grid; place-content: center; text-align: center}
+.reader-empty .ti { width: 44px; height: 44px; margin: 0 auto 20px; color: var(--color)}
+.reader-empty h2 { font-size: 23px; margin-bottom: 8px}
+.reader-empty p { font-size: 12px; color: var(--muted-ink)}
+.reader-empty small { font-size: 11px; color: var(--muted-ink)}
+.back-button { display: none}
+.composer { width: 620px; max-width: calc(100vw - 30px); padding: 26px 30px; max-height: 92dvh; overflow: auto}
+.composer-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px}
+.composer h2 { font-size: 23px; font-weight: 600; letter-spacing: -.6px; margin: 7px 0 0}
+.compose-from { display: flex; align-items: center; gap: 15px; padding: 10px 0 20px; color: var(--muted-ink); font-size: 11px}
+.compose-from select { border: 1px solid var(--line); padding: 8px 10px; background: var(--surface); border-radius: var(--radius); color: var(--muted-ink); flex: 1; font-size: 11px}
+.compose-attachments { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 4px}
+.compose-files { display: contents}
+.compose-attachments .attachment { padding-right: 4px}
+.attachment-remove { border: 0; background: transparent; color: var(--muted-ink); cursor: pointer; padding: 4px 6px; border-radius: var(--radius)}
+.attachment-remove:hover { color: var(--muted-ink)}
+.composer-ai { background: var(--surface-soft); border-radius: var(--radius); padding: 14px 16px; color: var(--muted-ink); margin-top: 6px}
+.composer-ai .ai-actions { margin-top: 12px}
+.composer-ai strong { display: block; font-size: 11px; font-weight: 500}
+.composer-ai small { display: block; font-size: 11px; margin-top: 5px; color: var(--muted-ink)}
+.error-text { color: #a35164!important}
+@media(min-width: 1550px) { .mail-list { width: 410px}
+.reader-content { padding: 45px 65px; max-width: 950px; width: 100%; margin: 0 auto}
+}
+@media(max-width: 1150px) { .sidebar { width: 210px; padding-left: 12px; padding-right: 12px}
+.mail-list { width: 330px}
+.reader-content { padding: 28px}
+.topbar { padding: 0 22px}
+.private-badge { display: none}
+.search-wrap { width: 240px}
+.reader h2 { font-size: 24px}
+}
+@media(max-width: 900px) { .sidebar { width: 190px}
+.mail-list { width: 290px}
+.reader-content { padding: 25px 22px}
+.breadcrumb { display: none}
+.search-wrap { width: 100%}
+.topbar { height: 64px}
+.reader h2 { font-size: 22px}
+.toolbar-note { display: none}
+.reader-toolbar { justify-content: space-between}
+.account-email { font-size: 11px}
+}
+@media(max-width: 730px) { .sidebar { width: 66px; padding: 22px 8px}
+.brand { font-size: 0; padding: 0; justify-content: center}
+.brand-mark { margin: 0}
+.brand-dot { display: none}
+.compose-button { font-size: 0; padding: 12px; justify-content: center; margin: 25px 0}
+.compose-button .ti { width: 20px}
+.keyhint,.nav-label,.accounts-heading,.folder-label,.folder-count,.account-name,.account-email,.account-dot,.sidebar-bottom { display: none}
+.folder { padding: 12px; justify-content: center}
+.account { padding: 10px 9px}
+.folder .ti { width: 20px}
+#accounts { margin-top: 24px}
+.mail-list { width: 100%; border-right: 0}
+.reader { display: none}
+.workspace.has-reader .mail-list { display: none}
+.workspace.has-reader .reader { display: flex}
+.back-button { display: inline-flex}
+.list-heading { padding: 26px 24px}
+.reader-content { padding: 26px 24px}
+.topbar { padding: 0 17px}
+.composer { padding: 24px 20px}
+.reader-toolbar { padding: 0 17px}
+}
+.language-control { display: flex; align-items: center; gap: 7px; flex-shrink: 0; color: var(--muted-ink); font-size: 11px}
+.language-control select { font-size: 11px; color: #757575; background: var(--surface-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 7px 9px; max-width: 100px}
+.language-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%)}
+@media(max-width: 730px) { .topbar { gap: 10px}
+.search-wrap { min-width: 0}
+.language-control select { padding: 6px 3px; font-size: 11px; max-width: 77px}
+}
+ui-component[name=repeater],ui-component[name=template] { display: block}
+.ui-modal-bg { background: #23263866; backdrop-filter: none}
+.ui-modal { border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 24px 100px #1f20342c; color: var(--ink); max-width: calc(100vw - 30px)}
+.ui-modal.composer { padding: 0; max-height: none; overflow: hidden}
+.ui-modal .composer-heading { height: 90px; margin: 0; padding: 24px 30px 15px; border-bottom: 0}
+.ui-modal .compose-body { padding: 0 30px}
+.ui-modal .compose-footer-area { height: 110px; padding: 0 30px 20px; border-top: 0; text-align: left; line-height: normal}
+.ui-modal .composer-footer button { font-size: 11px; height: auto; line-height: normal; padding: 11px 17px; font-weight: 600; border-radius: var(--radius)}
+.language-control ui-component { width: 134px}
+.compose-from ui-component { flex: 1; min-width: 0}
+.compose-from select { border: 0; padding: 0; margin-top: 4px; background-color: transparent; border-radius: 0; font-size: 11px; height: 26px}
+.ui-notify-container { z-index: 200}
+.ui-notify { font-family: inherit}
+.ui-notify-message { font-size: 12px!important}
+.ui-notify figure { border-radius: var(--radius)}
+.brand-mark .ti { font-size: 21px}
+.folder>.ti { font-size: 18px}
+.icon-button .ti { font-size: 18px}
+.primary-button .ti,.secondary-button .ti { font-size: 15px}
+.private-badge .ti { font-size: 14px}
+.mini-star .ti { font-size: 12px}
+.reader-empty>.ti { font-size: 44px}
+.settings-button .ti { font-size: 16px}
+.ai-heading .ti { font-size: 17px}
+@media(max-width: 730px) { .language-control ui-component { width: 77px}
+.ui-modal .composer-heading { padding: 24px 20px 15px}
+.ui-modal .compose-body { padding: 0 20px}
+.ui-modal .compose-footer-area { padding: 0 20px 20px; height: 120px}
+}
+@media(max-width: 730px) { .ui-modal.composer { width: calc(100vw - 30px)!important; max-width: calc(100vw - 30px)!important}
+.ui-modal .ui-modal-body-area { width: 100%!important}
+}
+.account-add { padding: 0; color: #aeaeae}
+.account-add .ti { font-size: 14px}
+.sidebar-bottom .settings-button { margin: 6px 0}
+.sidebar-bottom .user { margin-top: 15px}
+.user small { overflow: hidden; text-overflow: ellipsis; max-width: 145px}
+.access-page { min-height: 100dvh; display: grid; place-items: center; background: linear-gradient(135deg,#252525,#484848); padding: 28px}
+.access-card { position: relative; background: var(--surface); border-radius: var(--radius); padding: 38px; width: 440px; max-width: 100%; box-shadow: 0 25px 100px #0003}
+.access-brand { display: flex; gap: 10px; align-items: center; font-size: 23px; font-weight: 650; margin-bottom: 45px}
+.access-brand .ti { background: var(--color); color: #fff; padding: 8px; border-radius: var(--radius)}
+.access-language { position: absolute; right: 32px; top: 40px; width: 136px}
+.access-card h1 { font-size: 26px; letter-spacing: -.7px; margin: 10px 0}
+.access-card>p { font-size: 13px; line-height: 1.8; color: #919191; margin-bottom: 25px}
+.access-card small { font-size: 11px; color: #919191}
+.access-form { display: contents}
+/* A ui-bind that only wraps something (a button in a row of buttons) takes no box of its own. */
+ui-bind.contents { display: contents}
+.icon-button.starred { color: #b59c56}
+ui-bind.contents.hidden { display: none}
+.access-card .primary-button { width: 100%; justify-content: center; margin-top: 20px}
+.access-card .access-note { text-align: center; font-size: 11px; margin: 24px 0 0}
+.access-card #access-error { font-size: 12px; margin: 15px 0 0}
+.settings-modal { width: 680px}
+.settings-heading { height: 90px; display: flex; align-items: center; justify-content: space-between; padding: 20px 28px; border-bottom: 0}
+.settings-heading h2 { font-size: 23px; font-weight: 600; margin: 7px 0}
+.settings-body { padding: 10px 28px}
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px}
+.settings-body ui-component[name='input'] { margin-bottom: 16px}
+.settings-body h3 { font-size: 13px; letter-spacing: .7px; margin: 25px 0 15px}
+.settings-note { font-size: 11px; line-height: 1.7; color: var(--muted-ink)}
+.settings-footer { height: 75px; padding: 16px 28px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end}
+.settings-footer .primary-button { height: auto; line-height: normal; background: var(--color); border-radius: var(--radius); font-size: 12px}
+.settings-body .error-text { font-size: 12px; line-height: 1.7}
+.company-user { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px}
+.company-user strong { font-size: 12px}
+.company-user span,.company-user small { font-size: 11px; color: var(--muted-ink)}
+.settings-modal .ui-modal-body-area { width: 100%!important}
+@media(max-width: 730px) { .ui-modal.settings-modal { width: calc(100vw - 30px)!important; max-width: calc(100vw - 30px)!important}
+.settings-grid { grid-template-columns: 1fr}
+.settings-body { padding: 8px 20px}
+.settings-heading { padding: 20px}
+.settings-footer { padding: 16px 20px}
+.access-card { padding: 30px 24px}
+.access-language { right: 24px; top: 31px}
+}
+.settings-hub { width: 420px}
+.settings-hub .settings-body .secondary-button { width: 100%; margin: 10px 0}
+.settings-hub .settings-footer { height: 20px; padding: 0; border: 0}
+.workspace-settings { flex-shrink: 0}
+.topbar { gap: 12px}
+.empty-account-button { margin: 18px auto 0}
+.access-page { grid-template-columns: minmax(0,1fr)}
+.access-card { min-width: 0; width: min(440px,100%)}
+.send-detail { display: grid; grid-template-columns: 75px 1fr; gap: 10px; font-size: 12px; overflow-wrap: anywhere}
+.send-detail strong { color: var(--muted-ink); font-weight: 500}
+.send-body { white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; font-size: 13px; line-height: 1.8; background: var(--surface-soft); border-radius: var(--radius); padding: 18px; color: var(--muted-ink); max-height: 300px; overflow: auto}
+.settings-footer { gap: 8px}
+.settings-footer .secondary-button { height: auto; line-height: normal; background: var(--surface-soft); color: var(--muted-ink); font-size: 11px; border-radius: var(--radius); padding: 8px}
+.folder .ti-folder { font-size: 17px}
+@media(max-width: 730px) { #account-setup .settings-footer { height: 110px; flex-wrap: wrap; justify-content: center; padding: 12px}
+.ui-modal .compose-footer-area { height: 140px}
+}
+/* Official j-Modal measures content height. Padding belongs to inner content. */
+.ui-modal .composer-heading, .ui-modal .settings-heading { padding: 0; display: block; }
+.modal-heading-content { height: 100%; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; }
+.ui-modal .compose-body, .ui-modal .settings-body { padding: 0; }
+.modal-body-content { padding: 10px 28px; }
+.ui-modal .compose-footer-area, .ui-modal .settings-footer { padding: 0; display: block; }
+.modal-footer-content { padding: 16px 28px; height: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.compose-footer-area .modal-footer-content { display: block; }
+.access-page { background: var(--surface-hover); }
+.access-card, .ui-modal { border-radius: var(--radius); box-shadow: 0 12px 50px #0002; }
+.brand-mark, .compose-button { box-shadow: none; }
+.primary-button: hover { background: var(--color); }
+@media(max-width: 730px) { .modal-heading-content { padding: 18px 20px; }
+.modal-body-content { padding: 8px 20px; }
+.modal-footer-content { padding: 12px 20px; }
+}
+.ui-modal .settings-footer button { height: 34px; min-height: 34px; line-height: 34px; padding: 0 15px; }
+@media(max-width:730px) { #account-setup .settings-footer { height: 150px; padding: 0; } #account-setup .modal-footer-content { align-content: center; } }
+
+.app-shell a:hover, .access-card a:hover { text-decoration: none; }
+
+.sidebar { min-height: 0; overflow-y: auto; }
+.sidebar > * { flex-shrink: 0; }
+.main, .mail-list, .reader, .reader-content { min-height: 0; }
+.workspace { overflow: hidden; }
+
+/* Keep native modal footer defaults from overriding the app button hierarchy. */
+.primary-button, .secondary-button { min-height: 36px; white-space: nowrap; flex-shrink: 0; }
+.primary-button .ti, .secondary-button .ti { flex-shrink: 0; }
+.secondary-button { color: var(--muted-ink); border-color: var(--line-strong); justify-content: center; }
+.secondary-button:hover { background: var(--surface-hover); border-color: var(--line-strong); color: var(--ink-2); }
+.ui-modal .ui-modal-footer .primary-button { background: var(--color); color: #FFFFFF; border: 1px solid transparent; }
+.ui-modal .ui-modal-footer .primary-button:hover { background: var(--color); }
+.ui-modal .ui-modal-footer .secondary-button { background: var(--surface-soft); color: var(--muted-ink); border: 1px solid var(--line-strong); }
+.ui-modal .ui-modal-footer .secondary-button:hover { background: var(--surface-hover); color: var(--ink-2); border-color: var(--line-strong); }
+.primary-button:disabled, .secondary-button:disabled { cursor: not-allowed; }
+.ui-modal .ui-modal-footer button:disabled { background: var(--surface-hover); border-color: var(--line); color: #999999; cursor: not-allowed; }
+.ui-modal .compose-footer-area { height: auto; }
+.compose-footer-area .modal-footer-content { height: auto; }
+.compose-body .modal-body-content > ui-component[name='input'] { display: block; margin-bottom: 14px; }
+.reader-reply { flex-wrap: wrap; }
+.ui-modal .settings-footer button { min-height: 36px; height: auto; line-height: normal; }
+@media(max-width: 480px) {
+}
+
+/* j-Input owns selection; j-Directory supplies its shared picker. */
+.language-control ui-component { min-width: 0; }
+.language-control .ui-input, .access-language .ui-input { margin: 0; }
+.language-control .ui-input-control { height: 32px; background: var(--surface-soft); border-radius: var(--radius); }
+.language-control .ui-input input { font-size: 11px; padding-left: 8px; }
+.access-language .ui-input input { font-size: 12px; }
+.compose-from .ui-input { margin: 0; }
+.compose-from .ui-input-control { min-height: 36px; border-radius: var(--radius); }
+.compose-from .ui-input input { font-size: 11px; }
+.ui-directory { z-index: 1000; }
+
+.language-control .ui-input-value, .compose-from .ui-input-value { font-size: 11px; }
+.access-language .ui-input-value { font-size: 12px; }
+
+.user { width: 100%; text-align: left; }
+.user:hover { color: #FFFFFF; }
+.brand-mark, .compose-button, .primary-button, .access-brand .ti, .ui-modal .ui-modal-footer .primary-button { color: var(--accent-text, #FFFFFF); }
+.primary-button:hover, .compose-button:hover { filter: brightness(.94); }
+.profile-modal { width: 620px; }
+.profile-modal .settings-footer { height: 76px; }
+.profile-modal .settings-note { margin: 4px 0 20px; }
+
+.folder-modal .settings-footer {height:76px}
+.folder-modal .ui-input {margin-bottom:16px}
+.reader-toolbar .toolbar-left {display:flex;gap:2px;flex-wrap:wrap}
+@media (max-width:600px) {.reader-toolbar .toolbar-note {display:none}.reader-toolbar {gap:4px}.reader-toolbar .icon-button {width:34px;min-width:34px}}
+
+/* Login identity: scoped to access so mailbox colors remain personal. */
+.access-page {background:#041531 url('/img/bg.jpg') center center / cover fixed no-repeat;color:#F4F8FF;padding:28px 16px;isolation:isolate}
+.access-page:before {content:'';position:fixed;inset:0;background:linear-gradient(180deg,#020D2218,#020D2238);z-index:-1;pointer-events:none}
+.access-page ui-plugin {display:block;width:100%}
+.access-card {width:440px;max-width:100%;margin:auto;padding:28px 38px 24px;border:1px solid #CDE6FF40;border-radius:24px;background:linear-gradient(145deg,#0B1B34BB,#22467D9E);box-shadow:0 24px 80px #0005,inset 0 1px 0 #FFFFFF0D;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.access-brand {display:flex;flex-direction:column;gap:0;margin:0 0 4px;color:#FFFFFF;text-align:center}
+.access-brand:hover {color:#FFFFFF}
+.access-brand img {display:block;width:156px;height:156px;object-fit:contain;margin:-16px auto -18px;filter:drop-shadow(0 8px 18px #00193A44)}
+.access-wordmark {font-size:40px;line-height:1.2;font-weight:700;letter-spacing:-1.6px}
+.access-wordmark>span {color:#39C9F4}
+.access-card .access-tagline {text-align:center;text-transform:uppercase;font-size:11px;line-height:1.8;letter-spacing:2.2px;color:#C0D1EA;margin:6px 0 30px}
+.access-description {position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.access-card h1 {color:#FFFFFF}
+.access-card>.eyebrow {color:#CCDCED}
+.access-card>p,.access-card small {color:#CDDAEE}
+.access-card .ui-input {margin:0 0 18px}
+.access-card .ui-input-label {color:#DCE8F9;font-size:12px;margin-bottom:7px}
+.access-card .ui-input-control {background:#FFFFFF12;border:1px solid #B7D5FF40;border-radius:12px;color:#FFFFFF;min-height:48px;box-shadow:inset 0 1px 0 #FFFFFF05}
+.access-card .ui-input-control:focus-within {border-color:#79D6FF;box-shadow:0 0 0 3px #4BB8FF25}
+.access-card .ui-input input,.access-card .ui-input-value {background:transparent;color:#FFFFFF;font-size:14px}
+.access-card .ui-input input::placeholder {color:#B5C8E0}
+.access-card .ui-input-icon,.access-card .ui-input-arrow,.access-card .ui-input-password {color:#D3E5FB;background:transparent;border-color:#B7D5FF30}
+.access-card .primary-button {height:50px;border:0;border-radius:12px;background:linear-gradient(110deg,#4C57FA,#279DF1);color:#FFFFFF;justify-content:space-between;box-shadow:0 8px 26px #0D45AC40;margin-top:12px;padding:0 20px;font-size:14px}
+.access-card .primary-button:hover {background:linear-gradient(110deg,#5964FF,#32AEFA);filter:none}
+.access-card .primary-button:disabled {opacity:.6;color:#FFFFFF}
+.access-card #access-error {color:#FFE1E1;line-height:1.6}
+.access-card #access-error:empty {display:none}
+.access-language {position:static;width:120px;margin:20px auto 0}
+.access-language .ui-input {margin:0}
+.access-language .ui-input-control {min-height:32px;background:#061D3A55;border-color:#BCD5F526;border-radius:8px}
+.access-language .ui-input-value {font-size:12px}
+@media (max-width:480px) {.access-page {padding:20px 16px}.access-card {padding:26px 24px 22px;border-radius:20px}.access-wordmark {font-size:36px}.access-card .access-tagline {letter-spacing:1.5px}}
+@media (prefers-reduced-transparency:reduce) {.access-card {background:#10294F;backdrop-filter:none}}
+
+.brand-mark img {display:block;width:100%;height:100%;border-radius:inherit}
+.access-card .ui-input-icon-left,.access-card .ui-input-icon-right {color:#D3E5FB;border-color:#B7D5FF30}
+.access-card .primary-button {position:relative;justify-content:center;font-weight:600}
+.access-card .primary-button>.ti {position:absolute;right:20px;font-size:18px}
+
+/* Directory is mounted outside the glass card and keeps its light palette. */
+.access-page .ui-directory {color:var(--ink)}
+.access-page .ui-directory-search {color:var(--muted)}
+.access-page .ui-directory-search input {color:var(--ink)}
+.access-page .ui-directory-search input::placeholder {color:var(--muted)}
+
+.account {position:relative}
+.account-unread {margin-left:auto;min-width:20px;padding:2px 5px;border-radius:10px;background:var(--color);color:var(--accent-text);text-align:center;font-size:10px;font-weight:600;flex-shrink:0}
+.account-sync-error {color:#ffbd7a;font-weight:700;font-size:12px}
+.account-unread+.account-dot {margin-left:0}
+@media(max-width:700px) {.account-unread {position:absolute;right:1px;top:3px;min-width:15px;padding:1px 3px;font-size:9px}.account-sync-error {position:absolute;right:2px;bottom:2px}}
+/* Readability and target size (WCAG 2.2 AA): contrast of secondary text, 32px targets, white initials on any account colour. */
+.account-avatar { position: relative; isolation: isolate}
+.account-avatar::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(0,0,0,.28); z-index: -1}
+.account-add { display: grid; place-items: center; width: 32px; height: 32px; margin-left: auto}
+.list-tabs button { min-height: 32px; padding-bottom: 12px}
+.list-tabs button.active::after { bottom: 0}
+.ai-actions button { min-height: 32px}
+.secondary-button { min-height: 34px}
+/* Accent colour used as text is darkened so it keeps 4.5:1 on white for any base colour. */
+:root { --color-text: color-mix(in srgb, var(--color) 70%, #000)}
+.list-tabs button.active { color: var(--color-text)}
+.ai-heading .soon { color: var(--muted-ink)}
+.ui-input-placeholder { color: var(--muted-ink)}
+.ui-input-label { color: var(--muted-ink)}
+@media (max-width: 730px) {
+.search-wrap kbd { display: none}
+.language-control .ui-input-control { min-width: 96px}
+.language-control ui-component { width: 100px}
+}
+@media (max-width: 480px) {
+.reader-toolbar { padding: 0 8px; gap: 0}
+.reader-toolbar .toolbar-left { gap: 0}
+.reader-toolbar .icon-button { width: 32px; min-width: 32px}
+}
+/* Visible keyboard focus (3:1 against its background on light and dark surfaces). */
+button:focus-visible, a:focus-visible, select:focus-visible, [tabindex]:focus-visible, .ui-input input:focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px}
+.sidebar :focus-visible, .access-page :focus-visible { outline-color: #fff}
+/* Account type picker and provider guide */
+.provider-picker { margin-bottom: 18px}
+.provider-picker h3 { margin: 0 0 10px}
+.provider-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px}
+.provider-tile { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink-2); text-align: left; font-size: 12px; min-height: 44px}
+.provider-tile:hover { border-color: var(--color)}
+.provider-tile.active { border-color: var(--color-text); box-shadow: inset 0 0 0 1px var(--color-text); font-weight: 600}
+.provider-tile .ti { font-size: 18px; flex-shrink: 0}
+.provider-guide { margin-top: 12px; padding: 14px 16px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: var(--radius); font-size: 12px; line-height: 1.7; color: var(--ink-2)}
+.provider-guide .provider-summary { margin: 0 0 6px; font-weight: 600}
+.provider-guide p { color: inherit}
+.settings-body p > strong { color: var(--ink)}
+.provider-guide ol { margin: 0; padding-left: 20px}
+.provider-guide li { margin: 4px 0}
+.provider-guide a { color: var(--color-text); text-decoration: underline; white-space: nowrap}
+.provider-guide a .ti { font-size: 12px; margin-left: 3px}
+.provider-guide .provider-note { margin: 8px 0 0; color: var(--muted-ink)}
+#provider-suggestion { display: flex; align-items: center; gap: 10px; flex-wrap: wrap}
+.server-details { margin: 6px 0}
+.server-details summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--ink-2); padding: 8px 0}
+@media (max-width: 480px) { .provider-tiles { grid-template-columns: 1fr 1fr}}
+.server-details summary::before { content: '\25B8'; display: inline-block; width: 14px; transition: transform .15s}
+.server-details[open] summary::before { transform: rotate(90deg)}
+.server-details summary { list-style: none}
+.server-details summary::-webkit-details-marker { display: none}
+ui-bind.admin-link-block { margin-top: 10px}
+.admin-link-block .admin-link-row { margin-bottom: 10px}
+.admin-link-row { display: flex; gap: 8px; align-items: center}
+.admin-link-row input { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); font-size: 11px; color: var(--ink-2); background: var(--surface-soft)}
+.admin-link-row > ui-bind { flex: 1; min-width: 0}
+.admin-link-row ui-bind input { width: 100%; box-sizing: border-box}
+/* Account types and sign-in (administrators) */
+.type-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid var(--line)}
+.type-name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px}
+.type-name .badge { font-size: 11px; color: var(--ink-2); background: var(--surface-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 1px 6px}
+.type-actions { display: flex; gap: 6px; flex-wrap: wrap}
+.providers-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 18px}
+.company-user .secondary-button { justify-self: start; width: auto; margin-top: 6px}
+.manage-panel { margin-top: 14px; padding-top: 4px; border-top: 1px solid var(--line)}
+/* Conversations and server search */
+.thread-count { margin-left: 6px; min-width: 18px; padding: 0 5px; font-size: 11px; line-height: 18px; text-align: center; color: var(--ink-2); background: var(--surface-hover); border-radius: 9px}
+.thread { margin: 0 0 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden}
+.thread-title { padding: 8px 12px; font-size: 11px; font-weight: 600; letter-spacing: .4px; color: var(--muted-ink); background: var(--surface-soft); border-bottom: 1px solid var(--line)}
+.thread-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; width: 100%; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--ink-2)}
+.thread-item:last-child { border-bottom: 0}
+.thread-item:hover { background: var(--surface-soft)}
+.thread-item.current { box-shadow: inset 3px 0 0 var(--color-text); background: var(--surface-soft)}
+.thread-who { font-weight: 600; display: flex; align-items: center; gap: 6px}
+.thread-when { color: var(--muted-ink); font-size: 11px}
+.thread-snippet { grid-column: 1 / -1; color: var(--muted-ink); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis}
+.load-older i.ti { margin-right: 6px}
+/* Formatted mail */
+.mail-frame { display: block; width: 100%; height: 62vh; min-height: 320px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-bottom: 18px}
+.view-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 10px}
+.images-note { font-size: 11px; color: var(--muted-ink)}
+/* Address suggestions in the composer */
+.contacts-menu { position: fixed; z-index: 400; max-height: 260px; overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,.14)}
+.contacts-menu[hidden] { display: none}
+.contact-option { display: flex; align-items: baseline; gap: 8px; width: 100%; padding: 8px 12px; text-align: left; font-size: 12px; color: var(--ink); min-height: 36px}
+.contact-option small { color: var(--muted-ink); font-size: 11px}
+.contact-option.active, .contact-option:hover { background: var(--tint-soft)}
+
+/* Formatting toolbar of the composer */
+.compose-format { display: flex; align-items: center; gap: 2px; margin: 8px 0 6px; flex-wrap: wrap}
+.compose-format .format-button { width: 32px; height: 32px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center}
+.compose-format .format-button:hover { background: var(--surface-hover)}
+.compose-format .format-button:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 1px}
+.compose-format small { margin-left: 10px; font-size: 11px; color: var(--muted-ink)}
+
+/* Text that is read out but not shown */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0}
+
+/* Sidebar footer: who is signed in, and the way out. Everything else lives in the settings window. */
+.sidebar-bottom { padding-top: 16px}
+.sidebar-bottom .demo-label { margin-bottom: 4px}
+.user-row { display: flex; align-items: center; gap: 4px; border-top: 1px solid #434343; margin-top: 12px; padding: 14px 6px 0 0}
+.user-row .user { border-top: 0; margin: 0; padding: 4px 6px 4px 12px; flex: 1; min-width: 0; border-radius: 8px}
+.user-row .user:hover { background: #333}
+.user-row .user > div { min-width: 0}
+.user-row .user strong, .user-row .user small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%}
+.signout { width: 34px; height: 34px; flex-shrink: 0; border-radius: 8px; color: #c0c0c0; display: inline-grid; place-items: center; cursor: pointer}
+.signout:hover { background: #333; color: #fff}
+
+/* Settings window: preferences as switches, the rest as grouped links */
+.settings-section { font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--muted-ink); margin: 22px 0 8px}
+.settings-section:first-child { margin-top: 6px}
+.switch-row { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 4px; text-align: left; border-bottom: 1px solid var(--line); cursor: pointer; background: transparent; border-radius: 0}
+.switch-row > .ti { font-size: 18px; width: 22px; color: var(--muted-ink); flex-shrink: 0}
+.switch-text { flex: 1; min-width: 0}
+.switch-text strong { display: block; font-size: 13px; font-weight: 500}
+.switch-text small { display: block; margin-top: 3px; font-size: 11px; line-height: 1.5; color: var(--muted-ink)}
+.switch-pill { position: relative; width: 36px; height: 20px; border-radius: 10px; background: #8a8a8a; flex-shrink: 0; transition: background .15s}
+.switch-pill::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); transition: transform .15s}
+.switch-row[aria-checked='true'] .switch-pill { background: var(--color-text, #1d4ed8)}
+.switch-row[aria-checked='true'] .switch-pill::after { transform: translateX(16px)}
+.switch-row:focus-visible, .hub-link:focus-visible { outline: 2px solid var(--color-text, #1d4ed8); outline-offset: 2px; border-radius: 6px}
+.hub-link { display: flex; align-items: center; gap: 14px; width: 100%; padding: 11px 4px; font-size: 13px; text-align: left; border-bottom: 1px solid var(--line); cursor: pointer; background: transparent; border-radius: 0}
+.hub-link > .ti:first-child { font-size: 18px; width: 22px; color: var(--muted-ink)}
+.hub-link .hub-chevron { margin-left: auto; color: #8a8a8a; font-size: 14px}
+.hub-link:hover, .switch-row:hover { background: var(--surface-soft)}
+.hub-link.hidden, .settings-section.hidden { display: none}
+.hub-language { padding: 14px 0 0}
+@media (min-width: 561px) { .hub-language { display: none} }
+
+/* Error and info notices keep words whole */
+.ui-notify-message, .ui-notify figure { word-break: normal !important; overflow-wrap: break-word !important}
+/* Reader: the way to answer comes first, the assistant after it */
+.reader-reply { margin-top: 28px}
+.ai-card { margin-top: 28px}
+
+/* Composer: Cc and Bcc on request */
+.compose-extra-links { display: flex; gap: 2px}
+.compose-extra-links[hidden], .compose-extra[hidden] { display: none}
+.link-button { background: transparent; border: 0; padding: 4px 8px; font-size: 12px; color: var(--color-text, #1d4ed8); cursor: pointer; border-radius: 6px; text-decoration: underline; text-underline-offset: 2px}
+.link-button:hover { background: var(--surface-hover)}
+.link-button:focus-visible { outline: 2px solid var(--color-text, #1d4ed8); outline-offset: 1px}
+.compose-extra { margin: 0}
+.compose-body .compose-extra > ui-component[name='input'] { display: block; margin-bottom: 14px}
+
+/* Phones: the language moves into the settings window so the search box gets the room */
+@media (max-width: 560px) { .language-control, .private-badge { display: none} .search-wrap { flex: 1}}
+
+/* Fields. jComponent floats the icons and gives the text a fixed offset, so in a taller control everything sat at the top
+   and the dividers stopped short (or, in the 32 px language picker, stuck out). The control is a row instead: icon, text, icon,
+   all as tall as the control, text centred. */
+.ui-input-control { display: flex; align-items: stretch}
+.ui-input-control > .ui-input-icon-left, .ui-input-control > .ui-input-icon-right { float: none; flex: 0 0 34px; height: auto; display: grid; place-items: center; line-height: 1; margin: 0; box-sizing: border-box}
+.ui-input-control > .ui-input-icon-left { order: 0}
+.ui-input-control > .ui-input-input { order: 1; flex: 1 1 auto; min-width: 0; height: auto; margin: 0; padding: 0 8px; display: flex; align-items: center; box-sizing: border-box}
+.ui-input-control > .ui-input-icon-right { order: 2}
+.ui-input-control .ui-input-input > input, .ui-input-control .ui-input-input > .ui-input-value { width: 100%; height: auto; min-height: 0; line-height: 1.4; padding: 0}
+.ui-input-control .ui-input-input > textarea { width: 100%; padding: 8px 0}
+/* One focus ring, on the control. The field inside carries tabindex, which gave it a second ring just inside the first. */
+.ui-input-control input:focus-visible, .ui-input-control textarea:focus-visible, .ui-input-control [tabindex]:focus-visible { outline: none}
+.ui-input-control:focus-within { border-color: var(--color-text, #1d4ed8); box-shadow: 0 0 0 2px var(--color-text, #1d4ed8)}
+.access-card .ui-input-control:focus-within { border-color: #79D6FF; box-shadow: 0 0 0 3px #4BB8FF55}
+
+/* The New message button stays on one line; its key hint gives way first when the sidebar is narrow */
+.compose-button { white-space: nowrap}
+@media (max-width: 1100px) { .compose-button .keyhint { display: none}}
+
+/* Several messages at once */
+.message-line { position: relative}
+.message-line .message-row { padding-left: 36px}
+.row-check { position: absolute; left: 5px; top: 14px; width: 24px; height: 24px; margin: 0; accent-color: var(--color-text, #1d4ed8); cursor: pointer; opacity: 0; z-index: 1}
+.message-line:hover .row-check, .row-check:focus-visible, .row-check:checked, .messages.has-checked .row-check { opacity: 1}
+.message-line:hover .unread-dot, .messages.has-checked .unread-dot { visibility: hidden}
+.message-line.checked .message-row { background: var(--tint); border-color: var(--tint-line)}
+.row-check:focus-visible { outline: 2px solid var(--color-text, #1d4ed8); outline-offset: 2px}
+.bulk-bar { display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 22px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--tint-soft)}
+.bulk-bar input[type=checkbox] { width: 24px; height: 24px; margin: 0; accent-color: var(--color-text, #1d4ed8)}
+.bulk-bar [role=status] { font-size: 12px; font-weight: 600; flex: 1}
+.bulk-actions { display: flex; gap: 2px}
+.bulk-actions button { width: 32px; height: 32px; border-radius: 8px; display: inline-grid; place-items: center; color: var(--ink-2); cursor: pointer; background: transparent}
+.bulk-actions button:hover { background: #E6ECFB}
+.bulk-actions button:focus-visible { outline: 2px solid var(--color-text, #1d4ed8); outline-offset: 1px}
+.shortcut-list { margin: 8px 0 0}
+.shortcut-list > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 13px}
+.shortcut-list dt { display: flex; gap: 4px; flex-shrink: 0}
+.shortcut-list dd { margin: 0; color: var(--ink-2); text-align: right}
+.shortcut-list kbd { min-width: 24px; padding: 3px 7px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 6px; background: var(--surface-soft); font: 600 11px/1.2 inherit; text-align: center}
+.bulk-bar { flex-wrap: wrap; row-gap: 2px}
+.bulk-bar [role=status] { white-space: nowrap; min-width: 80px}
+.bulk-actions { margin-left: auto}
+
+/* Dropping files on the composer */
+.compose-body { position: relative}
+.drop-hint { display: none; position: absolute; inset: 8px; z-index: 5; align-items: center; justify-content: center; gap: 10px; border: 2px dashed var(--color-text, #1d4ed8); border-radius: var(--radius); background: #EEF3FFE6; color: var(--color-text, #1d4ed8); font-size: 14px; font-weight: 600; pointer-events: none}
+.composer.dropping .drop-hint { display: flex}
+
+/* Mailing list bar and calendar invitations in the reader */
+.unsub-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 14px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-soft); font-size: 12px; color: var(--ink-2)}
+.unsub-bar .ti { color: var(--muted-ink)}
+.unsub-bar .secondary-button { margin-left: auto; min-height: 32px; display: inline-flex; align-items: center}
+.invite-card { display: flex; gap: 14px; margin: 4px 0 16px; padding: 14px 16px; border: 1px solid var(--tint-line); border-radius: var(--radius); background: var(--tint-soft)}
+.invite-card > .ti { font-size: 22px; color: var(--color-text, #1d4ed8); margin-top: 2px}
+.invite-card strong { display: block; font-size: 14px; margin-bottom: 4px}
+.invite-card small { display: block; font-size: 12px; line-height: 1.6; color: var(--ink-2)}
+.invite-card .soon { margin-left: 8px}
+
+/* The "Send as" row sits right under "From" */
+.compose-from + .compose-from { margin-top: -14px}
+
+/* Two-step verification: the code step of the sign-in card and the setup window */
+.access-second-note { font-size: 13px; line-height: 1.6; color: #CDDAEE; margin: 0 0 14px}
+.access-card .link-button { display: block; margin: 14px auto 0; color: #CDE6FF}
+.access-card .link-button:hover { background: #FFFFFF18}
+.ts-qr { display: flex; justify-content: center; padding: 14px; margin: 12px 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius)}
+.ts-secret { display: block; margin: 6px 0 16px; padding: 10px 12px; background: var(--surface-soft); border-radius: 8px; font: 600 14px/1.5 ui-monospace, Menlo, monospace; letter-spacing: 1px; word-break: break-all; user-select: all}
+.ts-recovery { margin: 12px 0; padding: 14px; background: var(--surface-soft); border-radius: 8px; font: 600 15px/1.9 ui-monospace, Menlo, monospace; column-count: 2; user-select: all}
+.ts-recovery:focus-visible { outline: 2px solid var(--color-text, #1d4ed8); outline-offset: 2px}
+#profile-twostep { margin-top: 14px}
+#profile-twostep small { margin-left: auto; margin-right: 6px; color: var(--muted-ink); font-size: 12px}
+.ts-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px}
+.ts-actions .primary-button, .ts-actions .secondary-button { width: auto; margin: 0}
+
+/* The error on the dark sign-in card: the general error colour is for white surfaces (it is 2.7:1 on this one) */
+.access-card .error-text, .access-card #access-error { color: #FFD5D5!important}
+
+/* A long list is shown in stretches */
+.show-more { display: block; margin: 8px auto 12px; min-height: 36px}
+.show-more[hidden] { display: none}
+
+/* Colour scheme. Every surface, text and line colour of the app is a variable; "dark" redefines them. The page sets data-mode
+   (light or dark) on <html> from the person's choice or the system's, before it paints (see views/head.html). jComponent's own
+   inputs, lists and pickers switch with the ui-dark class that goes with it. */
+:root { color-scheme: light; --surface: #FFFFFF; --surface-soft: #F8F8F8; --surface-hover: #F0F0F0; --tint: #EEF3FF; --tint-soft: #F4F7FF; --tint-line: #C7D6FB; --ink-2: #404040; --muted-ink: #606060; --line-strong: #C8C8C8; --chip: #E0E0E0; --avatar-ink: #7A5744}
+:root[data-mode='dark'] { color-scheme: dark; --surface: #1A1E26; --surface-soft: #12151B; --surface-hover: #262C37; --tint: #1B2842; --tint-soft: #172033; --tint-line: #2C3F66; --ink: #E7EAF0; --ink-2: #CDD3DD; --muted-ink: #A6AFBD; --muted: #8A94A3; --line: #2F3643; --line-strong: #434C5C; --chip: #2F3643; --avatar-ink: #E8D9CF; --sidebar: #0D1015; --color-text: color-mix(in srgb, var(--color) 55%, #fff)}
+.hub-theme { padding: 14px 0 0}
+
+/* The review step shows the message as it will arrive */
+.send-frame { display: block; width: 100%; height: 240px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; margin: 10px 0 4px}
+
+/* Keyboard and assistive technology: a way past the sidebar, calm motion, forced colours */
+.skip-link { position: absolute; left: 8px; top: -60px; z-index: 300; padding: 10px 16px; border-radius: 8px; background: var(--surface); color: var(--ink); border: 2px solid var(--color-text, #1d4ed8); font-size: 13px; font-weight: 600}
+.skip-link:focus { top: 8px}
+.mail-list:focus { outline: none}
+.undo-bar { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 250; display: flex; align-items: center; gap: 14px; padding: 10px 14px 10px 18px; border-radius: 10px; background: #1f2933; color: #fff; font-size: 13px; box-shadow: 0 8px 30px #0005}
+.undo-bar .link-button { color: #9ec5ff; font-weight: 600; min-height: 32px}
+.undo-bar .link-button:hover { background: #ffffff1f}
+.settings-footer:has(.modal-footer-content:not(:has(*))) { display: none}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms!important; animation-iteration-count: 1!important; transition-duration: .01ms!important; scroll-behavior: auto!important}}
+@media (forced-colors: active) { .switch-pill { border: 2px solid ButtonText; background: Canvas}.switch-row[aria-checked='true'] .switch-pill { background: Highlight}.switch-pill::after { background: ButtonText}.row-check, .bulk-bar button, .undo-bar { forced-color-adjust: auto}.message-row.selected, .message-line.checked .message-row { outline: 2px solid Highlight}}
+.reader-welcome p { max-width: 380px; margin: 10px auto 22px; line-height: 1.7}
+.reader-welcome .primary-button { justify-self: center; align-self: center; width: auto; min-height: 40px; padding: 0 22px; display: inline-flex; align-items: center; justify-content: center; gap: 8px}
+.reader-welcome .primary-button i { position: static; display: inline-block; width: auto; height: auto; font-size: 18px; line-height: 1; color: inherit; margin: 0}
+.ai-sources { margin: 6px 0 0 16px; padding: 0; font-size: 11px; color: var(--muted-ink); line-height: 1.7}
+.ai-collection { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin: 0 0 12px; background: var(--surface-soft)}
+.ai-collection-head { display: flex; gap: 10px; align-items: center; margin-bottom: 8px}
+.ai-documents { list-style: none; margin: 0 0 10px; padding: 0; font-size: 12px; color: var(--muted-ink)}
+.ai-documents li { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line)}
+.ai-documents li button { font-size: 11px; padding: 4px 8px}
+.ai-actions .ai-language { min-width: 160px; max-width: 220px; margin: 0}
+.ai-language .ui-input-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap}
+.ai-language .ui-input-control { min-height: 34px}
+.ai-language .ui-input-value, .ai-language input { font-size: 12px}
+.ai-card .ui-input, .composer-ai .ui-input { margin: 10px 0 0}
+.ai-actions .ui-input { margin: 0}
+.ai-warning { border-left: 3px solid #b45309; padding-left: 10px; color: var(--ink-2)}
+.check-group { font-size: 12px; font-weight: 600; margin: 16px 0 6px; color: var(--ink-2)}
+.check-list { list-style: none; margin: 0; padding: 0}
+.check { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; font-size: 13px; color: var(--ink)}
+.check small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-2)}
+.check i { margin-top: 2px; flex: none}
+.check-ok i { color: #15803d}
+.check-warn i { color: #b45309}
+.check-fail i { color: #b91c1c}
+.check-skip i { color: var(--muted-ink)}
+
+/* Composer: Cc and Bcc beside the To label, the actions in one row, the status and the note under them */
+.compose-to { position: relative; margin-bottom: 14px}
+.compose-to .compose-extra-links { position: absolute; top: -5px; right: 0}
+.compose-from > span { flex: 0 0 84px}
+.compose-attachments { margin-top: 10px}
+/* The placeholder of a multi-line field starts where the text starts, not in the middle */
+.ui-input-type-multiline .ui-input-placeholder { top: 8px; line-height: 16px}
+.composer-footer { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0}
+.composer-footer .composer-discard { margin-right: auto}
+.composer-footer .secondary-button { background: var(--surface-soft); color: var(--muted-ink)}
+.composer-status { margin: 12px 0 0; min-height: 18px; font-size: 12px; line-height: 1.5; color: var(--muted-ink)}
+.composer-note { margin: 2px 0 0; font-size: 11px; line-height: 1.6; color: var(--muted-ink)}
+@media (max-width: 480px) {
+	.composer-footer button { flex: 1 1 100%}
+	.composer-footer .composer-discard { margin-right: 0}
+}
+
+/* The assistant's card: every control on a row has the same height and sits on the same line */
+.ai-actions { align-items: center}
+.ai-actions .ai-language { padding: 0}
+.ai-actions .ai-language .ui-input-control { min-height: 32px; height: 32px}
+.ai-actions .ai-translate { display: flex; align-items: center; gap: 7px; margin-left: auto}
+.ai-actions + .ui-input, .ai-actions + ui-component { margin-top: 12px}
+.ai-card .ai-actions + ui-component + .ai-actions, .ai-card ui-component + .ai-actions { margin-top: 12px}
+
+/* Printing a message is of no use on a phone */
+@media (max-width: 730px) { .desktop-only { display: none}}
+
+.device-detail { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-2)}
+.device-row { align-items: flex-start; gap: 16px}
+.device-info { flex: 1; min-width: 0}
+
+/* Language flags (circle-flags, MIT): decorative, the name always follows. */
+img.flag {
+	width: 1.15em;
+	height: 1.15em;
+	margin-right: 0.5em;
+	vertical-align: -0.2em;
+	border-radius: 50%;
+}
+
+/* The text of a message while it is written: the marks are drawn behind the box, in colour only (nothing changes width) */
+.mailbody-live { position: relative}
+.mailbody-live > textarea { position: relative; z-index: 1; background: transparent; color: transparent; caret-color: var(--ink)}
+.mailbody-live > textarea::placeholder { color: var(--muted)}
+.mailbody-mirror { position: absolute; z-index: 0; margin: 0; border: 0; overflow: hidden; white-space: pre-wrap; overflow-wrap: break-word; pointer-events: none; color: var(--ink)}
+.mailbody-mirror .mk-mark { color: var(--muted)}
+.mailbody-mirror .mk-bold { text-shadow: .45px 0 currentColor, -.45px 0 currentColor}
+.mailbody-mirror .mk-italic { background: #4285f424; border-radius: 3px; box-shadow: 0 0 0 1px #4285f430}
+.mailbody-mirror .mk-link { color: var(--color-text, #1d4ed8); text-decoration: underline}
+.mailbody-mirror .mk-quote, .mailbody-mirror .mk-sig { color: var(--muted-ink, #6b6b6b)}
+@media (forced-colors: active) {
+	.mailbody-live > textarea { color: CanvasText}
+	.mailbody-mirror { display: none}
+}
+
+/* Reading comfort and a clear current message, in both colour schemes. */
+.sidebar { overflow-y: auto }
+.sidebar > * { flex-shrink: 0 }
+.account > div { min-width: 0; flex: 1 }
+.account-name, .account-email { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.message-row:hover { background: var(--surface-hover) }
+.message-row.selected { background: var(--tint); border-color: var(--tint-line); box-shadow: inset 3px 0 0 var(--color) }
+.sender, .message-subject { font-size: 14px }
+.message-preview { font-size: 12px; line-height: 1.6 }
+.message-top { margin-bottom: 7px }
+.message-meta { margin-top: 9px }
+.mail-body { font-size: 15px; line-height: 1.8; color: var(--ink-2); overflow-wrap: anywhere }
+.sender-card > div:not(.sender-avatar) { min-width: 0 }
+.sender-card small { overflow-wrap: anywhere }
+.reader-content .mail-body { max-width: 78ch }
+.reader-toolbar .icon-button { width: 36px; height: 36px }
+@media (max-width: 480px) { .reader-toolbar { overflow-x: auto; justify-content: flex-start } .reader-toolbar .toolbar-left { flex-shrink: 0 } .reader-toolbar .icon-button { width: 36px; min-width: 36px } .reader-content { padding: 24px 18px } }
+
+/* Search reset is a native keyboard button; touch users can discover bulk selection. */
+.search-clear { position: absolute; left: 0; top: 0; width: 34px; height: 36px }
+.search-clear button { width: 100%; height: 100%; display: grid; place-items: center; background: transparent; color: var(--muted-ink); border: 0; border-radius: var(--radius) }
+.search-clear button:hover { background: var(--surface-hover); color: var(--ink) }
+.search-wrap:has(.search-clear:not(.hidden)) .ui-searchinput > span { visibility: hidden }
+.ui-searchinput:focus-within { outline: 2px solid var(--color-text); outline-offset: 2px }
+.empty > .ti { display: block; font-size: 28px; margin-bottom: 14px; color: var(--muted-ink) }
+.empty p { margin: 0 0 18px; font-size: 13px }
+#composer .mailbody-live > textarea { font-size: 15px; line-height: 1.7 }
+@media (hover: none), (pointer: coarse) { .row-check { opacity: 1 } }
+@media (max-width: 730px) { .ui-modal.composer { left: 15px!important; margin-left: 0!important } .row-check { opacity: 1 } }
+@media (max-width: 480px) { #composer .ui-input input, #composer .ui-input textarea { font-size: 16px } }

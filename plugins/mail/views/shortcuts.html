@@ -1,0 +1,49 @@
+<ui-component
+	name="modal"
+	path="mail.window"
+	config="if:shortcuts;width:480;center:true"
+	id="shortcuts"
+	class="settings-modal settings-hub hidden"
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="shortcuts-title"
+	><div class="settings-heading">
+		<div class="modal-heading-content">
+			<h2 id="shortcuts-title">@(Shortcuts)</h2>
+			<button class="icon-button exec" data-command="close-shortcuts" data-exec="mail/click" aria-label="@(Close)">
+				<i class="ti ti-times" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+	<div class="settings-body">
+		<div class="modal-body-content">
+			<dl class="shortcut-list" tabindex="0" aria-label="@(Shortcuts)">
+				<div><dt><kbd>N</kbd> <kbd>C</kbd></dt><dd>@(New message)</dd></div>
+				<div><dt><kbd>/</kbd></dt><dd>@(Search your mail)</dd></div>
+				<div><dt><kbd>J</kbd> <kbd>K</kbd></dt><dd>@(Next and previous message)</dd></div>
+				<div><dt><kbd>X</kbd></dt><dd>@(Select or unselect the message)</dd></div>
+				<div><dt><kbd>R</kbd></dt><dd>@(Reply)</dd></div>
+				<div><dt><kbd>A</kbd></dt><dd>@(Reply all)</dd></div>
+				<div><dt><kbd>F</kbd></dt><dd>@(Forward)</dd></div>
+				<div><dt><kbd>E</kbd></dt><dd>@(Archive)</dd></div>
+				<div><dt><kbd>#</kbd> <kbd>Delete</kbd></dt><dd>@(Move to trash)</dd></div>
+				<div><dt><kbd>S</kbd></dt><dd>@(Star)</dd></div>
+				<div><dt><kbd>U</kbd></dt><dd>@(Mark as unread)</dd></div>
+				<div><dt><kbd>Z</kbd></dt><dd>@(Undo the last move)</dd></div>
+				<div><dt><kbd>Esc</kbd></dt><dd>@(Clear the selection or close a window)</dd></div>
+				<div><dt><kbd>?</kbd></dt><dd>@(Show this list)</dd></div>
+			</dl>
+			<p class="settings-note">@(With messages selected, the actions apply to all of them.)</p>
+			<h3 class="settings-section">@(Search)</h3>
+			<dl class="shortcut-list">
+				<div><dt><kbd>from:</kbd> <kbd>to:</kbd> <kbd>subject:</kbd> <kbd>body:</kbd></dt><dd>@(Look only in that part, like from:ana)</dd></div>
+				<div><dt><kbd>is:unread</kbd> <kbd>is:read</kbd> <kbd>is:starred</kbd></dt><dd>@(Messages in that state)</dd></div>
+				<div><dt><kbd>has:attachment</kbd></dt><dd>@(Messages with files)</dd></div>
+				<div><dt><kbd>after:</kbd> <kbd>before:</kbd></dt><dd>@(A date, like after:2026-09-01)</dd></div>
+				<div><dt><kbd>"…"</kbd></dt><dd>@(An exact phrase)</dd></div>
+			</dl>
+			<p class="settings-note">@(Every word must match. “Search the whole mailbox” also looks at mail that is not loaded yet.)</p>
+		</div>
+	</div>
+	<div class="settings-footer"><div class="modal-footer-content"></div></div
+></ui-component>

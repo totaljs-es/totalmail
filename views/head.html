@@ -1,0 +1,44 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="format-detection" content="telephone=no" />
+<title>TotalMail · @(Self-hosted email client)</title>
+<script>
+	// Light or dark, decided before the first paint: the person's choice (Settings), else the system's. The sign-in page keeps its own look.
+	(function () {
+		var root = document.documentElement, media = window.matchMedia && matchMedia('(prefers-color-scheme: dark)');
+		function apply() {
+			var choice = 'auto';
+			try { choice = localStorage.getItem('totalmail-theme') || 'auto'; } catch (e) {}
+			var dark = root.dataset.page !== 'access' && (choice === 'dark' || (choice !== 'light' && !!media && media.matches));
+			root.dataset.mode = dark ? 'dark' : 'light';
+			root.classList.toggle('ui-dark', dark);
+		}
+		apply();
+		if (media && media.addEventListener) media.addEventListener('change', apply);
+		window.totalmailtheme = apply;
+	})();
+</script>
+<link rel="stylesheet" href="https://cdn.componentator.com/spa.min@20.css" />
+<script src="https://cdn.componentator.com/spa.min@20.js"></script>
+<script src="@{REPO.ui}"></script>
+<script src="/_mail/request.js"></script>
+@{import('app.css')}
+<script>
+	DEF.color = '@{model.color}';
+	DEF.language = '@{language}';
+	// Every call to the server goes through jComponent (plugins/mail/public/request.js): this is what the server expects.
+	DEF.api = '/api/';
+	DEF.headers['X-TotalMail'] = '1';
+	DEF.languages = @{!model.languages};
+	// The languages for the selectors: decorative flag first, the name in its own language next to it (nothing depends on seeing the flag).
+	DEF.languageitems = DEF.languages.map(function(item) {
+		return { id: item.id, name: '<img class="flag" src="/flags/' + encodeURIComponent(item.id) + '.svg" alt="" onerror="this.remove()">' + Thelpers.encode(item.name) };
+	});
+	LOCALIZE(@{!model.localization});
+</script>
+
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#0b1b34" />
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=20261009" />
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png?v=20261009" />
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=20261009" />

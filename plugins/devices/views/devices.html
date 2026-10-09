@@ -1,0 +1,44 @@
+<ui-plugin path="devices">
+	<ui-component
+		name="modal"
+		path="mail.window"
+		config="if:devices;width:620;center:true"
+		id="devices"
+		class="settings-modal hidden"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="devices-title"
+		><div class="settings-heading">
+			<div class="modal-heading-content">
+				<div>
+					<span class="eyebrow">@(YOUR ACCOUNT)</span>
+					<h2 id="devices-title">@(My devices)</h2>
+				</div>
+				<button class="icon-button exec" data-exec="mail/click" data-command="close-settings" aria-label="@(Close)">
+					<i class="ti ti-times" aria-hidden="true"></i>
+				</button>
+			</div>
+		</div>
+		<div class="settings-body">
+			<div class="modal-body-content">
+				<p class="settings-note">@(The apps where you are signed in to this TotalMail. If you do not recognize one, or you lost a device, sign it out: it stops working at once.)</p>
+				<ui-bind path="devices.items" config="template" class="block"
+					><script type="text/html">
+						{{ if value.length }}{{ foreach d in value }}
+						<div class="type-row device-row">
+							<div class="device-info">
+								<div class="type-name"><strong>{{ d.name }}</strong>{{ if d.current }}<span class="badge">@(This device)</span>{{ fi }}</div>
+								<span class="device-detail">{{ d.detail }}</span>
+								<span class="device-detail">{{ d.lastUsed }}</span>
+							</div>
+							<div class="type-actions"><button type="button" class="secondary-button exec" data-exec="devices/revoke" data-id="{{ d.id }}" aria-label="@(Sign out): {{ d.name }}">@(Sign out)</button></div>
+						</div>
+						{{ end }}{{ else }}<p class="settings-note">@(No devices yet. Apps appear here when you sign in with them.)</p>{{ fi }}
+					</script></ui-bind
+				>
+				<p class="error-text" role="alert"><ui-bind path="devices.error" config="text:value"></ui-bind></p>
+			</div>
+		</div>
+		<div class="settings-footer"><div class="modal-footer-content"></div></div></ui-component
+	>
+</ui-plugin>

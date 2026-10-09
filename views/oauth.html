@@ -1,0 +1,17 @@
+@{layout('')}
+<!doctype html>
+<html lang="@{language}">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<meta http-equiv="refresh" content="0;url=/?oauth=@{model.result}" />
+		<title>TotalMail</title>
+		<style>
+			body { font: 14px Arial, sans-serif; background: #041531; color: #F4F8FF; display: grid; place-items: center; min-height: 100dvh; margin: 0 }
+			a { color: #9FD3FF }
+		</style>
+	</head>
+	<body>
+		<p>@(Returning to TotalMail…) <a href="/?oauth=@{model.result}">@(Continue)</a></p>
+	</body>
+</html>

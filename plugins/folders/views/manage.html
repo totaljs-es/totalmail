@@ -1,0 +1,24 @@
+<ui-plugin path="folders">
+<ui-component name="modal" path="mail.window" config="if:folder-manager;width:520;center:true;cancel:folders/close" id="folder-manager" class="settings-modal folder-modal hidden" role="dialog" aria-modal="true" aria-labelledby="folder-manager-title">
+	<div class="settings-heading"><div class="modal-heading-content">
+		<h2 id="folder-manager-title"><ui-bind path="folders.moving" config="text:value ? '@(Move message)' : '@(Create folder)'"></ui-bind></h2>
+		<button class="icon-button exec" data-exec="folders/close" aria-label="@(Close)"><i class="ti ti-times" aria-hidden="true"></i></button>
+	</div></div>
+	<div class="settings-body"><div class="modal-body-content">
+		<ui-bind path="folders.moving" config="hide:value" class="block">
+			<ui-component name="input" path="folders.form.accountId" config="label:@(Mail account);dirsource:folders.accounts;$delay:1"></ui-component>
+			<ui-component name="input" path="folders.form.name" config="label:@(Folder name);maxlength:80;$delay:1"></ui-component>
+			<ui-component name="input" path="folders.form.parent" config="label:@(Parent folder);dirsource:folders.parents;$delay:1"></ui-component>
+		</ui-bind>
+		<ui-bind path="folders.moving" config="show:value" class="block">
+			<ui-component name="input" path="folders.form.path" config="label:@(Destination folder);dirsource:folders.destinations;$delay:1"></ui-component>
+		</ui-bind>
+		<p class="settings-note">@(Changes are saved on your mail server.)</p>
+		<p class="error-text" role="alert"><ui-bind path="folders.error" config="text:value"></ui-bind></p>
+	</div></div>
+	<div class="settings-footer"><div class="modal-footer-content">
+		<button class="secondary-button exec" data-exec="folders/close">@(Cancel)</button>
+		<ui-bind path="folders.busy" config="disabled button:value"><button class="primary-button exec" data-exec="folders/save">@(Save)</button></ui-bind>
+	</div></div>
+</ui-component>
+</ui-plugin>

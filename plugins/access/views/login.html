@@ -1,0 +1,50 @@
+<ui-plugin path="access">
+	<main class="access-card">
+		<a class="access-brand" href="/" aria-label="TotalMail">
+			<img src="/img/totalmail-logo.png" width="156" height="156" alt="" />
+			<span class="access-wordmark">Total<span>Mail</span></span>
+		</a>
+		<p class="access-tagline">@(Secure email for teams and individuals)</p>
+		@{if model.setup}<span class="eyebrow">@(FIRST SETUP)</span>
+		<h1>@(Set up TotalMail)</h1>
+		<p>@(Create the first administrator. Only administrators can add company users.)</p>
+		<ui-component name="input" path="access.name" config="label:@(Full name);maxlength:80;$delay:1"></ui-component
+		>@{else}<h1 class="access-description">@(Sign in to TotalMail)</h1>
+		<p class="access-description">@(Sign in to access your mail accounts.)</p>
+		@{fi}
+		<form class="access-form" method="post" action="#" autocomplete="on">
+		<ui-bind path="access.step" config="hide:value==='code'" class="block">
+			<ui-bind path="access.step" config="delay:300;attr autocomplete input:'username';attr id input:'username'" class="block"
+				><ui-component name="input" path="access.email" config="label:@(Email);licon:user;type:email;maxlength:254;autofill:username;$delay:1"></ui-component></ui-bind
+			><ui-bind path="access.step" config="delay:300;attr autocomplete input:@{if model.setup}'new-password'@{else}'current-password'@{fi};attr id input:'password'" class="block"
+				><ui-component
+					name="input"
+					path="access.password"
+					config="label:@(Password);licon:lock;type:password;maxlength:128;autofill:password;$delay:1"
+				></ui-component></ui-bind
+			>
+			@{if model.setup}<small>@(Use at least 12 characters. There is no default password.)</small>@{fi}
+		</ui-bind>
+		<ui-bind path="access.step" config="show:value==='code';focus:input" class="block">
+			<p class="access-second-note">@(Enter the 6-digit code from your authenticator app. If you lost your phone, use one of your recovery codes.)</p>
+			<ui-bind path="access.step" config="delay:300;attr autocomplete input:'one-time-code';attr id input:'otp';attr inputmode input:'numeric';attr autocapitalize input:'off';attr enterkeyhint input:'go'" class="block"
+				><ui-component name="input" path="access.code" config="label:@(Code);licon:lock;maxlength:40;autofill:otp;$delay:1"></ui-component></ui-bind
+			>
+		</ui-bind>
+		<p class="error-text" role="alert"><ui-bind path="access.error" config="text:value"></ui-bind></p>
+		<ui-bind path="access.busy" config="disabled:value" class="block"
+			><button type="submit" class="primary-button exec" data-exec="access/submit" data-prevent="true">
+				@{if model.setup}@(Create administrator)@{else}@(Sign in)@{fi}<i
+					class="ti ti-chevron-right"
+					aria-hidden="true"
+				></i></button
+		></ui-bind>
+		<ui-bind path="access.step" config="show:value==='code'" class="block"
+			><button type="button" class="link-button exec" data-exec="access/restart">@(Start again)</button></ui-bind
+		>
+		</form>
+		<div class="access-language">
+			<ui-component name="input" path="access.language" config="dirsource:access.languages;dirraw:1;$delay:1" id="access-language" data-label="@(Language)"></ui-component>
+		</div>
+	</main>
+</ui-plugin>

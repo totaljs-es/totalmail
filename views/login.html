@@ -1,0 +1,19 @@
+@{layout('')}
+<!doctype html>
+<html lang="@{language}" data-page="access" style="--color: @{model.color}; --accent-text: @{model.foreground}">
+	<head>
+		@{view('head', model)}
+	</head>
+	<body class="access-page">
+<ui-component name="directory" config="zindex:100"></ui-component>
+<ui-component name="locale" config="language:@{language}"></ui-component>
+		@{view('#access/views/login', model)}
+		<ui-component name="exec"></ui-component>
+		<ui-component name="a11y"></ui-component>
+		<script>
+			var initialsetup = @{model.setup};
+		</script>
+		<script src="/_mail/a11y.js"></script>
+		<script src="/_access/access.js"></script>
+	</body>
+</html>

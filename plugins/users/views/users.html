@@ -1,0 +1,80 @@
+<ui-plugin path="users">
+	<ui-component
+		name="modal"
+		path="mail.window"
+		config="if:users;width:560;center:true"
+		id="users"
+		class="settings-modal hidden"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="users-title"
+		><div class="settings-heading">
+			<div class="modal-heading-content">
+				<h2 id="users-title">@(Company users)</h2>
+				<button
+					class="icon-button exec"
+					data-exec="mail/click"
+					data-command="close-settings"
+					aria-label="@(Close)"
+				>
+					<i class="ti ti-times" aria-hidden="true"></i>
+				</button>
+			</div>
+		</div>
+		<div class="settings-body">
+			<div class="modal-body-content">
+				<ui-bind path="users.items" config="template" class="block"
+					><script type="text/html">
+						{{ foreach m in value }}
+						<div class="company-user">
+							<strong>{{ m.name }}</strong><span>{{ m.email }}</span><small>{{ m.roleLabel }}{{ if m.disabledLabel }} · {{ m.disabledLabel }}{{ fi }}{{ if m.twostepLabel }} · {{ m.twostepLabel }}{{ fi }}</small>
+							{{ if m.canManage }}<button type="button" class="secondary-button exec" data-exec="users/manage" data-id="{{ m.id }}">@(Manage)</button>{{ fi }}
+						</div>
+						{{ end }}
+					</script></ui-bind
+				>
+				<ui-bind path="users.panel" config="show:value" class="manage-panel block">
+					<h3><ui-bind path="users.manageTitle" config="text:value"></ui-bind></h3>
+					<ui-component name="input" path="users.manage.password" config="label:@(New password for this person);type:password;maxlength:128;$delay:1"></ui-component>
+					<div class="providers-actions"><button type="button" class="secondary-button exec" data-exec="users/reset">@(Set the new password)</button><ui-bind path="users.totpReset" config="show:value"><button type="button" class="secondary-button exec" data-exec="users/resettwostep">@(Remove two-step verification)</button></ui-bind></div>
+					<ui-component name="input" path="users.manage.role" config="dirsource:users.roleOptions;label:@(Role);$delay:1"></ui-component>
+					<div class="providers-actions">
+						<button type="button" class="secondary-button exec" data-exec="users/saverole">@(Save role)</button>
+						<button type="button" class="secondary-button exec" data-exec="users/toggle"><ui-bind path="users.toggleLabel" config="text:value"></ui-bind></button>
+						<button type="button" class="secondary-button exec" data-exec="users/remove"><ui-bind path="users.removeLabel" config="text:value"></ui-bind></button>
+					</div>
+					<ui-component name="input" path="users.manage.adminPassword" config="label:@(Your password, to confirm);type:password;maxlength:128;$delay:1"></ui-component>
+					<p class="settings-note">@(Deleting a person also deletes their mailbox data on this server. Their mail on the provider is not touched.)</p>
+				</ui-bind>
+				<h3>@(Add a user)</h3>
+				<ui-component
+					name="input"
+					path="users.form.name"
+					config="label:@(Full name);maxlength:80;$delay:1"
+				></ui-component
+				><ui-component
+					name="input"
+					path="users.form.email"
+					config="label:@(Email);type:email;maxlength:254;$delay:1"
+				></ui-component>
+				<ui-bind path="users.form" config="attr autocomplete input:'new-password'" class="block"
+					><ui-component
+						name="input"
+						path="users.form.password"
+						config="label:@(Password);type:password;maxlength:128;$delay:1"
+					></ui-component
+				></ui-bind>
+				<p class="settings-note">@(Use at least 12 characters. Share the access details privately.)</p>
+				<p class="error-text" role="alert"><ui-bind path="users.error" config="text:value"></ui-bind></p>
+			</div>
+		</div>
+		<div class="settings-footer">
+			<div class="modal-footer-content">
+				<ui-bind path="users.createBusy" config="disabled:value"
+					><button class="primary-button exec" data-exec="mail/click" data-command="create-user">
+						@(Create user)<i class="ti ti-plus" aria-hidden="true"></i>
+					</button></ui-bind
+				>
+			</div></div
+	></ui-component>
+</ui-plugin>

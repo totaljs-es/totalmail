@@ -1,0 +1,17 @@
+{
+	"id": "other",
+	"order": 0,
+	"name": "@(Other or hosting)",
+	"icon": "server",
+	"discover": true,
+	"auth": "password",
+	"summary": "@(Your own domain or hosting. The servers are looked up from your address.)",
+	"steps": [
+		{
+			"text": "@(Enter your email address and choose Discover servers.)"
+		},
+		{
+			"text": "@(Review the servers found and enter your mail password.)"
+		}
+	]
+}

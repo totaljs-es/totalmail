@@ -1,0 +1,44 @@
+{
+	"name": "totalmail",
+	"version": "1.0.0",
+	"description": "A self-hosted mail client for teams and personal use, built with Total.js 5: IMAP and SMTP, private mailboxes, optional manual AI assistant.",
+	"private": true,
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/totaljs-es/totalmail.git"
+	},
+	"bugs": {
+		"url": "https://github.com/totaljs-es/totalmail/issues"
+	},
+	"homepage": "https://github.com/totaljs-es/totalmail#readme",
+	"keywords": [
+		"email",
+		"imap",
+		"smtp",
+		"webmail",
+		"self-hosted",
+		"totaljs"
+	],
+	"engines": {
+		"node": ">=22"
+	},
+	"scripts": {
+		"start": "node index.js 8000",
+		"start:production": "NODE_ENV=production node index.js 8000",
+		"test": "node --test tests/*.test.js",
+		"lint": "eslint .",
+		"format": "prettier --write \"**/*.js\" \"**/*.cjs\" && eslint --fix .",
+		"translations": "node bin/translations.js"
+	},
+	"dependencies": {
+		"imapflow": "^2.3.0",
+		"mailparser": "^3.9.37",
+		"sanitize-html": "^2.18.0",
+		"total5": "^0.0.19"
+	},
+	"devDependencies": {
+		"eslint": "^9.0.0",
+		"prettier": "3.3.3"
+	}
+}

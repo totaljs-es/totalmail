@@ -1,0 +1,11 @@
+// TotalMail already includes a working config. This file is a reference for your installation's non-secret settings.
+// Apply the settings you need to config, or mount your own config over /app/config with Docker.
+// Credentials are entered in the app and encrypted in database/: never put them in a public config or commit.
+
+name : TotalMail
+production : false
+// $port : 8000
+$ip : 0.0.0.0
+trust_proxy : true
+
+// oauth_base_url : https://mail.example.com

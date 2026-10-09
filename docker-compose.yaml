@@ -1,0 +1,53 @@
+# TotalMail on its own, behind your reverse proxy.
+#
+#   (optional) edit the included config and uncomment the config mount below
+#   docker compose up -d --build
+#
+# The container listens on 127.0.0.1:8000 only: put the proxy that gives you HTTPS in front of it (TotalMail
+# refuses to be reached any other way in practice, the session cookie is `Secure` over https). The proxy must
+# send X-Forwarded-Proto and append to X-Forwarded-For, which nginx, Caddy and Traefik do.
+#
+# Using the nginx-proxy / Let's Encrypt companion that Total.js Code uses? Remove `ports`, add the VIRTUAL_* and
+# LETSENCRYPT_* variables below and join its network at the bottom.
+
+name: totalmail
+
+services:
+
+  totalmail:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: totalmail
+    restart: unless-stopped
+    init: true
+
+    ports:
+      - "127.0.0.1:8000:8000"
+
+    volumes:
+      # People, mailboxes and the encryption key. Named volume: it is created owned by the app user.
+      - totalmail-data:/app/database
+      # Only if you need installation-specific settings (public address, trust_proxy): the config is included.
+      # - ./config:/app/config:ro
+
+    environment:
+      # nginx-proxy companion:
+      # - VIRTUAL_HOST=mail.example.com
+      # - VIRTUAL_PORT=8000
+      # - LETSENCRYPT_HOST=mail.example.com
+      # - HTTPS_METHOD=redirect
+
+    # Nothing here needs more than a plain process.
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  totalmail-data:
+
+# networks:
+#   default:
+#     name: proxy
+#     external: true

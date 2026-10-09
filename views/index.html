@@ -1,0 +1,53 @@
+@{layout('')}
+<!doctype html>
+<html lang="@{language}" style="--color: @{model.color}; --accent-text: @{model.foreground}">
+	<head>
+		@{view('head', model)}
+	</head>
+	<body>
+<ui-component name="colorpicker"></ui-component>
+<ui-component name="directory" config="zindex:100"></ui-component>
+<ui-component name="locale" config="language:@{language}"></ui-component>
+		<ui-plugin path="mail">
+			@{view('#mail/views/mail', model)} @{view('#mail/views/composer', model)} @{view('#accounts/views/account-setup', model)} @{view('#users/views/users', model)} @{view('#providers/views/providers', model)} @{view('#ai/views/ai', model)} @{view('#rules/views/rules', model)} @{view('#devices/views/devices', model)}
+			@{view('#folders/views/manage', model)} @{view('#users/views/profile', model)} @{view('#users/views/twostep', model)} @{view('#mail/views/settings', model)} @{view('#mail/views/shortcuts', model)} @{view('#mail/views/send-confirm', model)}
+		</ui-plugin>
+		<ui-component
+			name="notify"
+			config="position:bottom-right;timeout:7000"
+			role="status"
+			aria-live="polite"
+		></ui-component>
+		<ui-component name="exec"></ui-component>
+		<ui-component name="a11y"></ui-component>
+		<ui-component name="pageevents" config="visible:reception/tick;online:reception/tick;leaving:reception/leaving"></ui-component>
+		<ui-component name="filepicker"></ui-component>
+		<ui-component name="page"></ui-component>
+		<ui-component name="keys" config="exec:mail/keys"></ui-component>
+		<ui-component name="dropfiles" path="mail.dropping" config="exec:mail/dropped"></ui-component>
+		<ui-component name="modalguard" path="mail.window"></ui-component>
+		<ui-component name="beforeleave" config="check:mail/pending"></ui-component>
+		<ui-bind path="mail.notifyOn" config="template;changes" class="contents"
+			><script type="text/html">
+				{{ if value }}<ui-component name="nativenotifications" config="icon:/icons/app-192.png;timeout:8000"></ui-component>{{ fi }}
+			</script></ui-bind
+		>
+		<script src="/_mail/a11y.js"></script>
+		<script src="/_mail/behaviors.js"></script>
+		<script src="/_mail/threads.js"></script>
+		<script src="/_mail/contacts.js"></script>
+		<script src="/_mail/quote.js"></script>
+		<script src="/_mail/format.js"></script>
+		<script src="/_mail/query.js"></script>
+		<script src="/_mail/mail.js"></script>
+		<script src="/_accounts/accounts.js"></script>
+		<script src="/_users/users.js"></script>
+		<script src="/_users/twostep.js"></script>
+		<script src="/_providers/providers.js"></script>
+		<script src="/_ai/ai.js"></script>
+		<script src="/_rules/rules.js"></script>
+		<script src="/_devices/devices.js"></script>
+		<script src="/_folders/folders.js"></script>
+		<script src="/_reception/reception.js"></script>
+	</body>
+</html>

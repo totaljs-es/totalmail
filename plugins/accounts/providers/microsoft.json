@@ -1,0 +1,78 @@
+{
+	"id": "microsoft",
+	"order": 10,
+	"name": "Outlook / Microsoft 365",
+	"icon": "microsoft",
+	"auth": "oauth2",
+	"summary": "@(Outlook.com, Hotmail and work or school accounts on Microsoft 365.)",
+	"domains": [
+		"outlook.com",
+		"hotmail.com",
+		"live.com",
+		"msn.com",
+		"outlook.sk",
+		"outlook.es",
+		"outlook.cz"
+	],
+	"mx": [
+		".protection.outlook.com",
+		".mail.protection.outlook.com"
+	],
+	"imap": {
+		"host": "outlook.office365.com",
+		"port": 993,
+		"security": "tls"
+	},
+	"smtp": {
+		"host": "smtp.office365.com",
+		"port": 587,
+		"security": "starttls"
+	},
+	"username": "email",
+	"steps": [
+		{
+			"text": "@(Enter your email address, then choose Sign in with Microsoft.)"
+		},
+		{
+			"text": "@(Approve the access Microsoft asks for. Your password never reaches TotalMail.)"
+		},
+		{
+			"text": "@(Work and school accounts may need approval from the organization administrator.)"
+		}
+	],
+	"setup": [
+		{
+			"text": "@(Register an application in Microsoft Entra, for accounts in any organization and personal accounts.)",
+			"url": "https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade"
+		},
+		{
+			"text": "@(Add the web redirect address shown in the administrator guide, then create a client secret.)"
+		},
+		{
+			"text": "@(Put the application ID and the secret in the administrator window (Account types and sign-in), then try again.)"
+		}
+	],
+	"note": "@(Sign-in with Microsoft is not set up on this server. Ask the administrator to add the application ID.)",
+	"personal": {
+		"domains": [
+			"outlook.com",
+			"hotmail.com",
+			"live.com",
+			"msn.com",
+			"outlook.sk",
+			"outlook.es",
+			"outlook.cz",
+			"hotmail.es",
+			"hotmail.co.uk",
+			"live.co.uk"
+		],
+		"smtp": {
+			"host": "smtp-mail.outlook.com",
+			"port": 587,
+			"security": "starttls"
+		}
+	},
+	"signin": "@(Sign in with Microsoft)",
+	"redirectNote": "@(Return address to register in Microsoft Entra, under the Web platform.)",
+	"adminConsent": true
+}

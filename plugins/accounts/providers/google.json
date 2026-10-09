@@ -1,0 +1,44 @@
+{
+	"id": "google",
+	"order": 21,
+	"name": "Google (sign in)",
+	"icon": "google",
+	"auth": "oauth2",
+	"summary": "@(Gmail and Google Workspace accounts, signing in with Google instead of an app password.)",
+	"domains": [],
+	"mx": [],
+	"imap": {
+		"host": "imap.gmail.com",
+		"port": 993,
+		"security": "tls"
+	},
+	"smtp": {
+		"host": "smtp.gmail.com",
+		"port": 465,
+		"security": "tls"
+	},
+	"username": "email",
+	"signin": "@(Sign in with Google)",
+	"redirectNote": "@(Return address to register in Google Cloud, under Authorized redirect URIs.)",
+	"steps": [
+		{
+			"text": "@(Enter your email address, then choose Sign in with Google.)"
+		},
+		{
+			"text": "@(Approve the access Google asks for. Your password never reaches TotalMail.)"
+		}
+	],
+	"setup": [
+		{
+			"text": "@(Create an OAuth client of type Web application in Google Cloud.)",
+			"url": "https://console.cloud.google.com/apis/credentials"
+		},
+		{
+			"text": "@(Add the return address shown here under Authorized redirect URIs, and add the Gmail scope https://mail.google.com/ to the consent screen.)"
+		},
+		{
+			"text": "@(Put the client ID and the secret in the administrator window, then try again.)"
+		}
+	],
+	"note": "@(Sign-in with this provider is not set up on this server. Ask the administrator to add the application ID.)"
+}

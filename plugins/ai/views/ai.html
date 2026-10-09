@@ -1,0 +1,103 @@
+<ui-plugin path="ai">
+	<ui-component
+		name="modal"
+		path="mail.window"
+		config="if:ai;width:640;center:true"
+		id="ai"
+		class="settings-modal hidden"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="ai-title"
+		><div class="settings-heading">
+			<div class="modal-heading-content">
+				<div>
+					<span class="eyebrow">@(THIS INSTALLATION)</span>
+					<h2 id="ai-title">@(AI assistant)</h2>
+				</div>
+				<button class="icon-button exec" data-exec="mail/click" data-command="close-settings" aria-label="@(Close)">
+					<i class="ti ti-times" aria-hidden="true"></i>
+				</button>
+			</div>
+		</div>
+		<div class="settings-body">
+			<div class="modal-body-content">
+				<p class="settings-note">@(The assistant summarizes conversations, drafts replies and adjusts the tone of a draft. It only suggests text: nothing is sent without the person's review.)</p>
+				<ui-bind path="ai.enabled" config="attr aria-checked button:String(!!value)" class="block"
+					><button type="button" role="switch" aria-checked="false" class="switch-row exec" data-exec="ai/toggle">
+						<i class="ti ti-magic" aria-hidden="true"></i
+						><span class="switch-text"><strong>@(Turn on the assistant)</strong><small>@(While it is off, nothing leaves this server.)</small></span
+						><span class="switch-pill" aria-hidden="true"></span>
+					</button></ui-bind
+				>
+
+				<h3>@(Server)</h3>
+				<p class="settings-note">@(Claude, or any server that speaks the OpenAI chat protocol: Ollama, llama.cpp, LM Studio, vLLM or a hosted service. Choose one to fill in its usual address.)</p>
+				<div class="providers-actions">
+					<button type="button" class="secondary-button exec" data-exec="ai/preset" data-provider="anthropic" data-endpoint="https://api.anthropic.com/v1">Claude</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/preset" data-provider="openai" data-endpoint="http://localhost:11434/v1">Ollama</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/preset" data-provider="openai" data-endpoint="http://localhost:8080/v1">llama.cpp</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/preset" data-provider="openai" data-endpoint="http://localhost:1234/v1">LM Studio</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/preset" data-provider="openai" data-endpoint="https://api.openai.com/v1">OpenAI</button>
+				</div>
+				<ui-component name="input" path="ai.form.provider" config="dirsource:ai.providerOptions;label:@(Protocol);$delay:1"></ui-component>
+				<ui-component name="input" path="ai.form.endpoint" config="label:@(Server address);placeholder:http://localhost:11434/v1;maxlength:300;$delay:1"></ui-component>
+				<p class="settings-note">@(The address is opened by the server that runs TotalMail, not by your computer: on a remote server, localhost means that server. Use an address that server can reach.)</p>
+				<div class="settings-grid">
+					<ui-component name="input" path="ai.form.model" config="label:@(Model);placeholder:claude-haiku-5-5;maxlength:120;$delay:1"></ui-component
+					><ui-component name="input" path="ai.form.key" config="label:@(Key, if the server needs one);type:password;maxlength:500;$delay:1"></ui-component>
+				</div>
+				<p class="settings-note">@(Leave the key empty to keep the one saved. It is stored encrypted and never shown again. Claude needs one. Use a model that answers directly: models that think aloud are slow here.)</p>
+				<ui-component name="input" path="ai.form.maxChars" config="label:@(Characters of a conversation sent to the model);type:number;$delay:1"></ui-component>
+				<p class="settings-note" role="status"><ui-bind path="ai.status" config="text:value"></ui-bind></p>
+				<div class="providers-actions">
+					<button type="button" class="primary-button exec" data-exec="ai/save">
+						<i class="ti ti-check" aria-hidden="true"></i>@(Save assistant settings)
+					</button>
+					<button type="button" class="secondary-button exec" data-exec="ai/test">@(Test connection)</button>
+					<ui-bind path="ai.keySet" config="enabled:value"><button type="button" class="secondary-button exec" data-exec="ai/clearkey">@(Remove saved key)</button></ui-bind>
+				</div>
+
+				<h3>@(Knowledge base)</h3>
+				<p class="settings-note">@(Documents the assistant can use to draft a reply: prices, conditions, answers to common questions. They stay on this server; when someone asks for a reply from the knowledge base, only the passages that match the message are sent to the model, with the message.)</p>
+				<div class="settings-grid">
+					<ui-component name="input" path="ai.form.cname" config="label:@(New collection);placeholder:@(Prices and conditions);maxlength:80;$delay:1"></ui-component>
+					<ui-bind path="ai.localonly" config="attr aria-checked button:String(!!value)" class="block"
+						><button type="button" role="switch" aria-checked="false" class="switch-row exec" data-exec="ai/togglelocal">
+							<i class="ti ti-lock" aria-hidden="true"></i
+							><span class="switch-text"><strong>@(Local only)</strong><small>@(Never read when the model is outside your own network.)</small></span
+							><span class="switch-pill" aria-hidden="true"></span>
+						</button></ui-bind
+					>
+				</div>
+				<div class="providers-actions">
+					<button type="button" class="secondary-button exec" data-exec="ai/addcollection">@(Add collection)</button>
+				</div>
+				<ui-bind path="ai.library" config="template" class="block" role="group" aria-label="@(Collections the assistant may read)"
+					><script type="text/html">
+						{{ if value.length }}{{ foreach c in value }}
+						<div class="ai-collection" role="group" aria-label="{{ c.name }}">
+							<div class="ai-collection-head"><strong>{{ c.name }}</strong>{{ if c.localonly }}<span class="badge">@(Local only)</span>{{ fi }}</div>
+							<ul class="ai-documents">
+								{{ foreach d in c.documents }}<li><span>{{ d.label }}</span><button type="button" class="secondary-button exec" data-exec="ai/removedoc" data-id="{{ d.id }}" aria-label="@(Remove): {{ d.title }}">@(Remove)</button></li>{{ end }}
+								{{ if !c.documents.length }}<li>@(No documents yet.)</li>{{ fi }}
+							</ul>
+							<div class="providers-actions">
+								<button type="button" class="primary-button exec" data-exec="ai/adddocs" data-id="{{ c.id }}">@(Add documents)</button>
+								<button type="button" class="secondary-button exec" data-exec="ai/togglecollection" data-id="{{ c.id }}">{{ c.localLabel }}</button>
+								<button type="button" class="secondary-button exec" data-exec="ai/removecollection" data-id="{{ c.id }}">@(Delete collection)</button>
+							</div>
+						</div>
+						{{ end }}{{ else }}<p class="settings-note">@(No collections yet. Add one, then add documents to it.)</p>{{ fi }}
+					</script></ui-bind
+				>
+				<p class="settings-note" role="status"><ui-bind path="ai.libraryStatus" config="text:value"></ui-bind></p>
+
+				<h3>@(What people are told)</h3>
+				<p class="settings-note">@(Before using it, everyone sees where the text of a conversation goes: to a server inside your own network or outside it. Each mail account can opt out in its settings. Only how many times each task ran is counted, never its content.)</p>
+				<p class="settings-note"><ui-bind path="ai.usage" config="text:value"></ui-bind></p>
+				<p class="error-text" role="alert"><ui-bind path="ai.error" config="text:value"></ui-bind></p>
+			</div>
+		</div>
+		<div class="settings-footer"><div class="modal-footer-content"></div></div></ui-component
+	>
+</ui-plugin>
