@@ -1663,6 +1663,7 @@ PLUGIN('mail', function(exports) {
 		var locked = ['sending', 'sent', 'unknown'].includes(draft?.status);
 		ui({ sendOff: !a?.configured || locked, locked });
 		SETTER('#compose-account', 'reconfigure', { disabled: locked });
+		SETTER('#compose-alias', 'reconfigure', { disabled: locked });
 	}
 	function updatesyncstatus() {
 		ui({

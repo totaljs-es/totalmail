@@ -27,7 +27,8 @@
 		</ui-bind>
 		<ui-bind path="access.step" config="show:value==='code';focus:input" class="block">
 			<p class="access-second-note">@(Enter the 6-digit code from your authenticator app. If you lost your phone, use one of your recovery codes.)</p>
-			<ui-bind path="access.step" config="delay:300;attr autocomplete input:'off';attr id input:'_auth_code';attr inputmode input:'numeric';attr autocapitalize input:'off';attr enterkeyhint input:'go'" class="block"
+			<!-- j-Input has no HTML tel option: keep text semantics for recovery codes and expose tel for Step Two. -->
+			<ui-bind path="access.step" config="delay:300;attr autocomplete input:'off';attr type input:'tel';attr id input:'_auth_code';attr inputmode input:'numeric';attr autocapitalize input:'off';attr enterkeyhint input:'go'" class="block"
 				><ui-component name="input" path="access.code" config="label:@(Code);licon:lock;maxlength:40;autofill:_auth_code;$delay:1"></ui-component></ui-bind
 			>
 		</ui-bind>
