@@ -23,7 +23,9 @@ PLUGIN('access', function(exports) {
 		try {
 			// The model follows the keyboard a millisecond later: let the last key be in it (Enter can come right after it).
 			await new Promise((resolve) => setTimeout(resolve, 20));
-			var data = token ? { token, code: GET('access.code') } : { email: GET('access.email'), password: GET('access.password') };
+			// Autofill extensions can update the field without emitting the events that update the component model.
+			var codeInput = token ? document.querySelector('.access-form input[name="_auth_code"]') : null;
+			var data = token ? { token, code: codeInput ? codeInput.value : GET('access.code') } : { email: GET('access.email'), password: GET('access.password') };
 			if (initialsetup && !token)
 				data.name = GET('access.name');
 

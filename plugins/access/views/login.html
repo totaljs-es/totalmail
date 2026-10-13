@@ -27,8 +27,8 @@
 		</ui-bind>
 		<ui-bind path="access.step" config="show:value==='code';focus:input" class="block">
 			<p class="access-second-note">@(Enter the 6-digit code from your authenticator app. If you lost your phone, use one of your recovery codes.)</p>
-			<ui-bind path="access.step" config="delay:300;attr autocomplete input:'one-time-code';attr id input:'otp';attr inputmode input:'numeric';attr autocapitalize input:'off';attr enterkeyhint input:'go'" class="block"
-				><ui-component name="input" path="access.code" config="label:@(Code);licon:lock;maxlength:40;autofill:otp;$delay:1"></ui-component></ui-bind
+			<ui-bind path="access.step" config="delay:300;attr autocomplete input:'off';attr id input:'_auth_code';attr inputmode input:'numeric';attr autocapitalize input:'off';attr enterkeyhint input:'go'" class="block"
+				><ui-component name="input" path="access.code" config="label:@(Code);licon:lock;maxlength:40;autofill:_auth_code;$delay:1"></ui-component></ui-bind
 			>
 		</ui-bind>
 		<p class="error-text" role="alert"><ui-bind path="access.error" config="text:value"></ui-bind></p>
