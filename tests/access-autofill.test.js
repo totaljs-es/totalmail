@@ -5,11 +5,11 @@ const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '../plugins/access/public/access.js'), 'utf8');
 
-for (const value of ['012345', 'abcd-efgh-ijkl', '']) {
+for (const value of ['012345', 'abcd-efgh-ijkl', ''])
 	test('OTP submission uses the visible autofilled value: ' + JSON.stringify(value), async () => {
-		const state = {}, calls = [];
+		let state = {}, calls = [];
 		let plugin;
-		const input = { value };
+		let input = { value };
 		vm.runInNewContext(source, {
 			PLUGIN(name, init) {
 				plugin = { set(key, val) { state['access.' + key] = val; } };
@@ -35,4 +35,3 @@ for (const value of ['012345', 'abcd-efgh-ijkl', '']) {
 		assert.equal(calls[1].data.code, value);
 		assert.equal(calls[1].data.token, 'pending-test-token');
 	});
-}
