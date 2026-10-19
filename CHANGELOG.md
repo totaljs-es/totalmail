@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Device sign-out remains effective when a concurrent activity write completes; revocations are persisted without restoring old tokens.
+
 - German, French, Italian, Portuguese and Greek (formal register), and each language shown with its flag (circle-flags, MIT) in the selectors.
 - The composer draws the marks of the formatting as what they make while you write (bold, italic, links, lists, quotes, the signature), in colour only so the cursor never drifts; the same grammar the server turns into HTML.
 - Under the list of messages, the way to load older mail is a button, as in the native app.

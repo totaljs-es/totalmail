@@ -73,3 +73,55 @@ test('use is remembered (when and from where) without writing for every request'
 	Assert.equal(store.find(made.token, almost).id, made.record.id);
 	Assert.equal(store.find(made.token, new Date(minute.getTime() + Devices.limits.idle + 86400000)), null);
 });
+
+for (let operation of ['revoke', 'revokeUser'])
+	test(operation + ' stays revoked while an earlier activity write finishes, including after restart', async (t) => {
+		var dir = folder(t),
+			storage = await require('../lib/mirror').open(Devices.spec(Db.table(dir)), { seed: { devices: [] } }),
+			store = Devices.create(storage),
+			now = new Date('2026-10-11T10:00:00Z'),
+			made = await store.create('u1', mac, now),
+			other = await store.create('u2', { name: 'Other user' }, now);
+		var enter, release;
+		var entered = new Promise((resolve) => (enter = resolve)),
+			gate = new Promise((resolve) => (release = resolve)),
+			save = storage.mirror.save,
+			blocked = true;
+		storage.mirror.save = async (next) => {
+			if (blocked) {
+				blocked = false;
+				enter();
+				await gate;
+			}
+			await save(next);
+			Assert.equal(store.find(made.token, now), null, 'revocation stays effective even before the stale write returns');
+		};
+		var activity = store.touch(made.record.id, mac.address, new Date(now.getTime() + 120000));
+		await entered;
+		var revocation = operation === 'revoke' ? store.revoke(made.record.id, 'u1') : store.revokeUser('u1');
+		Assert.equal(store.find(made.token, now), null, 'revocation is immediate');
+		release();
+		await Promise.all([activity, revocation]);
+		Assert.equal(store.find(made.token, now), null, 'the earlier write cannot resurrect the token');
+		Assert.deepEqual(store.list('u1', now), []);
+		var reopened = await open(dir);
+		Assert.equal(reopened.find(made.token, now), null, 'revocation is persisted');
+		Assert.equal(reopened.find(other.token, now).userId, 'u2', 'other users keep their devices');
+	});
+
+test('a failed revocation write cannot restore access and a later write persists the removal', async (t) => {
+	var dir = folder(t),
+		storage = await require('../lib/mirror').open(Devices.spec(Db.table(dir)), { seed: { devices: [] } }),
+		store = Devices.create(storage),
+		now = new Date('2026-10-11T10:00:00Z'),
+		made = await store.create('u1', mac, now),
+		save = storage.mirror.save;
+	storage.mirror.save = async () => {
+		throw Error('Disk unavailable');
+	};
+	await Assert.rejects(store.revoke(made.record.id, 'u1'), /Disk unavailable/);
+	Assert.equal(store.find(made.token, now), null, 'failed persistence does not undo immediate revocation');
+	storage.mirror.save = save;
+	await store.create('u2', { name: 'Other user' }, now);
+	Assert.equal((await open(dir)).find(made.token, now), null, 'the next successful write keeps the token revoked');
+});
