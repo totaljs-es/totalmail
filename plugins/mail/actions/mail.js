@@ -12,6 +12,8 @@ NEWACTION('Mailboxes|bootstrap', {
 	route: '+API /api/ -bootstrap --> Mailboxes|bootstrap',
 	action: function($) {
 		var data = MODS.users.forUser($.user).snapshot();
+		// Keep submitted records in storage to prevent duplicate sends, but do not list sent mail as drafts.
+		data.drafts = data.drafts.filter((draft) => draft.status !== 'sent');
 		data.messages = data.messages.map((item) => Welcome.decorate(item, $.language));
 		$.callback({
 			user: $.user,

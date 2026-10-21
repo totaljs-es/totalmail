@@ -257,6 +257,43 @@ test('a draft cannot attach another account message as its reply parent', async 
 	);
 });
 
+test('sending refreshes the confirmed Sent folder without resubmitting if that refresh fails', async (t) => {
+	for (var fails of [false, true]) {
+		let { store } = fixture(t),
+			submissions = 0,
+			refreshes = 0;
+		let draft = await store.saveDraft({ id: 'sent-refresh', accountId: 'real', to: 'recipient@example.test', subject: 'Test', body: 'Body' });
+		let live = create({
+			resolve,
+			decrypt,
+			smtp: { options: () => ({}), send: async () => { submissions++; return { source: 'MIME' }; } },
+			imap: {
+				saveSent: async () => ({ status: 'saved', path: 'INBOX.Sent', uid: 42, uidValidity: '7' }),
+				sync: async (account, password, target, path, known) => {
+					refreshes++;
+					assert.equal(path, 'INBOX.Sent');
+					assert.deepEqual(known, []);
+					if (fails)
+						throw Error('Refresh disconnected');
+					return {
+						path,
+						uidValidity: '7',
+						total: 1,
+						folders: [{ id: 'sent-folder', path, specialUse: '\\Sent' }],
+						messages: [{ id: 'remote-sent', accountId: account.id, folder: 'sent-folder', mailboxPath: path, remote: true, uid: 42, uidValidity: '7' }]
+					};
+				}
+			}
+		});
+		assert.equal((await live.send(user, store, draft.id, true, draft.revision)).sentCopy, 'saved');
+		assert.equal(refreshes, 1);
+		assert.equal(store.snapshot().messages.some((m) => m.id === 'remote-sent'), !fails);
+		assert.equal(store.snapshot().drafts[0].status, 'sent');
+		await assert.rejects(live.send(user, store, draft.id, true, draft.revision));
+		assert.equal(submissions, 1);
+	}
+});
+
 test('confirmed SMTP remains sent when its server copy fails, and cannot be resubmitted', async (t) => {
 	let { store } = fixture(t);
 	await store.saveDraft({
