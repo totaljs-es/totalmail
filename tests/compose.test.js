@@ -38,6 +38,38 @@ function send(store, calls) {
 	});
 }
 const user = { id: 'u'.repeat(32) };
+test('recipient suggestions can leave a trailing separator without blocking delivery', async (t) => {
+	var store = fixture(t),
+		calls = [],
+		live = send(store, calls);
+	for (var separator of [', ', '; ']) {
+		var draft = await store.saveDraft({
+			id: 'suggestion-' + calls.length,
+			accountId: 'a',
+			to: 'a@example.test' + separator + 'b@example.test' + separator,
+			cc: 'c@example.test' + separator,
+			bcc: 'd@example.test' + separator,
+			subject: 'S',
+			body: 'B'
+		});
+		Assert.equal((await live.send(user, store, draft.id, true, draft.revision)).status, 'sent');
+	}
+	Assert.equal(calls.length, 2);
+	for (var call of calls)
+		Assert.deepEqual(call, { recipients: ['a@example.test', 'b@example.test'], copies: ['c@example.test'], blind: ['d@example.test'] });
+});
+
+test('empty or invalid primary recipients never reach SMTP', async (t) => {
+	var store = fixture(t),
+		calls = [],
+		live = send(store, calls);
+	for (var to of ['', ' , ; ', 'a@example.test, not an address, ']) {
+		var draft = await store.saveDraft({ id: 'invalid', accountId: 'a', to, cc: 'copy@example.test', subject: 'S', body: 'B' });
+		await Assert.rejects(live.send(user, store, draft.id, true, draft.revision), /up to 10/);
+	}
+	Assert.equal(calls.length, 0);
+});
+
 test('the hidden recipients of a draft are kept, count towards the limit and reach the sender separately', async (t) => {
 	var store = fixture(t),
 		calls = [],
