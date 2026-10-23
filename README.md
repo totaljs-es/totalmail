@@ -67,6 +67,7 @@ TotalMail is in daily use on a hosted instance and its logic is covered by more 
 - [docs/assistant.md](docs/assistant.md): the optional AI assistant and why it is limited.
 - [docs/apps-api.md](docs/apps-api.md): how a native app signs in and talks to an instance.
 - [docs/storage.md](docs/storage.md): where the data is.
+- [docs/total-js.md](docs/total-js.md): the map of the code for Total.js developers.
 - [docs/localization.md](docs/localization.md) and [docs/accessibility.md](docs/accessibility.md).
 - [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and [CHANGELOG.md](CHANGELOG.md).
 
@@ -74,7 +75,7 @@ TotalMail is in daily use on a hosted instance and its logic is covered by more 
 
 ```bash
 npm ci
-npm run format    # style of the Total.js guidelines
+npm run format    # style of the Total.js guidelines (ESLint --fix)
 npm run lint
 npm test
 ```

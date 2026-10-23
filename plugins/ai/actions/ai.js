@@ -1,13 +1,16 @@
 const Extract = require('../../../lib/extract');
+
 function overview() {
 	return MODS.instance.aiView();
 }
+
 NEWACTION('Assistant|get', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -assistant_get --> Assistant|get',
 	action: ($) => FUNC.run($, overview)
 });
+
 NEWACTION('Assistant|save', {
 	user: true,
 	permissions: 'admin',
@@ -15,6 +18,7 @@ NEWACTION('Assistant|save', {
 	input: 'enabled:Boolean, provider:{openai|anthropic}, endpoint:String(300), model:String(120), key:String(500), clearKey:Boolean, maxChars:Number',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			var provider = model.provider || 'openai',
 				endpoint = (model.endpoint || '').trim(),
 				name = (model.model || '').trim();
@@ -44,6 +48,7 @@ NEWACTION('Assistant|save', {
 			return overview();
 		})
 });
+
 // The knowledge base: collections of documents the assistant may read. Administrators only.
 NEWACTION('Assistant|knowledge', {
 	user: true,
@@ -51,6 +56,7 @@ NEWACTION('Assistant|knowledge', {
 	route: '+API /api/ -assistant_knowledge --> Assistant|knowledge',
 	action: ($) => FUNC.run($, () => ({ ...MODS.knowledge.view(), accept: Extract.supported }))
 });
+
 NEWACTION('Assistant|collection', {
 	user: true,
 	permissions: 'admin',
@@ -67,6 +73,7 @@ NEWACTION('Assistant|collection', {
 			return MODS.knowledge.view();
 		})
 });
+
 NEWACTION('Assistant|collection_delete', {
 	user: true,
 	permissions: 'admin',
@@ -78,6 +85,7 @@ NEWACTION('Assistant|collection_delete', {
 			return MODS.knowledge.view();
 		})
 });
+
 NEWACTION('Assistant|document_delete', {
 	user: true,
 	permissions: 'admin',
@@ -89,6 +97,7 @@ NEWACTION('Assistant|document_delete', {
 			return MODS.knowledge.view();
 		})
 });
+
 // A short question to the model with the values on screen, before they are saved.
 NEWACTION('Assistant|test', {
 	user: true,
@@ -97,6 +106,7 @@ NEWACTION('Assistant|test', {
 	input: 'provider:{openai|anthropic}, endpoint:String(300), *model:String(120), key:String(500)',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			var provider = model.provider || 'openai',
 				saved = MODS.instance.ai();
 			var target = MODS.ai.parseendpoint(model.endpoint || (provider === 'anthropic' ? MODS.ai.defaults.anthropic : ''));
@@ -119,6 +129,7 @@ NEWACTION('Assistant|test', {
 			}
 		})
 });
+
 // The tasks every signed-in person can run. The conversation comes from the person's own mailbox, never from the request.
 NEWACTION('Assistant|run', {
 	user: true,
@@ -128,6 +139,7 @@ NEWACTION('Assistant|run', {
 		FUNC.run(
 			$,
 			async () => {
+
 				var settings = MODS.instance.ai();
 				if (!MODS.ai.status(settings).configured)
 					throw Error('@(The assistant is not turned on.)');
@@ -143,6 +155,7 @@ NEWACTION('Assistant|run', {
 				};
 				// The model reads what a person reads: never the plain part of a message that also has HTML, never what a reader cannot see.
 				var visible = (message) => {
+
 					var read = MODS.ai.readable(store.message(message.id));
 					hidden = hidden || read.hidden;
 					return read.text;

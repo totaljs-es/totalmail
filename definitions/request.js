@@ -6,9 +6,11 @@ var request = function(ctrl, next) {
 	else
 		next();
 };
+
 NEWMIDDLEWARE('request', request);
 // A middleware is assigned to the routes that exist, so it waits until all of them are registered.
 ON('ready', () => NEWMIDDLEWARE('request', request, 'routes'));
+
 // What the actions have in common: answer a request from a promise. A message that starts with @( is meant for the person and
 // goes back as it is; anything else is logged and replaced by `fallback`.
 FUNC.run = function($, fn, fallback) {

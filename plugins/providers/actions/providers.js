@@ -1,5 +1,6 @@
 // Only administrators configure an installation. Every call checks the session owner and the request headers.
 function overview($) {
+
 	var catalogue = MODS.providers,
 		hidden = MODS.instance.hidden(),
 		defaultid = catalogue.defaultId();
@@ -40,6 +41,7 @@ function overview($) {
 		}))
 	};
 }
+
 function slug(name) {
 	return (
 		String(name)
@@ -51,6 +53,7 @@ function slug(name) {
 			.slice(0, 20) || 'custom'
 	);
 }
+
 // One line per step: "text" or "text | https://link".
 function steps(text) {
 	return String(text || '')
@@ -59,17 +62,20 @@ function steps(text) {
 		.filter(Boolean)
 		.slice(0, 8)
 		.map((line) => {
+
 			var [first, ...rest] = line.split('|');
 			var link = rest.join('|').trim();
 			return link ? { text: first.trim(), url: link } : { text: first.trim() };
 		});
 }
+
 NEWACTION('Instance|get', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -instance_get --> Instance|get',
 	action: ($) => FUNC.run($, () => overview($))
 });
+
 NEWACTION('Instance|oauth', {
 	user: true,
 	permissions: 'admin',
@@ -77,6 +83,7 @@ NEWACTION('Instance|oauth', {
 	input: '*provider:String(30), clientId:String(120), clientSecret:String(500), clearSecret:Boolean, tenant:String(40)',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			if (!MODS.providers.all().some((p) => p.id === model.provider && p.auth === 'oauth2'))
 				throw Error('@(Invalid operation.)');
 			await MODS.instance.saveOAuth(model.provider, {
@@ -88,6 +95,7 @@ NEWACTION('Instance|oauth', {
 			return overview($);
 		})
 });
+
 NEWACTION('Instance|type', {
 	user: true,
 	permissions: 'admin',
@@ -95,6 +103,7 @@ NEWACTION('Instance|type', {
 	input: 'id:String(30), *name:String(80), summary:String(200), note:String(300), domains:String(1000), *imapHost:String(253), *imapPort:Number, *imapSecurity:{tls|starttls}, *smtpHost:String(253), *smtpPort:Number, *smtpSecurity:{tls|starttls}, auth:{password|app-password}, steps:String(2000)',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			var catalogue = MODS.providers,
 				existing = model.id ? catalogue.get(model.id) : null;
 			if (model.id && !existing?.custom)
@@ -133,6 +142,7 @@ NEWACTION('Instance|type', {
 			return overview($);
 		})
 });
+
 NEWACTION('Instance|type_delete', {
 	user: true,
 	permissions: 'admin',
@@ -140,12 +150,14 @@ NEWACTION('Instance|type_delete', {
 	input: '*id:String(30)',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			if (!MODS.providers.get(model.id)?.custom)
 				throw Error('@(Account type not found.)');
 			await MODS.instance.deleteProvider(model.id);
 			return overview($);
 		})
 });
+
 NEWACTION('Instance|prefs', {
 	user: true,
 	permissions: 'admin',
@@ -153,6 +165,7 @@ NEWACTION('Instance|prefs', {
 	input: 'hidden:String(1000), defaultProvider:String(30)',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			var known = MODS.providers.all().map((p) => p.id);
 			var hidden = String(model.hidden || '')
 				.split(/[\s,;]+/)

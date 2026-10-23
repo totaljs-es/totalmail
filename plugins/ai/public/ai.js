@@ -16,6 +16,7 @@ var aicard = () => ({
 	sources: [],
 	canReply: false
 });
+
 var aicomposer = () => ({
 	shown: false,
 	where: '',
@@ -27,9 +28,12 @@ var aicomposer = () => ({
 	warnLinks: false,
 	replaced: false
 });
+
 SET('ai.card', aicard());
 SET('ai.composer', aicomposer());
+
 PLUGIN('ai', function(exports) {
+
 	// The model exists from the start: the views bind to it before the rest of the page is ready.
 	var model = {};
 	// What a person can translate into: the names of the languages are their own, not translated.
@@ -46,6 +50,7 @@ PLUGIN('ai', function(exports) {
 		pl: 'Polski'
 	};
 	function remembered() {
+
 		var saved = '';
 		try {
 			saved = localStorage.getItem('totalmail-translate') || '';
@@ -80,6 +85,7 @@ PLUGIN('ai', function(exports) {
 			return !!PLUGINS.mail?.store && !!PLUGINS.accounts;
 		},
 		function() {
+
 			var mailbox = PLUGINS.mail,
 				state = mailbox.store,
 				data = null,
@@ -103,6 +109,7 @@ PLUGIN('ai', function(exports) {
 				set('status', text || '');
 			}
 			function renderadmin() {
+
 				SET('ai.form', {
 					provider: data.provider,
 					endpoint: data.endpoint,
@@ -134,6 +141,7 @@ PLUGIN('ai', function(exports) {
 				};
 			}
 			async function call(schema, payload) {
+
 				if (busy)
 					return null;
 				busy = true;
@@ -163,6 +171,7 @@ PLUGIN('ai', function(exports) {
 				}
 			}
 			async function save(extra) {
+
 				var next = await call('assistant_save', { enabled: exports.get('enabled') === true, ...fields(), ...extra });
 				if (next) {
 					data = next;
@@ -175,6 +184,7 @@ PLUGIN('ai', function(exports) {
 			exports.open = open;
 			exports.toggle = () => set('enabled', !exports.get('enabled'));
 			exports.preset = (element) => {
+
 				SET('ai.form.provider', element[0].dataset.provider);
 				SET('ai.form.endpoint', element[0].dataset.endpoint);
 				status('');
@@ -192,6 +202,7 @@ PLUGIN('ai', function(exports) {
 				set('libraryStatus', text || '');
 			}
 			async function change(schema, payload) {
+
 				var next = await call(schema, payload);
 				if (next) {
 					library = { ...next, accept: library.accept };
@@ -217,6 +228,7 @@ PLUGIN('ai', function(exports) {
 				);
 			}
 			async function upload(collectionid, chosen) {
+
 				var files = [],
 					lines = [];
 				// Total.js refuses a whole upload that carries a real image, so what cannot be read is set aside here, with its reason.
@@ -267,6 +279,7 @@ PLUGIN('ai', function(exports) {
 				c && change('assistant_collection', { id: c.id, name: c.name, description: c.description, localonly: !c.localonly });
 			};
 			exports.removecollection = (element) => {
+
 				var c = collection(element);
 				if (!c)
 					return;
@@ -276,6 +289,7 @@ PLUGIN('ai', function(exports) {
 			};
 			exports.togglelocal = () => set('localonly', !exports.get('localonly'));
 			exports.addcollection = async () => {
+
 				var name = GET('ai.form.cname').trim();
 				if (!name) {
 					error(TRANSLATE('@(Give the collection a name.)'));
@@ -287,6 +301,7 @@ PLUGIN('ai', function(exports) {
 				}
 			};
 			exports.test = async () => {
+
 				var f = fields();
 				status(TRANSLATE('@(Testing…)'));
 				var result = await call('assistant_test', { provider: f.provider, endpoint: f.endpoint, model: f.model, key: f.key });
@@ -330,6 +345,7 @@ PLUGIN('ai', function(exports) {
 				return mailbox.store.accounts.find((a) => a.id === accountid)?.assistant === false;
 			}
 			async function run(payload) {
+
 				if (working)
 					return null;
 				working = true;
@@ -357,6 +373,7 @@ PLUGIN('ai', function(exports) {
 			// ---- The card: its state follows the message that is open
 			var cardkey = '';
 			function showresult(key) {
+
 				var m = current(),
 					found = key && m && results.get(m.id + ':' + key);
 				cardkey = found ? key : '';
@@ -382,6 +399,7 @@ PLUGIN('ai', function(exports) {
 				});
 			}
 			function drawcard() {
+
 				var m = current();
 				if (!available() || !m || m.welcome || accountoff(m.accountId)) {
 					patch('card', { shown: false });
@@ -392,6 +410,7 @@ PLUGIN('ai', function(exports) {
 			}
 			// task is summarize, translate, reply or replyk (a reply from the knowledge base)
 			exports.go = async (element) => {
+
 				var m = current(),
 					task = element[0].dataset.task,
 					withknowledge = task === 'replyk';
@@ -430,6 +449,7 @@ PLUGIN('ai', function(exports) {
 				} catch {}
 			};
 			exports.dismiss = () => {
+
 				var m = current();
 				m && results.delete(m.id + ':' + cardkey);
 				showresult(null);
@@ -437,6 +457,7 @@ PLUGIN('ai', function(exports) {
 			// ---- The composer
 			// The part of the composer the person wrote: before the quoted original and before the signature.
 			function mine(text) {
+
 				var lines = text.split('\n'),
 					cut = lines.length;
 				for (var i = 0; i < lines.length; i++)
@@ -449,6 +470,7 @@ PLUGIN('ai', function(exports) {
 				return { head: lines.slice(0, cut).join('\n'), tail: lines.slice(cut).join('\n') };
 			}
 			function drawcomposer() {
+
 				var accountid = GET('mail.compose.accountId');
 				if (!available() || accountoff(accountid)) {
 					patch('composer', { shown: false });
@@ -458,6 +480,7 @@ PLUGIN('ai', function(exports) {
 			}
 			// task is tone, proofread, translate or compose; a tone also carries data-style, a compose is written from ai.idea
 			exports.write = async (element) => {
+
 				var task = element[0].dataset.task,
 					extra = {},
 					text = '';
@@ -484,6 +507,7 @@ PLUGIN('ai', function(exports) {
 				patch('composer', { resultShown: true, text: answer.text, ...flags(answer), replaced: false });
 			};
 			exports.replace = () => {
+
 				before = GET('mail.compose.body') || '';
 				var again = mine(before);
 				mailbox.writebody(exports.get('composer.text') + (again.tail ? '\n\n' + again.tail : ''));

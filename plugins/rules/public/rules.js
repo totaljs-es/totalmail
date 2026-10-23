@@ -4,6 +4,7 @@ PLUGIN('rules', function(exports) {
 			return !!PLUGINS.mail?.store && !!PLUGINS.accounts;
 		},
 		function() {
+
 			var mailbox = PLUGINS.mail,
 				state = mailbox.store,
 				model = {},
@@ -43,6 +44,7 @@ PLUGIN('rules', function(exports) {
 				return field + ' ' + op + ' “' + r.value + '” → ' + action + (r.path ? ' (' + r.path + ')' : '');
 			}
 			function render() {
+
 				var a = account(),
 					rules = a?.rules || [],
 					log = a?.ruleLog || [];
@@ -72,6 +74,7 @@ PLUGIN('rules', function(exports) {
 				);
 			}
 			function merge(result) {
+
 				var a = state.accounts.find((x) => x.id === result.accountId);
 				if (a) {
 					a.rules = result.rules;
@@ -80,6 +83,7 @@ PLUGIN('rules', function(exports) {
 				render();
 			}
 			async function call(schema, payload) {
+
 				if (busy)
 					return null;
 				busy = true;
@@ -94,12 +98,14 @@ PLUGIN('rules', function(exports) {
 				}
 			}
 			function clear() {
+
 				SET('rules.form', blank());
 				exports.set('heading', TRANSLATE('@(New rule)'));
 				exports.set('test', '');
 				error('');
 			}
 			function open() {
+
 				if (!state.accounts.some((a) => a.configured)) {
 					mailbox.notify(TRANSLATE('@(Add your first mail account to get started.)'));
 					return;
@@ -110,6 +116,7 @@ PLUGIN('rules', function(exports) {
 				SET('mail.window', 'rules');
 			}
 			var form = () => {
+
 				var payload = { accountId: GET('rules.accountId') };
 				for (var field of ['name', 'field', 'op', 'value', 'action', 'path'])
 					payload[field] = GET('rules.form.' + field);
@@ -120,6 +127,7 @@ PLUGIN('rules', function(exports) {
 			exports.open = open;
 			exports.clear = clear;
 			exports.save = async () => {
+
 				var payload = form();
 				if (payload.action !== 'move')
 					payload.path = '';
@@ -132,6 +140,7 @@ PLUGIN('rules', function(exports) {
 				}
 			};
 			exports.test = async () => {
+
 				var payload = form();
 				var result = await call('rule_test', {
 					accountId: payload.accountId,
@@ -149,6 +158,7 @@ PLUGIN('rules', function(exports) {
 				);
 			};
 			exports.edit = (element) => {
+
 				var r = (account()?.rules || []).find((x) => x.id === element[0].dataset.id);
 				if (!r)
 					return;
@@ -164,6 +174,7 @@ PLUGIN('rules', function(exports) {
 				exports.set('heading', TRANSLATE('@(Edit rule)'));
 			};
 			exports.toggle = async (element) => {
+
 				var r = (account()?.rules || []).find((x) => x.id === element[0].dataset.id);
 				if (!r)
 					return;

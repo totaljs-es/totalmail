@@ -5,11 +5,13 @@ function overview($) {
 		devices: MODS.security.devices.list($.user.id, now).map((d) => ({ ...d, current: d.id === $.user.deviceId }))
 	};
 }
+
 NEWACTION('Devices|list', {
 	user: true,
 	route: '+API /api/ -device_list --> Devices|list',
 	action: ($) => FUNC.run($, () => overview($))
 });
+
 // An app asks for its device token after the person signed in (password and two-step code). The password is asked again so that
 // a session that was left open cannot be turned into a sign-in that outlives it. The token is in this answer and nowhere else.
 NEWACTION('Devices|create', {
@@ -18,6 +20,7 @@ NEWACTION('Devices|create', {
 	input: '*name:String(60), platform:String(60), app:String(60), *password:String(128)',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			if ($.user.deviceId)
 				throw Error('@(Sign in with your password to add a device.)');
 			if (!MODS.security.allowLogin($, 'device-' + $.user.id))
@@ -33,6 +36,7 @@ NEWACTION('Devices|create', {
 			return { token: made.token, device: { ...made.record, current: true } };
 		})
 });
+
 NEWACTION('Devices|revoke', {
 	user: true,
 	route: '+API /api/ +device_revoke --> Devices|revoke',

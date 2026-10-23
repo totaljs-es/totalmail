@@ -1,4 +1,5 @@
 const Welcome = require('../../../lib/welcome');
+
 // A message's sanitized HTML has its own route; no Action answer carries it.
 function strip(value) {
 	if (value && typeof value === 'object' && !Array.isArray(value) && 'html' in value) {
@@ -7,6 +8,7 @@ function strip(value) {
 	}
 	return value;
 }
+
 function run($, fn) {
 	FUNC.run(
 		$,
@@ -14,12 +16,14 @@ function run($, fn) {
 		'@(Mail connection failed. Check the server, TLS settings and app password.)'
 	);
 }
+
 NEWACTION('Accounts|verify', {
 	user: true,
 	route: '+API /api/ +account_verify --> Accounts|verify',
 	input: '*accountId:String(80)',
 	action: ($, m) => run($, (store) => MODS.live.verify($.user, store, m.accountId))
 });
+
 // Support for an account that does not work: the checks, written in the person's language.
 NEWACTION('Accounts|diagnose', {
 	user: true,
@@ -42,48 +46,56 @@ NEWACTION('Accounts|diagnose', {
 			};
 		})
 });
+
 NEWACTION('Drafts|forwardfiles', {
 	user: true,
 	route: '+API /api/ +draft_forward_files --> Drafts|forwardfiles',
 	input: '*id:String(80), *messageId:String(80)',
 	action: ($, m) => run($, (store) => MODS.live.forwardFiles($.user, store, m.id, m.messageId))
 });
+
 NEWACTION('Accounts|sync', {
 	user: true,
 	route: '+API /api/ +account_sync --> Accounts|sync',
 	input: '*accountId:String(80), path:String(500)',
 	action: ($, m) => run($, (store) => MODS.live.sync($.user, store, m.accountId, m.path || 'INBOX'))
 });
+
 NEWACTION('Messages|erase', {
 	user: true,
 	route: '+API /api/ +message_erase --> Messages|erase',
 	input: '*id:String(80)',
 	action: ($, m) => run($, (store) => MODS.live.erase($.user, store, m.id))
 });
+
 NEWACTION('Folders|empty', {
 	user: true,
 	route: '+API /api/ +trash_empty --> Folders|empty',
 	input: '*accountId:String(80)',
 	action: ($, m) => run($, (store) => MODS.live.emptyTrash($.user, store, m.accountId))
 });
+
 NEWACTION('Accounts|search', {
 	user: true,
 	route: '+API /api/ +account_search --> Accounts|search',
 	input: '*accountId:String(80), *path:String(500), *query:String(200)',
 	action: ($, m) => run($, (store) => MODS.live.search($.user, store, m.accountId, m.path, m.query))
 });
+
 NEWACTION('Accounts|older', {
 	user: true,
 	route: '+API /api/ +account_older --> Accounts|older',
 	input: '*accountId:String(80), *path:String(500)',
 	action: ($, m) => run($, (store) => MODS.live.older($.user, store, m.accountId, m.path))
 });
+
 NEWACTION('Messages|read', {
 	user: true,
 	route: '+API /api/ +message_read --> Messages|read',
 	input: '*id:String(80)',
 	action: ($, m) => run($, (store) => MODS.live.read($.user, store, m.id))
 });
+
 // The text of a message as a person reads it (no hidden text, no invisible characters): what an app gives to a model on the
 // device. The same filter as the assistant of the server, which needs no assistant to be turned on.
 NEWACTION('Messages|text', {
@@ -92,6 +104,7 @@ NEWACTION('Messages|text', {
 	input: '*id:String(80)',
 	action: ($, m) =>
 		run($, (store) => {
+
 			var message = store.message(m.id);
 			if (!message || message.welcome)
 				throw Error('@(Message not found.)');
@@ -108,12 +121,14 @@ NEWACTION('Messages|text', {
 			};
 		})
 });
+
 NEWACTION('Messages|seen', {
 	user: true,
 	route: '+API /api/ +message_seen --> Messages|seen',
 	input: '*id:String(80)',
 	action: ($, m) => run($, (store) => MODS.live.markRead($.user, store, m.id))
 });
+
 NEWACTION('Drafts|send', {
 	user: true,
 	route: '+API /api/ +draft_send --> Drafts|send',
@@ -127,6 +142,7 @@ NEWACTION('Messages|move', {
 	input: '*id:String(80), *path:String(500)',
 	action: ($, m) => run($, (store) => MODS.live.move($.user, store, m.id, m.path))
 });
+
 NEWACTION('Folders|create', {
 	user: true,
 	route: '+API /api/ +folder_create --> Folders|create',
@@ -151,6 +167,7 @@ NEWACTION('Drafts|unattach', {
 	input: '*id:String(80), *attachmentId:String(32)',
 	action: ($, m) =>
 		run($, async (store) => {
+
 			var draft = await store.removeAttachment(m.id, m.attachmentId);
 			await MODS.users.files($.user).remove($.user.id, m.attachmentId);
 			return draft;
@@ -163,6 +180,7 @@ NEWACTION('Drafts|delete', {
 	input: '*id:String(80)',
 	action: ($, m) =>
 		run($, async (store) => {
+
 			var draft = await store.deleteDraft(m.id);
 			for (var item of draft.attachments || [])
 				await MODS.users.files($.user).remove($.user.id, item.id);

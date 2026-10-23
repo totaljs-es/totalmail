@@ -5,6 +5,7 @@
 // The plain alternative always travels with the HTML, so any client can read the message.
 // Pure and shared on purpose: the server builds the message with it and the review step shows the same result in the browser.
 var totalmailformat = (function() {
+
 	var inlinepattern =
 		/\[([^\]\n]+)\]\((https?:\/\/[^\s()<>]+|mailto:[^\s()<>]+)\)|(https?:\/\/[^\s<>()]+[^\s<>().,;:!?'"])|\*\*(\S(?:[^\n]*?\S)?)\*\*|(?<![\w*])\*(\S(?:[^*\n]*?\S)?)\*(?![\w*])/g;
 	var bullet = /^\s{0,3}[-*•]\s+(.*)$/,
@@ -20,11 +21,13 @@ var totalmailformat = (function() {
 
 	// One line of text as { html, plain, marked } (marked: it used bold, italic or a written link).
 	function inline(text) {
+
 		var html = '',
 			plain = '',
 			last = 0,
 			marked = false;
 		text.replace(inlinepattern, (match, label, url, bare, bold, italic, at) => {
+
 			var gap = text.slice(last, at);
 			html += escape(gap);
 			plain += gap;
@@ -51,6 +54,7 @@ var totalmailformat = (function() {
 
 	// Returns { html, plain } when the text uses formatting, otherwise null.
 	function render(text) {
+
 		text = String(text || '').replace(/\r\n?/g, '\n');
 		var lines = text.split('\n'),
 			signature = lines.findIndex((line) => signatureline.test(line));
@@ -117,15 +121,18 @@ var totalmailformat = (function() {
 	// The text as the person sees it while writing: the same grammar, drawn as HTML that has exactly the characters of the text (so it
 	// can sit behind the box without anything moving). The marks are dimmed, the words they mark are coloured; nothing changes width.
 	function live(text) {
+
 		var list = /^(\s{0,3}(?:[-*•]|\d{1,3}[.)])\s+)/,
 			signature = false;
 		function span(kind, value) {
 			return '<span class="mk-' + kind + '">' + escape(value) + '</span>';
 		}
 		function words(line) {
+
 			var html = '',
 				last = 0;
 			line.replace(inlinepattern, (match, label, url, bare, bold, italic, at) => {
+
 				html += escape(line.slice(last, at));
 				last = at + match.length;
 				if (label)
@@ -144,6 +151,7 @@ var totalmailformat = (function() {
 			.replace(/\r\n?/g, '\n')
 			.split('\n')
 			.map((line) => {
+
 				if (!signature && signatureline.test(line))
 					signature = true;
 				if (signature)
@@ -160,5 +168,6 @@ var totalmailformat = (function() {
 	}
 	return { render: render, live: live };
 })();
+
 if (typeof module !== 'undefined' && module.exports)
 	module.exports = totalmailformat;

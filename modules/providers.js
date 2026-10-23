@@ -2,6 +2,7 @@
 // MODS.providers; the logic is in lib/providers.js.
 const Lazy = require('../lib/lazy'),
 	Lib = require('../lib/providers');
+
 exports.install = function() {
 	Object.assign(
 		exports,
@@ -12,6 +13,7 @@ exports.install = function() {
 		)
 	);
 };
+
 exports.serversFor = Lib.serversFor;
 exports.validate = Lib.validate;
 exports.load = Lib.load;

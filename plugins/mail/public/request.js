@@ -3,6 +3,7 @@
 // jComponent hands a callback only the parsed answer; the HTTP status comes in the 'response' event that fires right before
 // it, and is kept here against that callback.
 var totalmailrequest = (function() {
+
 	var statuses = new WeakMap();
 	ON('response', function(o) {
 		if (typeof o.callback === 'function')
@@ -28,6 +29,7 @@ var totalmailrequest = (function() {
 	return {
 		// A schema of the API (POST /api/ with { schema, data }): the answer, or an Error with a message for the person.
 		api: async function(schema, data) {
+
 			var answer = await call((done) => TAPI(schema, data || {}, done));
 			if (!answer.status)
 				throw new Error(TRANSLATE('@(Cannot reach TotalMail. Check your connection and try again.)'));
@@ -41,6 +43,7 @@ var totalmailrequest = (function() {
 		},
 		// Files (a FormData): the answer in the same way.
 		upload: async function(url, form, progress) {
+
 			var answer = await call((done) => UPLOAD('POST ' + url, form, done, progress));
 			if (answer.status === 401)
 				throw new Error(TRANSLATE('@(Your session has expired. Sign in again to continue.)'));

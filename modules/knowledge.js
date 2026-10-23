@@ -2,6 +2,7 @@
 const Lib = require('../lib/knowledge'),
 	Extract = require('../lib/extract'),
 	Tables = require('../lib/tables').in(PATH.root('database'));
+
 exports.install = function() {
 	PAUSESERVER('knowledge', true);
 	Lib.open({ table: Tables, legacy: { file: PATH.root('database/knowledge.json') } })
@@ -11,14 +12,17 @@ exports.install = function() {
 		})
 		.catch((error) => Total.error(error, 'TotalMail knowledge base'));
 };
+
 exports.limits = Lib.limits;
 exports.tokens = Lib.tokens;
 exports.chunks = Lib.chunks;
 exports.block = Lib.block;
 exports.query = Lib.query;
+
 // Each uploaded file is read into text on the server and added to a collection. What was added and what could not be read, and
 // why, comes back; the text itself never does.
 exports.importFiles = async function(collectionid, files, language) {
+
 	var added = [],
 		failed = [];
 	for (var file of files) {

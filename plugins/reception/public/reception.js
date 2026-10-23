@@ -5,6 +5,7 @@ function totalmailreception(options) {
 		last = -Infinity;
 	return {
 		async tick() {
+
 			var now = options.now();
 			if (stopped || running || now - last < 60000 || !options.ready())
 				return;
@@ -26,8 +27,10 @@ function totalmailreception(options) {
 		}
 	};
 }
+
 // Long-polls /changes/. The server holds each request until an IMAP IDLE connection reports a change.
 totalmailreception.listen = function(options) {
+
 	var stopped = false,
 		since = 0,
 		failures = 0;
@@ -56,10 +59,12 @@ totalmailreception.listen = function(options) {
 		}
 	};
 };
+
 if (typeof module !== 'undefined' && module.exports)
 	module.exports = totalmailreception;
 else
 	PLUGIN('reception', function(exports) {
+
 		var enabled = true,
 			timer,
 			scheduler,
@@ -73,11 +78,13 @@ else
 		// The window is shown, or the network is back (the pageevents component of the page).
 		exports.tick = tick;
 		exports.leaving = function() {
+
 			clearInterval(timer);
 			scheduler?.stop();
 			listener?.stop();
 		};
 		exports.toggle = function() {
+
 			enabled = !enabled;
 			try {
 				localStorage.setItem('totalmail-reception-' + PLUGINS.mail.store.user.id, enabled ? '1' : '0');
@@ -87,6 +94,7 @@ else
 		WAIT(
 			() => !!PLUGINS.mail?.store.user && !PLUGINS.mail.store.loading,
 			function() {
+
 				var user = PLUGINS.mail.store.user.id;
 				try {
 					enabled = localStorage.getItem('totalmail-reception-' + user) !== '0';
@@ -109,6 +117,7 @@ else
 					sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 					wake: () => scheduler.wake().catch(() => {}),
 					async poll(since) {
+
 						var answer = await totalmailrequest.get('/changes/?since=' + since);
 						if (answer.status === 401)
 							return null;

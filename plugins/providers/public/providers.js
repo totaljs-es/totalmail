@@ -4,6 +4,7 @@ PLUGIN('providers', function(exports) {
 			return !!PLUGINS.mail?.store && !!PLUGINS.accounts;
 		},
 		function() {
+
 			var mailbox = PLUGINS.mail,
 				state = mailbox.store,
 				model = {},
@@ -46,6 +47,7 @@ PLUGIN('providers', function(exports) {
 				exports.set('error', text || '');
 			}
 			function render() {
+
 				var ms = data.oauth.microsoft || {};
 				SET('providers.ms', { clientId: ms.clientId, tenant: ms.tenant, clientSecret: '' });
 				exports.set('msReturn', ms.returnUri || '');
@@ -88,6 +90,7 @@ PLUGIN('providers', function(exports) {
 				);
 			}
 			async function call(schema, payload) {
+
 				if (busy)
 					return null;
 				busy = true;
@@ -120,6 +123,7 @@ PLUGIN('providers', function(exports) {
 				}
 			}
 			function hiddenids(except, add) {
+
 				var ids = data.types.filter((t) => t.hidden && t.id !== except).map((t) => t.id);
 				if (add)
 					ids.push(add);
@@ -159,6 +163,7 @@ PLUGIN('providers', function(exports) {
 			};
 			exports.makedefault = (element) => call('instance_prefs', { hidden: hiddenids(), defaultProvider: element[0].dataset.id });
 			exports.edit = (element) => {
+
 				var type = data.types.find((t) => t.id === element[0].dataset.id);
 				if (!type)
 					return;
@@ -180,6 +185,7 @@ PLUGIN('providers', function(exports) {
 				exports.set('heading', TRANSLATE('@(Edit account type)'));
 			};
 			exports.newtype = () => {
+
 				SET('providers.type', blank());
 				exports.set('heading', TRANSLATE('@(Add an account type)'));
 				error('');
@@ -189,6 +195,7 @@ PLUGIN('providers', function(exports) {
 					exports.newtype();
 			};
 			exports.savetype = async () => {
+
 				var payload = {};
 				// `id` has no input: it belongs to the type being edited.
 				for (var field of Object.keys(blank()))

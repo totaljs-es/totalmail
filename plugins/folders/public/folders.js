@@ -1,4 +1,5 @@
 PLUGIN('folders', function(exports) {
+
 	var mailbox,
 		messageid = '',
 		busy = false;
@@ -31,6 +32,7 @@ PLUGIN('folders', function(exports) {
 			SET('mail.window', '');
 	}
 	function create() {
+
 		if (!mailbox)
 			return;
 		var accounts = mailbox.store.accounts.filter((a) => a.configured);
@@ -54,6 +56,7 @@ PLUGIN('folders', function(exports) {
 		SET('mail.window', 'folder-manager');
 	}
 	function move(id) {
+
 		var m = mailbox.store.messages.find((m) => m.id === id);
 		if (!m?.remote)
 			return;
@@ -67,6 +70,7 @@ PLUGIN('folders', function(exports) {
 		SET('mail.window', 'folder-manager');
 	}
 	async function save() {
+
 		if (busy)
 			return;
 		busy = true;
@@ -74,6 +78,7 @@ PLUGIN('folders', function(exports) {
 		error();
 		try {
 			await mailbox.operation(async () => {
+
 				if (messageid)
 					await mailbox.api('message_move', { id: messageid, path: GET('folders.form.path') });
 				else {

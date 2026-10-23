@@ -1,6 +1,7 @@
 // Groups messages into conversations from Message-ID, In-Reply-To and References, never across accounts.
 // Pure on purpose: the browser and the tests use the same code.
 function totalmailthreads(messages) {
+
 	var parent = messages.map((_, i) => i);
 	function find(i) {
 		while (parent[i] !== i) {
@@ -45,5 +46,6 @@ function totalmailthreads(messages) {
 		key: (id) => threadof.get(id)
 	};
 }
+
 if (typeof module !== 'undefined' && module.exports)
 	module.exports = totalmailthreads;

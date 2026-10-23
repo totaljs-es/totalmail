@@ -28,7 +28,7 @@
 		"start:production": "NODE_ENV=production node index.js 8000",
 		"test": "node --test tests/*.test.js",
 		"lint": "eslint .",
-		"format": "prettier --write \"**/*.js\" \"**/*.cjs\" && eslint --fix .",
+		"format": "eslint --fix .",
 		"translations": "node bin/translations.js"
 	},
 	"dependencies": {
@@ -38,7 +38,6 @@
 		"total5": "^0.0.19"
 	},
 	"devDependencies": {
-		"eslint": "^9.0.0",
-		"prettier": "3.3.3"
+		"eslint": "^9.0.0"
 	}
 }

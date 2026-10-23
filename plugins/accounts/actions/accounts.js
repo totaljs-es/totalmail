@@ -1,12 +1,15 @@
 const Aliases = require('../../../lib/aliases'),
 	Discovery = require('../../../lib/discovery');
+
 var running = new Map();
+
 NEWACTION('Accounts|discover', {
 	user: true,
 	route: '+API /api/ +account_discover --> Accounts|discover',
 	input: '*email:Email',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			if (running.has($.user.id))
 				throw Error('@(Discovery is already running.)');
 			running.set($.user.id, true);
@@ -17,12 +20,14 @@ NEWACTION('Accounts|discover', {
 			}
 		})
 });
+
 NEWACTION('Accounts|save', {
 	user: true,
 	route: '+API /api/ +account_save --> Accounts|save',
 	input: 'id:String(80), *name:String(80), *email:Email, *imapHost:String(253), *imapPort:Number, *imapSecurity:{tls|starttls}, *imapUsername:String(254), *smtpHost:String(253), *smtpPort:Number, *smtpSecurity:{tls|starttls}, *smtpUsername:String(254), authType:{password|oauth2}, password:String(500), signature:String(1000), aliases:String(1500), assistant:Boolean',
 	action: ($, model) =>
 		FUNC.run($, () => {
+
 			for (var port of [model.imapPort, model.smtpPort])
 				if (!Number.isInteger(port) || port < 1 || port > 65535)
 					throw Error('@(Enter a port between 1 and 65535.)');
@@ -91,18 +96,21 @@ NEWACTION('Accounts|delete', {
 	input: '*id:String(80)',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			var removed = await MODS.users.forUser($.user).deleteAccount(model.id);
 			for (var file of removed.files)
 				await MODS.users.files($.user).remove($.user.id, file);
 			return { id: removed.id };
 		})
 });
+
 NEWACTION('Accounts|providers', {
 	user: true,
 	route: '+API /api/ -account_providers --> Accounts|providers',
 	action: ($) => {
 		// OAuth providers are usable only when this server has an application registered for them.
 		var list = MODS.providers.list().map((p) => {
+
 			if (p.auth !== 'oauth2')
 				return p;
 			var ready = MODS.oauth.configured(p.id);
@@ -118,6 +126,7 @@ NEWACTION('Accounts|providers', {
 		$.callback({ providers: list, defaultProvider: MODS.providers.defaultId() });
 	}
 });
+
 NEWACTION('Accounts|detect', {
 	user: true,
 	route: '+API /api/ +account_detect --> Accounts|detect',
@@ -131,6 +140,7 @@ NEWACTION('Accounts|adminlink', {
 	input: '*provider:String(30), *email:Email',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			var provider = MODS.providers.get(model.provider);
 			if (!provider || provider.auth !== 'oauth2')
 				throw Error('@(Invalid operation.)');
@@ -143,12 +153,14 @@ NEWACTION('Accounts|adminlink', {
 			};
 		})
 });
+
 NEWACTION('Accounts|oauth', {
 	user: true,
 	route: '+API /api/ +account_oauth_start --> Accounts|oauth',
 	input: '*provider:String(30), *email:Email, name:String(80), accountId:String(80)',
 	action: ($, model) =>
 		FUNC.run($, async () => {
+
 			var provider = MODS.providers.get(model.provider);
 			if (!provider || provider.auth !== 'oauth2')
 				throw Error('@(Invalid operation.)');

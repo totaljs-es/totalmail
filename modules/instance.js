@@ -2,6 +2,7 @@
 // added, the writing assistant and what it costs. Used as MODS.instance; the logic is in lib/instance.js.
 const Lib = require('../lib/instance'),
 	Tables = require('../lib/tables').in(PATH.root('database'));
+
 exports.install = function() {
 	// Nothing is served until the settings are loaded.
 	PAUSESERVER('instance', true);

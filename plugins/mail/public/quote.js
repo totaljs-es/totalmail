@@ -4,9 +4,11 @@
 // A reply is   (your text) / "On <date>, <sender> wrote:" / the original, every line starting with "> " / signature.
 // The quote goes before the signature because everything after the "-- " line is a signature and is never formatted.
 function totalmailquote(kind, message, signature, text) {
+
 	var maxlines = 200,
 		chars = 20000;
 	function quoted(body) {
+
 		var lines = String(body || '')
 			.replace(/\r\n?/g, '\n')
 			.slice(0, chars)
@@ -48,5 +50,6 @@ function totalmailquote(kind, message, signature, text) {
 		body: '\n\n' + text.wrote(text.format(message.date), person()) + '\n' + quoted(message.body) + (signature || '')
 	};
 }
+
 if (typeof module !== 'undefined' && module.exports)
 	module.exports = totalmailquote;

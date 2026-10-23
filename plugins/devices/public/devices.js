@@ -6,6 +6,7 @@ PLUGIN('devices', function(exports) {
 			return !!PLUGINS.mail?.store;
 		},
 		function() {
+
 			var mailbox = PLUGINS.mail,
 				busy = false;
 			var set = (path, value) => exports.set(path, value);
@@ -23,6 +24,7 @@ PLUGIN('devices', function(exports) {
 				);
 			}
 			async function call(schema, payload) {
+
 				if (busy)
 					return null;
 				busy = true;

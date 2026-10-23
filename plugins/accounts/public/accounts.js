@@ -1,4 +1,5 @@
 PLUGIN('accounts', function(exports) {
+
 	// What the window shows besides the form: it exists from the start, so the views can bind to it before the page is ready.
 	function initialui() {
 		return {
@@ -38,6 +39,7 @@ PLUGIN('accounts', function(exports) {
 			return !!PLUGINS.mail?.store;
 		},
 		function() {
+
 			var mailbox = PLUGINS.mail;
 			var state = mailbox.store;
 			var mail = mailbox.model;
@@ -110,6 +112,7 @@ PLUGIN('accounts', function(exports) {
 				}
 			}
 			function renderproviders() {
+
 				SET(
 					'accounts.providers',
 					providers.map((p) => ({ id: p.id, icon: p.icon, name: TRANSLATE(p.name), active: p.id === selected }))
@@ -150,6 +153,7 @@ PLUGIN('accounts', function(exports) {
 			}
 			// Which type an existing account corresponds to: its OAuth provider, or the catalogue entry with its servers.
 			function guess(a) {
+
 				if (!a)
 					return providers.some((p) => p.id === defaultid) ? defaultid : 'other';
 				if (a.oauth?.provider && provider(a.oauth.provider))
@@ -157,6 +161,7 @@ PLUGIN('accounts', function(exports) {
 				return providers.find((p) => !p.discover && p.imap?.host === a.imap?.host)?.id || 'other';
 			}
 			function applyprovider(id) {
+
 				var before = provider(selected);
 				selected = id;
 				var p = provider(id),
@@ -206,6 +211,7 @@ PLUGIN('accounts', function(exports) {
 				setmode();
 			}
 			async function detectprovider() {
+
 				var email = GET('accounts.form.email').trim();
 				if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email))
 					return;
@@ -253,6 +259,7 @@ PLUGIN('accounts', function(exports) {
 				);
 			}
 			function accountmodel(id) {
+
 				var a = state.accounts.find((a) => a.id === id && a.configured);
 				SET(
 					'accounts.form',
@@ -307,6 +314,7 @@ PLUGIN('accounts', function(exports) {
 				error('');
 			}
 			async function openaccountsetup() {
+
 				try {
 					await loadproviders();
 				} catch (e) {
@@ -316,6 +324,7 @@ PLUGIN('accounts', function(exports) {
 				SET('mail.window', 'account-setup');
 			}
 			async function discoveraccount() {
+
 				if (exports.busy)
 					return;
 				exports.busy = true;
@@ -367,6 +376,7 @@ PLUGIN('accounts', function(exports) {
 			}
 			// Sends the person to the provider's sign-in page; the callback creates or renews the account.
 			async function startoauth(again) {
+
 				if (exports.busy)
 					return;
 				var email = GET('accounts.form.email').trim(),
@@ -392,6 +402,7 @@ PLUGIN('accounts', function(exports) {
 				}
 			}
 			async function saveaccount() {
+
 				if (exports.busy)
 					return;
 				exports.busy = true;
@@ -437,6 +448,7 @@ PLUGIN('accounts', function(exports) {
 				ui({ assistant: !exports.get('ui').assistant });
 			};
 			exports.adminlink = async function() {
+
 				var email = GET('accounts.form.email').trim();
 				error('');
 				if (!email) {
@@ -480,6 +492,7 @@ PLUGIN('accounts', function(exports) {
 				skip: ['ti ti-minus', '@(Not checked)']
 			};
 			exports.diagnose = async () => {
+
 				var id = GET('accounts.form.id');
 				if (!id || exports.get('ui').diagnosing)
 					return;
@@ -521,6 +534,7 @@ PLUGIN('accounts', function(exports) {
 			exports.save = saveaccount;
 			// Removing an account takes it, its cached mail and its drafts out of TotalMail; the mail server keeps its mailbox.
 			exports.remove = async function() {
+
 				var id = GET('accounts.form.id');
 				if (exports.busy || !id)
 					return;
@@ -543,6 +557,7 @@ PLUGIN('accounts', function(exports) {
 			};
 			// A change of the id (the account chosen in the list) loads that account into the form.
 			WATCH('accounts.form.id', (value, flags) => {
+
 				SET('accounts.diagnosis', null);
 				ui({ saved: !!value });
 				SET('mail.ui.accountSaved', !!value);
@@ -551,6 +566,7 @@ PLUGIN('accounts', function(exports) {
 			});
 			// Once the address is typed, the provider is looked up (the model follows the keyboard: every input has $delay:1).
 			WATCH('accounts.form.email', () => {
+
 				clearTimeout(detecttimer);
 				ui({ suggestion: false });
 				detecttimer = setTimeout(detectprovider, 700);

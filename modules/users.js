@@ -4,11 +4,17 @@ const Mailbox = require('../lib/store'),
 	Mirror = require('../lib/mirror'),
 	Tables = require('../lib/tables').in(PATH.root('database')),
 	Files = require('../lib/files');
+
 var stores = new Map(),
 	database = PATH.root('database'),
 	files = Files.create(Total.Path.join(database, 'attachments'));
-var valid = (id) => /^[a-f0-9]{32}$/.test(id || '');
+
+const REG_ID = /^[a-f0-9]{32}$/;
+
+var valid = (id) => REG_ID.test(id || '');
+
 exports.install = function() {
+
 	PAUSESERVER('users', true);
 	var loading = MODS.security.ready
 		.then(() =>
@@ -32,7 +38,9 @@ exports.install = function() {
 				store.clean().catch((error) => Total.error(error, 'TotalMail mailbox clean'));
 	});
 };
+
 exports.forUser = function(user) {
+
 	if (!user || !valid(user.id))
 		throw Error('Authentication required');
 	let store = stores.get(user.id);
@@ -57,8 +65,10 @@ exports.forUser = function(user) {
 	stores.set(user.id, store);
 	return store;
 };
+
 // Removes everything a deleted user owned: mailbox data, outgoing attachments and the in-memory store.
 exports.drop = async function(userid) {
+
 	if (!valid(userid))
 		throw Error('Authentication required');
 	stores.delete(userid);
@@ -72,8 +82,9 @@ exports.drop = async function(userid) {
 	await Total.Fs.promises.rm(Total.Path.join(database, 'mail-' + userid + '.json.migrated'), { force: true });
 	await Total.Fs.promises.rm(Total.Path.join(database, 'attachments', userid), { recursive: true, force: true });
 };
+
 exports.files = function(user) {
-	if (!user || !/^[a-f0-9]{32}$/.test(user.id))
+	if (!user || !REG_ID.test(user.id))
 		throw Error('Authentication required');
 	return files;
 };

@@ -8,9 +8,12 @@
 // Stop TotalMail first and start it again afterwards: the running process keeps its own copy of the people in memory and
 // would write that copy back over this change. `--database <folder>` points at another data folder (default: ./database).
 require('total5');
+
 const Store = require('../lib/identities'),
 	Tables = require('../lib/tables');
+
 async function ask(text) {
+
 	if (process.env.TOTALMAIL_NEW_PASSWORD)
 		return process.env.TOTALMAIL_NEW_PASSWORD;
 	if (!process.stdin.isTTY)
@@ -19,7 +22,9 @@ async function ask(text) {
 	rl._writeToOutput = (value) => (value.includes(text) ? process.stdout.write(value) : process.stdout.write(''));
 	return new Promise((resolve) => rl.question(text, (answer) => (rl.close(), process.stdout.write('\n'), resolve(answer))));
 }
+
 exports.main = async function(argv, out = (line) => console.log(line)) {
+
 	var args = [...argv],
 		index = args.indexOf('--database'),
 		directory = Total.Path.resolve(__dirname, '../database');
@@ -63,6 +68,7 @@ exports.main = async function(argv, out = (line) => console.log(line)) {
 		out('Two-step verification removed for ' + user.email + '. Start TotalMail again.');
 	}
 };
+
 if (require.main === module)
 	// The database keeps the process alive, so it ends when the command is done.
 	exports.main(process.argv.slice(2)).then(

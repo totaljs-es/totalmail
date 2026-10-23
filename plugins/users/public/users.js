@@ -4,6 +4,7 @@ PLUGIN('users', function(exports) {
 			return !!PLUGINS.mail?.store;
 		},
 		function() {
+
 			var mailbox = PLUGINS.mail;
 			var state = mailbox.store;
 			var users = {};
@@ -34,6 +35,7 @@ PLUGIN('users', function(exports) {
 			users.profileform = {};
 			var profilebusy = false;
 			function openprofile() {
+
 				if (!state.user)
 					return;
 				SET('users.profileform', {
@@ -50,6 +52,7 @@ PLUGIN('users', function(exports) {
 				SET('mail.window', 'profile');
 			}
 			function closeprofile() {
+
 				if (profilebusy)
 					return;
 				SET('users.profileform.currentPassword', '');
@@ -58,6 +61,7 @@ PLUGIN('users', function(exports) {
 				SET('mail.window', '');
 			}
 			async function saveprofile() {
+
 				if (profilebusy)
 					return;
 				profilebusy = true;
@@ -83,6 +87,7 @@ PLUGIN('users', function(exports) {
 			}
 			var userbusy = false;
 			async function openusers() {
+
 				if (state.user.role !== 'admin')
 					return;
 				SET('users.form', {
@@ -115,6 +120,7 @@ PLUGIN('users', function(exports) {
 				exports.set('toggleLabel', TRANSLATE(chosen?.disabled ? '@(Enable user)' : '@(Disable user)'));
 			}
 			function manage(element) {
+
 				chosen = listing.find((u) => u.id === element[0].dataset.id) || null;
 				if (!chosen)
 					return;
@@ -129,6 +135,7 @@ PLUGIN('users', function(exports) {
 			}
 			// Every change to another person asks for the administrator's own password.
 			async function act(schema, extra, done) {
+
 				if (userbusy || !chosen)
 					return;
 				userbusy = true;
@@ -152,6 +159,7 @@ PLUGIN('users', function(exports) {
 				}
 			}
 			async function resetpassword() {
+
 				var password = GET('users.manage.password');
 				if (!password) {
 					exports.set('error', TRANSLATE('@(Use a password of 12 to 128 characters.)'));
@@ -176,6 +184,7 @@ PLUGIN('users', function(exports) {
 			}
 			// Deleting asks twice: the first press arms the button for five seconds.
 			async function removeuser() {
+
 				if (!chosen)
 					return;
 				if (Date.now() > confirming) {
@@ -197,6 +206,7 @@ PLUGIN('users', function(exports) {
 				}
 			}
 			async function createuser() {
+
 				if (userbusy)
 					return;
 				userbusy = true;

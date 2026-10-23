@@ -1,10 +1,12 @@
 // Address suggestions built from the mail already on screen: people who wrote to you and people you wrote to.
 // Pure on purpose: the browser and the tests use the same code. Nothing is stored or sent anywhere.
 function totalmailcontacts(messages, own) {
+
 	var mine = new Set((own || []).map((e) => String(e).toLowerCase())),
 		found = new Map();
 	var valid = /^[^@\s,;<>"]+@[^@\s,;<>"]+\.[^@\s,;<>"]+$/;
 	function add(address, name, date, weight) {
+
 		var email = String(address || '')
 			.trim()
 			.toLowerCase();
@@ -36,8 +38,10 @@ function totalmailcontacts(messages, own) {
 
 	return [...found.values()].sort((a, b) => b.count - a.count || b.last - a.last);
 }
+
 // Suggestions for the text being typed: the start of a name or address first, then any part of them.
 totalmailcontacts.match = function(list, token, limit) {
+
 	token = String(token || '')
 		.trim()
 		.toLowerCase();
@@ -59,5 +63,6 @@ totalmailcontacts.match = function(list, token, limit) {
 		.map((x) => x.c)
 		.slice(0, limit || 6);
 };
+
 if (typeof module !== 'undefined' && module.exports)
 	module.exports = totalmailcontacts;

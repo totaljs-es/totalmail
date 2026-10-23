@@ -7,6 +7,7 @@ PLUGIN('twostep', function(exports) {
 			return !!PLUGINS.mail?.store?.user && !!PLUGINS.accounts && !!PLUGINS.users;
 		},
 		function() {
+
 			var mailbox = PLUGINS.mail,
 				state = mailbox.store,
 				busy = false,
@@ -36,6 +37,7 @@ PLUGIN('twostep', function(exports) {
 				exports.set('totp', !!state.user.totp);
 			}
 			async function call(schema, data) {
+
 				if (busy)
 					return null;
 				busy = true;
@@ -57,6 +59,7 @@ PLUGIN('twostep', function(exports) {
 				SET('mail.window', 'twostep');
 			};
 			exports.close = function() {
+
 				// What was shown once is gone with the window.
 				codes = [];
 				listing();
@@ -64,6 +67,7 @@ PLUGIN('twostep', function(exports) {
 				SET('mail.window', 'profile');
 			};
 			exports.begin = async function() {
+
 				var result = await call('user_totp_begin', { password: GET('twostep.password') });
 				if (!result)
 					return;
@@ -73,6 +77,7 @@ PLUGIN('twostep', function(exports) {
 			};
 			exports.cancel = () => show('off');
 			exports.enable = async function() {
+
 				var result = await call('user_totp_enable', { code: GET('twostep.code') });
 				if (!result)
 					return;
@@ -83,6 +88,7 @@ PLUGIN('twostep', function(exports) {
 				link();
 			};
 			exports.disable = async function() {
+
 				var result = await call('user_totp_disable', { password: GET('twostep.password'), code: GET('twostep.code') });
 				if (!result)
 					return;
@@ -92,6 +98,7 @@ PLUGIN('twostep', function(exports) {
 				mailbox.notify(TRANSLATE('@(Two-step verification is off.)'));
 			};
 			exports.recovery = async function() {
+
 				var result = await call('user_totp_recovery', { password: GET('twostep.password'), code: GET('twostep.code') });
 				if (!result)
 					return;
@@ -121,6 +128,7 @@ PLUGIN('twostep', function(exports) {
 				SETTER('page/save', 'totalmail-recovery-codes.txt', text);
 			};
 			exports.done = function() {
+
 				codes = [];
 				listing();
 				show('on');

@@ -6,7 +6,9 @@
 // Anything else is a word that must appear somewhere (sender, recipients, subject or body); all of them must.
 // Pure on purpose: the browser filters what is loaded with it and the server turns the same query into an IMAP search.
 function totalmailquery() {}
+
 totalmailquery.parse = function(text) {
+
 	var q = { words: [], fields: [], is: [], has: [], after: null, before: null, empty: true };
 	var token = /(\w+):("([^"]*)"|\S+)|"([^"]*)"|\S+/g,
 		m,
@@ -35,8 +37,10 @@ totalmailquery.parse = function(text) {
 	q.empty = !q.words.length && !q.fields.length && !q.is.length && !q.has.length && !q.after && !q.before;
 	return q;
 };
+
 // Does a loaded message match? `item` is what the list holds: sender, email, to, subject, body, date, unread, starred.
 totalmailquery.matches = function(q, item) {
+
 	var has = (value, needle) =>
 		String(value || '')
 			.toLowerCase()
@@ -66,10 +70,12 @@ totalmailquery.matches = function(q, item) {
 		return false;
 	return true;
 };
+
 // The same query as an ImapFlow search object. ImapFlow takes one of each key (one `or`, one `not`), so what cannot share the
 // top level goes into a single `not` that negates an `or` of negations (De Morgan): NOT (NOT a OR NOT b) is a AND b.
 // "Has an attachment" has no IMAP search key; a multipart/mixed message is the nearest thing.
 totalmailquery.toImap = function(q) {
+
 	var plain = {},
 		groups = [];
 	var put = (key, value) => (key in plain ? groups.push({ [key]: value }) : (plain[key] = value));
@@ -97,5 +103,6 @@ totalmailquery.toImap = function(q) {
 	}
 	return plain;
 };
+
 if (typeof module !== 'undefined' && module.exports)
 	module.exports = totalmailquery;

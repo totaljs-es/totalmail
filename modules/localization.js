@@ -4,8 +4,10 @@ Object.defineProperty(exports, 'languages', {
 			.filter((name) => /^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/.test(name))
 			.sort()
 });
+
 exports.options = function() {
 	return exports.languages.map((id) => {
+
 		var name = Total.resource(id, 'language_name');
 		if (!name)
 			try {
@@ -17,13 +19,17 @@ exports.options = function() {
 		return { id, name };
 	});
 };
+
 exports.clientLanguages = function() {
 	return JSON.stringify(exports.options()).replace(/</g, '\\u003c');
 };
+
 exports.resolve = function(requested, saved) {
 	return exports.languages.includes(requested) ? requested : exports.languages.includes(saved) ? saved : 'en';
 };
+
 exports.clientResources = function(language) {
+
 	language = exports.resolve(language);
 	// Total.js has already loaded and parsed these resources at startup.
 	// Deliver that state to jComponent; do not maintain another resource loader.

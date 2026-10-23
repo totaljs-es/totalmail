@@ -16,7 +16,7 @@ Open <http://127.0.0.1:8000> and create the administrator. Everything the app st
 ## Before you open a pull request
 
 ```bash
-npm run format    # the style of the Total.js guidelines: Prettier, then ESLint --fix
+npm run format    # the style of the Total.js guidelines, applied by ESLint --fix
 npm run lint
 npm test
 ```

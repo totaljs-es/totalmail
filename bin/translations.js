@@ -7,14 +7,18 @@
 // parentheses: the framework would cut it there.
 const Fs = require('node:fs'),
 	Path = require('node:path');
+
 const root = Path.join(__dirname, '..');
 const folders = ['views', 'plugins', 'modules', 'controllers', 'lib', 'definitions'];
+
 exports.key = function(text) {
+
 	var hash = 0;
 	for (var i = 0; i < text.length; i++)
 		hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
 	return 'T' + (hash >>> 0).toString(36);
 };
+
 function walk(dir, found) {
 	for (var entry of Fs.readdirSync(dir, { withFileTypes: true })) {
 		if (entry.name === 'vendor' || entry.name === 'node_modules')
@@ -28,19 +32,24 @@ function walk(dir, found) {
 					found.add(match[1]);
 	}
 }
+
 // The texts the application asks for.
 exports.texts = function() {
+
 	var found = new Set();
 	for (var folder of folders)
 		if (Fs.existsSync(Path.join(root, folder)))
 			walk(Path.join(root, folder), found);
 	return [...found].sort();
 };
+
 exports.languages = () =>
 	Fs.readdirSync(Path.join(root, 'resources'))
 		.filter((name) => name.endsWith('.resource'))
 		.map((name) => name.replace('.resource', ''));
+
 function keys(language) {
+
 	var have = new Set();
 	for (var line of Fs.readFileSync(Path.join(root, 'resources', language + '.resource'), 'utf8').split('\n')) {
 		var match = /^(\S+) : /.exec(line);
@@ -49,8 +58,10 @@ function keys(language) {
 	}
 	return have;
 }
+
 // { language: [texts without a translation] }
 exports.missing = function() {
+
 	var texts = exports.texts(),
 		result = {};
 	for (var language of exports.languages()) {
@@ -59,7 +70,9 @@ exports.missing = function() {
 	}
 	return result;
 };
+
 exports.add = function() {
+
 	var result = exports.missing(),
 		added = 0;
 	for (var language of Object.keys(result)) {
@@ -75,6 +88,7 @@ exports.add = function() {
 	}
 	return added;
 };
+
 if (require.main === module)
 	if (process.argv.includes('--add'))
 		console.log('Added ' + exports.add() + ' lines. Translate them in each file (they start in English).');

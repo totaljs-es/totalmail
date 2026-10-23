@@ -2,6 +2,7 @@
 // <div> that is not tied to the field, gives every text field role="combobox" and leaves dropdowns without a role, so
 // a screen reader hears nothing useful. This runs for every window of every plugin, now and whenever one is rendered (the a11y component).
 (function() {
+
 	var counter = 0,
 		queued = false;
 	function identify(el, prefix) {
@@ -66,6 +67,7 @@
 		}
 	}
 	function schedule() {
+
 		if (queued)
 			return;
 		queued = true;
@@ -75,10 +77,12 @@
 		}, 30);
 	}
 	COMPONENT('a11y', function(self) {
+
 		self.singleton();
 		self.readonly();
 		self.nocompile && self.nocompile();
 		self.make = function() {
+
 			self.aclass('hidden');
 			new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
 			schedule();

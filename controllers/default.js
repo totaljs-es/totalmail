@@ -1,7 +1,13 @@
 const Files = require('../lib/files');
 const Html = require('../lib/html');
+
+const REG_MESSAGE = /^imap-[a-f0-9]{64}$/;
+const REG_ANYID = /^[A-Za-z0-9_-]{1,100}$/;
+
 exports.install = function() {
+
 	ROUTE('GET /', async function($) {
+
 		if (MODS.localization.languages.includes($.query.lang))
 			$.cookie('totalmail-language', $.language, '1 year', {
 				httpOnly: true,
@@ -21,7 +27,8 @@ exports.install = function() {
 	// The sanitized HTML of a message, for the sandboxed frame of the reader. Own policy, own headers: remote images
 	// stay blocked unless the reader asked for them with ?images=1.
 	ROUTE('+GET /html/{id}/', function($) {
-		if (!/^imap-[a-f0-9]{64}$/.test($.params.id))
+
+		if (!REG_MESSAGE.test($.params.id))
 			return $.invalid(404);
 		var message;
 		try {
@@ -39,7 +46,8 @@ exports.install = function() {
 	// A message laid out for paper in its own tab: the details, then the cleaned HTML or the plain text. No script runs here
 	// (same policy as the frame), so printing is the browser's own command.
 	ROUTE('+GET /print/{id}/', function($) {
-		if (!/^[A-Za-z0-9_-]{1,100}$/.test($.params.id))
+
+		if (!REG_ANYID.test($.params.id))
 			return $.invalid(404);
 		var message;
 		try {
@@ -62,11 +70,12 @@ exports.install = function() {
 	});
 	// The original message as an .eml file, straight from the server.
 	ROUTE('+GET /source/{id}/', function($) {
-		if (!/^imap-[a-f0-9]{64}$/.test($.params.id))
+		if (!REG_MESSAGE.test($.params.id))
 			return $.invalid(404);
 		Promise.resolve()
 			.then(() => MODS.live.source($.user, MODS.users.forUser($.user), $.params.id))
 			.then((file) => {
+
 				$.response.headers['cache-control'] = 'private, no-store';
 				$.response.headers['x-content-type-options'] = 'nosniff';
 				$.response.headers['content-security-policy'] = "default-src 'none'; sandbox";
@@ -76,12 +85,14 @@ exports.install = function() {
 	});
 	// Attachments leave the server only as opaque downloads of the signed-in user's own messages.
 	ROUTE('+GET /attachment/{id}/{index}/', function($) {
+
 		var index = /^\d{1,4}$/.test($.params.index) ? parseInt($.params.index) : -1;
-		if (!/^imap-[a-f0-9]{64}$/.test($.params.id) || index < 0)
+		if (!REG_MESSAGE.test($.params.id) || index < 0)
 			return $.invalid(404);
 		Promise.resolve()
 			.then(() => MODS.live.attachment($.user, MODS.users.forUser($.user), $.params.id, index))
 			.then((file) => {
+
 				$.response.headers['cache-control'] = 'private, no-store';
 				$.response.headers['x-content-type-options'] = 'nosniff';
 				$.response.headers['content-security-policy'] = "default-src 'none'; sandbox";
@@ -91,6 +102,7 @@ exports.install = function() {
 	});
 	// Outgoing attachments: stored privately per user and linked to one of the user's own drafts.
 	ROUTE('+POST /upload/{draft}/ @upload <16mb', function($) {
+
 		var file = $.files[0],
 			files = MODS.users.files($.user),
 			store = MODS.users.forUser($.user);
@@ -131,6 +143,7 @@ exports.install = function() {
 	// Documents for the knowledge base: administrators only. Each file is read into text on the server and added to a
 	// collection; the answer says what was added and what could not be read and why.
 	ROUTE('+POST /knowledge/upload/ @upload <40mb', async function($) {
+
 		if (UNAUTHORIZED($, 'admin'))
 			return;
 		if (!$.files.length || $.files.length > 10)
@@ -153,10 +166,12 @@ exports.install = function() {
 	// cross-site navigation, so the one-time state created by the signed-in user identifies who this belongs to,
 	// and the page then returns to the app through a same-site navigation.
 	ROUTE('GET /oauth/{provider}/callback/', function($) {
+
 		var provider = MODS.providers.get($.params.provider);
 		if (!provider || provider.auth !== 'oauth2')
 			return $.invalid(404);
 		function done(result) {
+
 			MODS.security.headers($);
 			$.response.headers['cache-control'] = 'private, no-store';
 			$.response.headers['referrer-policy'] = 'no-referrer';
@@ -176,6 +191,7 @@ exports.install = function() {
 			.then((grant) => service.complete(provider, grant))
 			.then(done)
 			.catch((err) => {
+
 				var exists = /already exists/.test(err.message || '');
 				if (!exists && err.message !== 'invalid_state')
 					Total.error('OAuth sign-in failed: ' + (err.oauthError || err.message), 'TotalMail');

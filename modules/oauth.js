@@ -1,15 +1,19 @@
 // OAuth sign-in to mail providers. Used as MODS.oauth; the logic is in lib/oauth.js.
 const Lib = require('../lib/oauth');
+
 exports.install = function() {
 	Object.assign(exports, Lib.create());
 };
+
 exports.settings = Lib.settings;
 exports.meta = Lib.meta;
 exports.claims = Lib.claims;
 exports.useInstance = Lib.useInstance;
+
 // What a finished sign-in leads to: the account it was started for becomes (or stays) an OAuth account of the provider, or, when it
 // was started from the account type list, a new account is added. Returns what the page tells the person: ok or mismatch.
 exports.complete = async function(provider, grant) {
+
 	var store = MODS.users.forUser({ id: grant.userId }),
 		servers = MODS.providers.serversFor(provider, grant.email);
 	if (grant.accountId) {

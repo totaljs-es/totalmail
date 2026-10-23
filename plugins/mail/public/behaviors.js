@@ -4,21 +4,25 @@
 // Opens the file browser of the computer and hands the files over; one for the whole page: SETTER('filepicker/open', opt)
 // with opt = { accept: '.txt,.md', multiple: true, callback: function(files) }.
 COMPONENT('filepicker', function(self) {
+
 	var input;
 	self.readonly();
 	self.nocompile && self.nocompile();
 	self.singleton();
 	self.make = function() {
+
 		self.aclass('hidden');
 		self.append('<input type="file" tabindex="-1" aria-hidden="true" />');
 		input = self.find('input');
 		input.on('change', function() {
+
 			var files = [...input[0].files];
 			input[0].value = '';
 			files.length && self.opt && self.opt.callback && self.opt.callback(files);
 		});
 	};
 	self.open = function(opt) {
+
 		self.opt = opt;
 		input.attr('accept', opt.accept || '*/*').prop('multiple', !!opt.multiple);
 		input.trigger('click');
@@ -27,12 +31,15 @@ COMPONENT('filepicker', function(self) {
 
 // Files dragged over the window: its path is true while they are over it, and what is dropped goes to config.exec(files).
 COMPONENT('dropfiles', function(self, config) {
+
 	var has = (event) => [...(event.dataTransfer?.types || [])].includes('Files');
 	self.singleton();
 	self.nocompile && self.nocompile();
 	self.make = function() {
+
 		self.aclass('hidden');
 		document.addEventListener('dragover', function(event) {
+
 			if (!has(event))
 				return;
 			event.preventDefault();
@@ -44,6 +51,7 @@ COMPONENT('dropfiles', function(self, config) {
 				self.set(false);
 		});
 		document.addEventListener('drop', function(event) {
+
 			if (!has(event))
 				return;
 			// The browser would otherwise leave the app to show the file.
@@ -56,6 +64,7 @@ COMPONENT('dropfiles', function(self, config) {
 
 // Every key pressed on the page goes to config.exec(event); the plugin decides what it means.
 COMPONENT('keys', function(self, config) {
+
 	self.singleton();
 	self.readonly();
 	self.nocompile && self.nocompile();
@@ -80,6 +89,7 @@ COMPONENT('scrollend', function(self, config) {
 // when it is out of it), SETTER('page/download', url) (a download that does not leave the page) and
 // SETTER('page/save', filename, text) (a text the person keeps as a file).
 COMPONENT('page', function(self) {
+
 	self.singleton();
 	self.readonly();
 	self.nocompile && self.nocompile();
@@ -87,12 +97,14 @@ COMPONENT('page', function(self) {
 	self.focus = (selector) => document.querySelector(selector)?.focus();
 	self.reveal = (selector) => document.querySelector(selector)?.scrollIntoView({ block: 'nearest' });
 	self.download = function(url, name) {
+
 		var link = document.createElement('a');
 		link.href = url;
 		link.download = name || '';
 		link.click();
 	};
 	self.save = function(name, text) {
+
 		var url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
 		self.download(url, name);
 		setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -102,10 +114,12 @@ COMPONENT('page', function(self) {
 // The window and the network: config.visible is called when the window is shown or hidden, config.online when the network
 // comes back and config.leaving when the page is closed (all plugin/method).
 COMPONENT('pageevents', function(self, config) {
+
 	self.singleton();
 	self.readonly();
 	self.nocompile && self.nocompile();
 	self.make = function() {
+
 		self.aclass('hidden');
 		var call = (path, event) => path && self.EXEC(path, event);
 		document.addEventListener('visibilitychange', (event) => call(config.visible, event));
@@ -116,10 +130,12 @@ COMPONENT('pageevents', function(self, config) {
 
 // Leaving the page: config.check (plugin/method) says whether something would be lost; the browser then asks.
 COMPONENT('beforeleave', function(self, config) {
+
 	self.singleton();
 	self.readonly();
 	self.nocompile && self.nocompile();
 	self.make = function() {
+
 		self.aclass('hidden');
 		var path = config.check.split('/');
 		window.addEventListener('beforeunload', function(event) {
@@ -134,12 +150,14 @@ COMPONENT('beforeleave', function(self, config) {
 // A window is open (its path is the name of the window): what is behind it cannot be reached, Tab stays inside it, the focus
 // goes into it and comes back to where it was when it closes.
 COMPONENT('modalguard', function(self, config) {
+
 	var remembered = null;
 	self.singleton();
 	self.nocompile && self.nocompile();
 	self.make = function() {
 		self.aclass('hidden');
 		document.addEventListener('keydown', function(event) {
+
 			var name = self.get(),
 				root = name && document.getElementById(name);
 			if (!root || event.key !== 'Tab')
@@ -159,6 +177,7 @@ COMPONENT('modalguard', function(self, config) {
 		});
 	};
 	self.setter = function(name) {
+
 		var shell = document.querySelector(config.shell || '.app-shell');
 		if (!shell)
 			return;
@@ -178,18 +197,21 @@ COMPONENT('modalguard', function(self, config) {
 // at config.source (a path); nothing leaves the browser. The field says to assistive technology whether the list is open and
 // which suggestion is active.
 COMPONENT('addresssuggest', function(self, config) {
+
 	var menu,
 		items = [],
 		active = -1,
 		input = null;
 	var parts = (value) => String(value || '').split(/[,;]/);
 	function hide() {
+
 		menu.attr('hidden', '');
 		items = [];
 		active = -1;
 		combo();
 	}
 	function combo() {
+
 		if (!input)
 			return;
 		var option = items.length && !menu[0].hasAttribute('hidden') ? menu.find('[role=option]')[active] : null;
@@ -201,6 +223,7 @@ COMPONENT('addresssuggest', function(self, config) {
 	}
 	// The field is a combo box: it says so to assistive technology, whether the list is open and which suggestion is active.
 	function prepare(el) {
+
 		input = el;
 		if (el.getAttribute('role') === 'combobox')
 			return;
@@ -212,6 +235,7 @@ COMPONENT('addresssuggest', function(self, config) {
 		el.removeAttribute('aria-haspopup');
 	}
 	function pick(email) {
+
 		var done = parts(input.value).map((v) => v.trim());
 		done.pop();
 		self.set([...done.filter(Boolean), email].join(', ') + ', ');
@@ -219,6 +243,7 @@ COMPONENT('addresssuggest', function(self, config) {
 		input.focus();
 	}
 	function show() {
+
 		var chosen = new Set(
 			parts(input.value)
 				.slice(0, -1)
@@ -278,6 +303,7 @@ COMPONENT('addresssuggest', function(self, config) {
 		}
 	}
 	self.make = function() {
+
 		// The list is drawn under the field, outside the window, so that nothing clips it.
 		menu = $('<div class="contacts-menu" role="listbox" hidden></div>');
 		menu.attr('id', 'contacts-menu-' + self.id).attr('aria-label', config.label || '');
@@ -307,6 +333,7 @@ COMPONENT('addresssuggest', function(self, config) {
 // be pasted, and the cursor can be put where it is needed. It wraps the input component of the body (a multiline one).
 //   config.paste: function(files)  called with the files pasted from the clipboard (a screenshot, say)
 COMPONENT('mailbody', function(self, config) {
+
 	var area = () => self.find('textarea')[0];
 	// The model follows the text: written by a command, it must be told.
 	function changed(el) {
@@ -314,6 +341,7 @@ COMPONENT('mailbody', function(self, config) {
 		self.set(el.value);
 	}
 	self.focus = function(start) {
+
 		var el = area();
 		if (!el)
 			return;
@@ -322,6 +350,7 @@ COMPONENT('mailbody', function(self, config) {
 			el.setSelectionRange(0, 0);
 	};
 	self.format = function(kind) {
+
 		var el = area();
 		if (!el)
 			return;
@@ -368,6 +397,7 @@ COMPONENT('mailbody', function(self, config) {
 	// dimmed and the words coloured, in colour only so that no letter changes width and the cursor stays where the text is.
 	var mirror = null;
 	function sync() {
+
 		var el = area();
 		if (!el || !mirror)
 			return;
@@ -381,6 +411,7 @@ COMPONENT('mailbody', function(self, config) {
 		mirror.scrollTop = el.scrollTop;
 	}
 	function paint() {
+
 		var el = area();
 		if (!el)
 			return;
@@ -402,9 +433,11 @@ COMPONENT('mailbody', function(self, config) {
 		requestAnimationFrame(paint);
 	};
 	self.make = function() {
+
 		setTimeout(paint, 60);
 		self.element.on('input', 'textarea', paint);
 		self.element.on('paste', 'textarea', function(event) {
+
 			var data = (event.originalEvent || event).clipboardData,
 				files = [...(data?.files || [])];
 			// Text (even with a picture alongside, as Word and web pages put it) pastes as text; only a bare file is attached.
@@ -414,6 +447,7 @@ COMPONENT('mailbody', function(self, config) {
 			self.EXEC(config.paste, files);
 		});
 		self.element.on('keydown', 'textarea', function(event) {
+
 			var key = event.key.toLowerCase();
 			if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey || !['b', 'i', 'k'].includes(key))
 				return;

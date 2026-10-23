@@ -1,16 +1,20 @@
 const Welcome = require('../../../lib/welcome');
+
 // Whether the assistant exists, where its text goes and, if a knowledge base is connected, where a message is searched.
 function aistatus() {
+
 	var status = MODS.ai.status(MODS.instance.ai());
 	if (status.configured)
 		status.knowledge = MODS.knowledge.has();
 	return status;
 }
+
 NEWACTION('Mailboxes|bootstrap', {
 	name: 'Private mailboxes',
 	user: true,
 	route: '+API /api/ -bootstrap --> Mailboxes|bootstrap',
 	action: function($) {
+
 		var data = MODS.users.forUser($.user).snapshot();
 		// Keep submitted records in storage to prevent duplicate sends, but do not list sent mail as drafts.
 		data.drafts = data.drafts.filter((draft) => draft.status !== 'sent');
@@ -23,6 +27,7 @@ NEWACTION('Mailboxes|bootstrap', {
 		});
 	}
 });
+
 NEWACTION('Drafts|save', {
 	name: 'Persist a local draft',
 	user: true,

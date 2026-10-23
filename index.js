@@ -11,6 +11,7 @@ try {
 }
 
 var production = CONF.production === true || process.env.NODE_ENV === 'production' || process.argv.includes('--release');
+
 var options = {
 	watcher: !production,
 	servicemode: process.argv.includes('--service') || process.argv.includes('--servicemode')

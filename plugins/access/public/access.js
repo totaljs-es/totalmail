@@ -1,4 +1,5 @@
 PLUGIN('access', function(exports) {
+
 	var access = {
 		name: '',
 		email: '',
@@ -15,6 +16,7 @@ PLUGIN('access', function(exports) {
 	exports.set('error', '');
 	exports.set('busy', false);
 	async function accesssubmit() {
+
 		if (accessbusy)
 			return;
 		accessbusy = true;
@@ -46,6 +48,7 @@ PLUGIN('access', function(exports) {
 		}
 	}
 	WATCH('access.language', (language) => {
+
 		if (!language || language === document.documentElement.lang)
 			return;
 		var url = new URL(location.href);
