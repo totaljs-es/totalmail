@@ -52,6 +52,56 @@ var totalmailformat = (function() {
 		return { html, plain, marked };
 	}
 
+	// "> > text" -> { depth: 2, text: 'text' }: every ">" at the start of the line is one level of quoting.
+	function quotelevel(line) {
+
+		var found = /^\s{0,3}((?:>[ \t]?)+)(.*)$/.exec(line);
+		return { depth: found[1].split('>').length - 1, text: found[2] };
+	}
+
+	// Lines with a depth -> blockquotes inside blockquotes, one per level, lines of the same level separated by a break.
+	function nested(levels) {
+
+		var html = '',
+			open = 0,
+			fresh = true;
+		for (var level of levels) {
+			var changed = level.depth !== open;
+			while (open < level.depth) {
+				html +=
+					'<blockquote style="margin:' +
+					(open ? '4px' : '0') +
+					' 0 ' +
+					(open ? '0' : '12px') +
+					';padding:2px 0 2px 12px;border-left:3px solid #cbd2d9;color:#52606d">';
+				open++;
+			}
+			while (open > level.depth) {
+				html += '</blockquote>';
+				open--;
+			}
+			if (!changed && !fresh)
+				html += '<br>';
+			html += level.html;
+			fresh = false;
+		}
+		return html + '</blockquote>'.repeat(open);
+	}
+
+	// A signature is not formatted, but the addresses in it can be clicked: web links and email addresses.
+	function signaturelinks(text) {
+
+		var html = '',
+			last = 0;
+		text.replace(/(https?:\/\/[^\s<>()]+[^\s<>().,;:!?'"])|([\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g, (match, web, mail, at) => {
+
+			html += escape(text.slice(last, at)) + '<a href="' + (web ? '' : 'mailto:') + escape(match) + '" style="color:#7b8794">' + escape(match) + '</a>';
+			last = at + match.length;
+			return match;
+		});
+		return html + escape(text.slice(last));
+	}
+
 	// Returns { html, plain } when the text uses formatting, otherwise null.
 	function render(text) {
 
@@ -72,28 +122,36 @@ var totalmailformat = (function() {
 				continue;
 			}
 			var items = [];
-			if (kind) {
+			if (kind === 'quote') {
 				marked = true;
-				while (i < lines.length && (kind === 'ul' ? bullet : kind === 'ol' ? number : quote).test(lines[i])) {
-					var m = (kind === 'ul' ? bullet : kind === 'ol' ? number : quote).exec(lines[i]);
-					var rendered = inline(m[kind === 'ol' ? 2 : 1]);
-					items.push(rendered.html);
-					plain.push((kind === 'ul' ? '- ' : kind === 'ol' ? m[1] + '. ' : '> ') + rendered.plain);
+				var levels = [];
+				while (i < lines.length && quote.test(lines[i])) {
+					var q = quotelevel(lines[i]),
+						shown = inline(q.text);
+					levels.push({ depth: q.depth, html: shown.html });
+					plain.push('> '.repeat(q.depth) + shown.plain);
 					i++;
 				}
-				var tag = kind === 'quote' ? 'blockquote' : kind;
+				blocks.push(nested(levels));
+				continue;
+			}
+			if (kind) {
+				marked = true;
+				while (i < lines.length && (kind === 'ul' ? bullet : number).test(lines[i])) {
+					var m = (kind === 'ul' ? bullet : number).exec(lines[i]);
+					var rendered = inline(m[kind === 'ol' ? 2 : 1]);
+					items.push(rendered.html);
+					plain.push((kind === 'ul' ? '- ' : m[1] + '. ') + rendered.plain);
+					i++;
+				}
 				blocks.push(
-					kind === 'quote'
-						? '<blockquote style="margin:0 0 12px;padding:2px 0 2px 12px;border-left:3px solid #cbd2d9;color:#52606d">' +
-								items.join('<br>') +
-								'</blockquote>'
-						: '<' +
-								tag +
-								' style="margin:0 0 12px;padding-left:24px">' +
-								items.map((item) => '<li>' + item + '</li>').join('') +
-								'</' +
-								tag +
-								'>'
+					'<' +
+						kind +
+						' style="margin:0 0 12px;padding-left:24px">' +
+						items.map((item) => '<li>' + item + '</li>').join('') +
+						'</' +
+						kind +
+						'>'
 				);
 				continue;
 			}
@@ -110,7 +168,7 @@ var totalmailformat = (function() {
 		if (!marked)
 			return null;
 		if (tail.length) {
-			blocks.push('<div style="margin-top:16px;color:#7b8794">' + tail.map((row) => escape(row)).join('<br>') + '</div>');
+			blocks.push('<div style="margin-top:16px;color:#7b8794">' + tail.map(signaturelinks).join('<br>') + '</div>');
 			plain.push(...tail);
 		}
 		return {

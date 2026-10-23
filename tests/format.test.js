@@ -67,3 +67,27 @@ test('the live view escapes what the person writes', () => {
 	Assert.ok(!/<script|<b>/.test(html));
 	Assert.match(html, /&lt;script&gt;/);
 });
+test('quotes inside quotes become nested blockquotes, one level per ">"', () => {
+	var out = Format.render('Gracias\n\n> respuesta\n> > pregunta\n> > otra\n> > > antigua\n> vuelta\n\nFin');
+	Assert.equal((out.html.match(/<blockquote/g) || []).length, 3);
+	Assert.equal((out.html.match(/<\/blockquote>/g) || []).length, 3);
+	Assert.match(out.html, /respuesta<blockquote[^>]*>pregunta<br>otra<blockquote[^>]*>antigua<\/blockquote><\/blockquote>vuelta<\/blockquote>/);
+	Assert.doesNotMatch(out.html, /&gt;/);
+	Assert.equal(out.plain, 'Gracias\n\n> respuesta\n> > pregunta\n> > otra\n> > > antigua\n> vuelta\n\nFin');
+});
+test('nested quote text is escaped and still formatted', () => {
+	var out = Format.render('> > <b>x</b> **fuerte**');
+	Assert.match(out.html, /&lt;b&gt;x&lt;\/b&gt; <strong>fuerte<\/strong>/);
+	Assert.doesNotMatch(out.html, /<b>/);
+});
+test('links and addresses in the signature can be clicked, the rest of it is not formatted', () => {
+	var out = Format.render('**Hola**\n\n-- \nGera *CEO*\nhttps://totaljs.es/docs.\ninfo@totaljs.es\n<script>x</script>');
+	Assert.match(out.html, /<a href="https:\/\/totaljs\.es\/docs"[^>]*>https:\/\/totaljs\.es\/docs<\/a>\./);
+	Assert.match(out.html, /<a href="mailto:info@totaljs\.es"[^>]*>info@totaljs\.es<\/a>/);
+	Assert.match(out.html, /Gera \*CEO\*/);
+	Assert.doesNotMatch(out.html, /<script>|<em>CEO/);
+	Assert.match(out.plain, /-- \nGera \*CEO\*\nhttps:\/\/totaljs\.es\/docs\.\ninfo@totaljs\.es/);
+});
+test('a link in the signature alone does not turn plain text into HTML', () => {
+	Assert.equal(Format.render('Hola\n\n-- \nhttps://totaljs.es'), null);
+});

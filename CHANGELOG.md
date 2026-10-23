@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Sent mail: quotes inside quotes (`> >`) become nested blockquotes, and web links and email addresses in the signature can be clicked.
 - Received mail: styled links (buttons) keep their safe styles, and more everyday layout styles are allowed (plain-colour `background`, `font`, border width and style, corner radii, `table-layout`).
 - Sent mail: the Message-ID uses the domain of the sending address instead of `totalmail.local`.
 - Device sign-out remains effective when a concurrent activity write completes; revocations are persisted without restoring old tokens.
