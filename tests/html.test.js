@@ -162,3 +162,29 @@ test('without the sanitizer library nothing is rendered', () => {
 	}
 	Assert.ok(Html.clean('<p>hello</p>'));
 });
+test('a styled link (a button in most mail) keeps its safe styles and loses the unsafe ones', () => {
+	var html = clean(
+		'<a href="https://x.test" style="display:inline-block;background-color:#09f;padding:10px 20px;border-radius:4px;color:#fff;background-image:url(https://evil.test/p.png);position:fixed">Go</a>'
+	);
+	Assert.match(html, /<a [^>]*style="[^"]*display:inline-block/);
+	Assert.match(html, /background-color:#09f/);
+	Assert.match(html, /padding:10px 20px/);
+	Assert.match(html, /border-radius:4px/);
+	Assert.match(html, /rel="noopener noreferrer nofollow"/);
+	Assert.doesNotMatch(html, /evil\.test|position|background-image/);
+});
+test('common layout styles survive; a background that is not a plain colour never does', () => {
+	var html = clean(
+		'<table style="background:#f4f4f4;table-layout:fixed;border-spacing:0"><tr><td style="border-width:1px;border-style:solid;font:14px/1.5 Arial,sans-serif;border-top-left-radius:4px">x</td></tr></table>'
+	);
+	for (var part of ['background:#f4f4f4', 'table-layout:fixed', 'border-width:1px', 'border-style:solid', 'border-top-left-radius:4px', 'font:14px/1.5 Arial,sans-serif'])
+		Assert.ok(html.includes(part), part);
+	for (var attack of [
+		'background:url(https://evil.test/x.png)',
+		'background:url(javascript:alert(1))',
+		'background:linear-gradient(red,blue)',
+		'font:14px Arial;x:url(https://evil.test)',
+		'font:url(https://evil.test/f)'
+	])
+		Assert.doesNotMatch(clean('<div style="' + attack + '">x</div>'), /evil\.test|url\(|gradient|javascript/, attack);
+});

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Received mail: styled links (buttons) keep their safe styles, and more everyday layout styles are allowed (plain-colour `background`, `font`, border width and style, corner radii, `table-layout`).
+- Sent mail: the Message-ID uses the domain of the sending address instead of `totalmail.local`.
 - Device sign-out remains effective when a concurrent activity write completes; revocations are persisted without restoring old tokens.
 
 - German, French, Italian, Portuguese and Greek (formal register), and each language shown with its flag (circle-flags, MIT) in the selectors.

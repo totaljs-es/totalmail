@@ -52,3 +52,16 @@ test('missing, read-only and unconfirmed Sent folders never trigger automatic re
 		Assert.ok(f.count() <= 1);
 	}
 });
+test('without a stored Message-ID the sender builds one on the domain of the account', async () => {
+	var captured;
+	var message = { from() {}, to() {}, cc() {}, bcc() {}, attachment() {} };
+	var smtp = require('../lib/smtp').create({
+		create: () => message,
+		send: (options, sending, done) => {
+			captured = sending.$messageid;
+			done(null);
+		}
+	});
+	await smtp.send({}, { email: 'me@example.test', name: 'Me' }, { subject: 'S', body: 'B' }, ['x@y.test']);
+	Assert.match(captured, /^<[a-f0-9]{48}@example\.test>$/);
+});

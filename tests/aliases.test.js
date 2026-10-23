@@ -113,3 +113,11 @@ test('the message goes out from the alias, the review is invalidated when it cha
 	await live2.send({ id: 'b'.repeat(32) }, store2, 'd', true, d2.revision);
 	Assert.deepEqual(sent2, ['me@example.test']);
 });
+test('the Message-ID carries the domain of the address the message goes out from', async (t) => {
+	var store = fixture(t, ['sales@other.test']);
+	await store.saveDraft({ id: 'd', accountId: 'a', to: 'x@example.test', subject: 'S', body: 'B' });
+	Assert.match((await store.beginSend('d')).messageId, /^<[a-f0-9]{48}@example\.test>$/);
+	var alias = fixture(t, ['sales@other.test']);
+	await alias.saveDraft({ id: 'd', accountId: 'a', to: 'x@example.test', subject: 'S', body: 'B', from: 'sales@other.test' });
+	Assert.match((await alias.beginSend('d')).messageId, /^<[a-f0-9]{48}@other\.test>$/);
+});
