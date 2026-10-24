@@ -8,3 +8,4 @@ index.js.map
 *.tmp
 .env
 tmp/
+.claude/settings.local.json

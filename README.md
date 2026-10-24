@@ -82,6 +82,8 @@ npm test
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how the code is organised, how to add a language, and what the project deliberately does not do. Security problems: [SECURITY.md](SECURITY.md).
 
+For AI coding agents, [AGENTS.md](AGENTS.md) has the instructions of the project (also as `CLAUDE.md`, `GEMINI.md` and `.github/copilot-instructions.md`), with the skills in `.claude/skills/`.
+
 ## License
 
 [MIT](LICENSE)
