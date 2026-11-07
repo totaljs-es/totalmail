@@ -351,7 +351,7 @@ PLUGIN('ai', function(exports) {
 				return state.messages.find(function(m) { return m.id === state.selected; });
 			}
 			function accountoff(accountid) {
-				return mailbox.store.accounts.find(function(a) { return a.id === accountid; })?.assistant === false;
+				return (mailbox.store.accounts.findItem('id', accountid) || {}).assistant === false;
 			}
 			async function run(payload) {
 

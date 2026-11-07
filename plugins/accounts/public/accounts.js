@@ -158,7 +158,8 @@ PLUGIN('accounts', function(exports) {
 					return providers.some(function(p) { return p.id === defaultid; }) ? defaultid : 'other';
 				if ((a.oauth && a.oauth.provider) && provider(a.oauth.provider))
 					return a.oauth.provider;
-				return providers.find(function(p) { return !p.discover && (p.imap && p.imap.host) === (a.imap && a.imap.host); })?.id || 'other';
+				var found = providers.find(function(p) { return !p.discover && (p.imap && p.imap.host) === (a.imap && a.imap.host); });
+				return (found && found.id) || 'other';
 			}
 			function applyprovider(id) {
 

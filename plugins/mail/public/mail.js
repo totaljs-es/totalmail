@@ -226,7 +226,7 @@ PLUGIN('mail', function(exports) {
 			return [];
 		var pairs = [];
 		for (var a of state.accounts.filter(function(a) { return a.configured && (!state.account || a.id === state.account); })) {
-			var path = state.folder === 'inbox' ? 'INBOX' : (a.mailboxes && a.mailboxes.find(function(f) { return f.id === state.folder; })?.path);
+			var path = state.folder === 'inbox' ? 'INBOX' : (a.mailboxes && (a.mailboxes.findItem('id', state.folder) || {}).path);
 			if (path && (a.remaining && a.remaining[path]) > 0)
 				pairs.push({ accountId: a.id, path, remaining: a.remaining[path] });
 		}
@@ -248,7 +248,7 @@ PLUGIN('mail', function(exports) {
 		for (var a of state.accounts.filter(
 			function(a) { return a.configured && ['verified', 'synced'].includes(a.status) && (!state.account || a.id === state.account); }
 		)) {
-			var path = state.folder === 'inbox' ? 'INBOX' : (a.mailboxes && a.mailboxes.find(function(f) { return f.id === state.folder; })?.path);
+			var path = state.folder === 'inbox' ? 'INBOX' : (a.mailboxes && (a.mailboxes.findItem('id', state.folder) || {}).path);
 			if (path)
 				pairs.push({ accountId: a.id, path });
 		}
@@ -456,7 +456,7 @@ PLUGIN('mail', function(exports) {
 				names[state.folder] ||
 				(state.folder === 'sent-local'
 					? TRANSLATE('@(Sent from TotalMail)')
-					: (account(state.account)?.mailboxes || []).find(function(f) { return f.id === state.folder; })?.name || TRANSLATE('@(Mail)')),
+					: (((account(state.account) || {}).mailboxes || []).findItem('id', state.folder) || {}).name || TRANSLATE('@(Mail)')),
 			accountScope: state.account ? account(state.account).name : TRANSLATE('@(All accounts)')
 		});
 	}
@@ -833,7 +833,7 @@ PLUGIN('mail', function(exports) {
 	}
 	// The signature of an account, as it is added below a new message.
 	function signature(accountid) {
-		var text = account(accountid)?.signature;
+		var text = (account(accountid) || {}).signature;
 		return text ? '\n\n-- \n' + text : '';
 	}
 	// Undo after moving mail out of the inbox. A server message gets a new id when it moves, so it is found again by its Message-ID.
@@ -1002,7 +1002,7 @@ PLUGIN('mail', function(exports) {
 						!erasing &&
 						t.remote &&
 						['archive', 'trash'].includes(operation) &&
-						!account(t.accountId).mailboxes?.some(function(f) { return f.specialUse === (operation === 'archive' ? '\\Archive' : '\\Trash'); })
+						!(account(t.accountId).mailboxes || []).some(function(f) { return f.specialUse === (operation === 'archive' ? '\\Archive' : '\\Trash'); })
 					) {
 						left++;
 						continue;
@@ -1159,9 +1159,8 @@ PLUGIN('mail', function(exports) {
 	// Cc and Bcc stay out of the way until they are asked for or the message already has them.
 	// The input component of a path, to give it the focus.
 	function focusfield(path) {
-		FIND('input', true)
-			.find(function(c) { return (c.path && c.path.path) === path; })
-			?.autofocus();
+		var field = FIND('input', true).find(function(c) { return (c.path && c.path.path) === path; });
+		field && field.autofocus();
 	}
 	// The window measures itself when it opens, before the assistant's box or a row of the form has appeared: it measures again,
 	// and a window that is still taller than the screen moves up until its buttons are in view.
@@ -1484,7 +1483,7 @@ PLUGIN('mail', function(exports) {
 			if (
 				m.remote &&
 				['archive', 'trash'].includes(operation) &&
-				!account(m.accountId).mailboxes?.some(function(f) { return f.specialUse === (operation === 'archive' ? '\\Archive' : '\\Trash'); })
+				!(account(m.accountId).mailboxes || []).some(function(f) { return f.specialUse === (operation === 'archive' ? '\\Archive' : '\\Trash'); })
 			) {
 				PLUGINS.folders.move(m.id);
 				return;
@@ -1515,7 +1514,7 @@ PLUGIN('mail', function(exports) {
 					)
 				)
 					toast(TRANSLATE('@(Message moved.)'));
-				var next = entries(visible())[0]?.m;
+				var next = (entries(visible())[0] || {}).m;
 				if (next)
 					await selectmessage(next.id);
 			}
@@ -1536,7 +1535,7 @@ PLUGIN('mail', function(exports) {
 				renderlist();
 				renderreader();
 				ui({ hasReader: false });
-				var f = account(state.account)?.mailboxes?.find(function(f) { return f.id === state.folder; });
+				var f = ((account(state.account) || {}).mailboxes || []).findItem('id', state.folder);
 				if (f)
 					await syncmail(state.account, f.path);
 			} else if (el.dataset.account) {
@@ -1825,7 +1824,7 @@ PLUGIN('mail', function(exports) {
 		}
 	}
 	function currentpath() {
-		return account(state.account)?.mailboxes?.find(function(f) { return f.id === state.folder; })?.path || '';
+		return (((account(state.account) || {}).mailboxes || []).findItem('id', state.folder) || {}).path || '';
 	}
 	async function perform(fn) {
 
@@ -1857,7 +1856,7 @@ PLUGIN('mail', function(exports) {
 		try {
 			await reading;
 			for (var a of accounts) {
-				var folderpath = path || (a.mailboxes && a.mailboxes.find(function(f) { return f.id === state.folder; })?.path) || 'INBOX';
+				var folderpath = path || (a.mailboxes && (a.mailboxes.findItem('id', state.folder) || {}).path) || 'INBOX';
 				await api('account_sync', { accountId: a.id, path: folderpath });
 				delete syncfailures[a.id];
 				delete retryafter[a.id];

@@ -155,7 +155,7 @@ NEWACTION('Instance|type_delete', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			if (!MODS.providers.get(model.id)?.custom)
+			if (!(MODS.providers.get(model.id) || {}).custom)
 				throw Error('@(Account type not found.)');
 			await MODS.instance.deleteProvider(model.id);
 			return overview($);

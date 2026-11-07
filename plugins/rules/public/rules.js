@@ -38,9 +38,9 @@ PLUGIN('rules', function(exports) {
 				exports.set('error', text || '');
 			}
 			function describe(r) {
-				var field = model.fieldOptions.find(function(f) { return f.id === r.field; })?.name,
-					op = model.opOptions.find(function(o) { return o.id === r.op; })?.name,
-					action = model.actionOptions.find(function(o) { return o.id === r.action; })?.name;
+				var field = (model.fieldOptions.findItem('id', r.field) || {}).name,
+					op = (model.opOptions.findItem('id', r.op) || {}).name,
+					action = (model.actionOptions.findItem('id', r.action) || {}).name;
 				return field + ' ' + op + ' “' + r.value + '” → ' + action + (r.path ? ' (' + r.path + ')' : '');
 			}
 			function render() {
@@ -135,7 +135,7 @@ PLUGIN('rules', function(exports) {
 				var payload = form();
 				if (payload.action !== 'move')
 					payload.path = '';
-				var enabled = (account()?.rules || []).find(function(r) { return r.id === payload.id; })?.enabled;
+				var enabled = ((((account() || {}).rules || []).findItem('id', payload.id)) || {}).enabled;
 				var result = await call('rule_save', Object.assign({}, payload, { enabled: enabled !== false }));
 				if (result) {
 					merge(result);
@@ -163,7 +163,7 @@ PLUGIN('rules', function(exports) {
 			};
 			exports.edit = function(element) {
 
-				var r = (account()?.rules || []).find(function(x) { return x.id === element[0].dataset.id; });
+				var r = ((account() || {}).rules || []).findItem('id', element[0].dataset.id);
 				if (!r)
 					return;
 				SET('rules.form', {
@@ -179,7 +179,7 @@ PLUGIN('rules', function(exports) {
 			};
 			exports.toggle = async function(element) {
 
-				var r = (account()?.rules || []).find(function(x) { return x.id === element[0].dataset.id; });
+				var r = ((account() || {}).rules || []).findItem('id', element[0].dataset.id);
 				if (!r)
 					return;
 				var result = await call('rule_save', Object.assign({}, r, { path: r.path || '',

@@ -94,8 +94,14 @@ COMPONENT('page', function(self) {
 	self.readonly();
 	self.nocompile && self.nocompile();
 	self.make = function() { return self.aclass('hidden'); };
-	self.focus = function(selector) { return document.querySelector(selector)?.focus(); };
-	self.reveal = function(selector) { return document.querySelector(selector)?.scrollIntoView({ block: 'nearest' }); };
+	self.focus = function(selector) {
+		var el = document.querySelector(selector);
+		el && el.focus();
+	};
+	self.reveal = function(selector) {
+		var el = document.querySelector(selector);
+		el && el.scrollIntoView({ block: 'nearest' });
+	};
 	self.download = function(url, name) {
 
 		var link = document.createElement('a');
@@ -185,7 +191,10 @@ COMPONENT('modalguard', function(self, config) {
 			if (!shell.inert)
 				remembered = document.activeElement;
 			shell.inert = true;
-			requestAnimationFrame(function() { return document.querySelector('#' + name + ' button')?.focus(); });
+			requestAnimationFrame(function() {
+				var el = document.querySelector('#' + name + ' button');
+				el && el.focus();
+			});
 		} else {
 			shell.inert = false;
 			(remembered && remembered.focus());
