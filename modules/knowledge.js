@@ -40,7 +40,7 @@ exports.importFiles = async function(collectionid, files, language) {
 		} catch (err) {
 			failed.push({
 				name,
-				error: TRANSLATE(language, err.message?.startsWith('@(') ? err.message : '@(The operation could not be completed.)')
+				error: TRANSLATE(language, (err.message && err.message.startsWith('@(')) ? err.message : '@(The operation could not be completed.)')
 			});
 		}
 	}

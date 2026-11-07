@@ -17,12 +17,9 @@ exports.install = function() {
 		$.response.headers['cache-control'] = 'private, no-store';
 		$.response.headers['content-language'] = $.language;
 		var user = await $.authorize();
-		$.view(user ? 'index' : 'login', {
-			localization: MODS.localization.clientResources($.language),
+		$.view(user ? 'index' : 'login', Object.assign({ localization: MODS.localization.clientResources($.language),
 			languages: MODS.localization.clientLanguages(),
-			setup: !MODS.security.identities.configured(),
-			...MODS.appearance.resolve(user?.color)
-		});
+			setup: !MODS.security.identities.configured() }, MODS.appearance.resolve((user && user.color))));
 	});
 	// The sanitized HTML of a message, for the sandboxed frame of the reader. Own policy, own headers: remote images
 	// stay blocked unless the reader asked for them with ?images=1.
@@ -137,7 +134,7 @@ exports.install = function() {
 			.catch(function(err) {
 				if (saved)
 					files.remove($.user.id, saved);
-				$.invalid(err.message?.startsWith('@(') ? err.message : '@(The operation could not be completed.)');
+				$.invalid((err.message && err.message.startsWith('@(')) ? err.message : '@(The operation could not be completed.)');
 			});
 	});
 	// Documents for the knowledge base: administrators only. Each file is read into text on the server and added to a
@@ -149,7 +146,7 @@ exports.install = function() {
 		if (!$.files.length || $.files.length > 10)
 			return $.invalid('@(Choose between one and ten files.)');
 		var result = await MODS.knowledge.importFiles(String(($.body || {}).collectionid || '').slice(0, 40), $.files, $.language);
-		$.json({ ...result, ...MODS.knowledge.view() });
+		$.json(Object.assign({}, result, MODS.knowledge.view()));
 	});
 	// Long poll: answers when an IDLE connection reports a change in one of the user's inboxes, or after about 25 seconds.
 	ROUTE('+GET /changes/ <40s', function($) {

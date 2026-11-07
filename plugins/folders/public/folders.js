@@ -5,7 +5,7 @@ PLUGIN('folders', function(exports) {
 		busy = false;
 	exports.set('', { form: {}, error: '', busy: false });
 	WAIT(
-		function() { return !!PLUGINS.mail?.store; },
+		function() { return !!(PLUGINS.mail && PLUGINS.mail.store); },
 		function() {
 			mailbox = PLUGINS.mail;
 		}
@@ -18,7 +18,7 @@ PLUGIN('folders', function(exports) {
 		var a = mailbox.store.accounts.find(function(a) { return a.id === id; });
 		SET(
 			'folders.parents',
-			[{ id: '', name: TRANSLATE('@(Top level)') }].concat((a?.mailboxes || []).map(function(f) { return { id: f.path, name: f.path }; }))
+			[{ id: '', name: TRANSLATE('@(Top level)') }].concat(((a && a.mailboxes) || []).map(function(f) { return { id: f.path, name: f.path }; }))
 		);
 	}
 	WATCH('folders.form.accountId', function(id) {
@@ -58,13 +58,13 @@ PLUGIN('folders', function(exports) {
 	function move(id) {
 
 		var m = mailbox.store.messages.find(function(m) { return m.id === id; });
-		if (!m?.remote)
+		if (!(m && m.remote))
 			return;
 		var a = mailbox.store.accounts.find(function(a) { return a.id === m.accountId; });
 		var options = (a.mailboxes || []).filter(function(f) { return f.path !== m.mailboxPath; }).map(function(f) { return { id: f.path, name: f.path }; });
 		messageid = id;
 		SET('folders.destinations', options);
-		SET('folders.form', { path: options[0]?.id || '' });
+		SET('folders.form', { path: (options[0] && options[0].id) || '' });
 		SET('folders.moving', true);
 		error();
 		SET('mail.window', 'folder-manager');

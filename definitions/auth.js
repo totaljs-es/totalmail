@@ -2,5 +2,5 @@
 // `permissions: 'admin'`.
 AUTH(function($) {
 	var user = MODS.security.session($.controller) || MODS.security.device($.controller);
-	$.callback(user ? { ...user, permissions: user.role === 'admin' ? ['admin'] : [] } : null);
+	$.callback(user ? Object.assign({}, user, { permissions: user.role === 'admin' ? ['admin'] : [] }) : null);
 });

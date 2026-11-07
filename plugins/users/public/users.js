@@ -1,7 +1,7 @@
 PLUGIN('users', function(exports) {
 	WAIT(
 		function() {
-			return !!PLUGINS.mail?.store;
+			return !!(PLUGINS.mail && PLUGINS.mail.store);
 		},
 		function() {
 
@@ -48,7 +48,7 @@ PLUGIN('users', function(exports) {
 					confirmPassword: ''
 				});
 				exports.set('profileError', '');
-				PLUGINS.twostep?.refreshlink && PLUGINS.twostep.refreshlink();
+				(PLUGINS.twostep && PLUGINS.twostep.refreshlink) && PLUGINS.twostep.refreshlink();
 				SET('mail.window', 'profile');
 			}
 			function closeprofile() {
@@ -101,13 +101,10 @@ PLUGIN('users', function(exports) {
 				SET(
 					'users.items',
 					result.users.map(function(u) {
-						return {
-							...u,
-							roleLabel: TRANSLATE(u.role === 'admin' ? '@(Administrator)' : '@(Member)'),
+						return Object.assign({}, u, { roleLabel: TRANSLATE(u.role === 'admin' ? '@(Administrator)' : '@(Member)'),
 							disabledLabel: u.disabled ? TRANSLATE('@(Disabled)') : '',
 							twostepLabel: u.totp ? TRANSLATE('@(Two-step verification)') : '',
-							canManage: u.id !== state.user.id
-						};
+							canManage: u.id !== state.user.id });
 					})
 				);
 				if (chosen && !listing.some(function(u) { return u.id === chosen.id; }))
@@ -119,7 +116,7 @@ PLUGIN('users', function(exports) {
 				exports.set('panel', false);
 			}
 			function managetoggle() {
-				exports.set('toggleLabel', TRANSLATE(chosen?.disabled ? '@(Enable user)' : '@(Disable user)'));
+				exports.set('toggleLabel', TRANSLATE((chosen && chosen.disabled) ? '@(Enable user)' : '@(Disable user)'));
 			}
 			function manage(element) {
 
@@ -143,7 +140,7 @@ PLUGIN('users', function(exports) {
 				userbusy = true;
 				exports.set('error', '');
 				try {
-					await mailbox.api(schema, { id: chosen.id, adminPassword: GET('users.manage.adminPassword'), ...extra });
+					await mailbox.api(schema, Object.assign({ id: chosen.id, adminPassword: GET('users.manage.adminPassword') }, extra));
 					SET('users.manage.password', '');
 					SET('users.manage.adminPassword', '');
 					userbusy = false;
@@ -151,7 +148,7 @@ PLUGIN('users', function(exports) {
 					if (chosen)
 						chosen = listing.find(function(u) { return u.id === chosen.id; }) || null;
 					managetoggle();
-					exports.set('totpReset', !!chosen?.totp);
+					exports.set('totpReset', !!(chosen && chosen.totp));
 					mailbox.notify(done);
 					return true;
 				} catch (e) {

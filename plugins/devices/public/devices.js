@@ -3,7 +3,7 @@ PLUGIN('devices', function(exports) {
 	exports.set('', { items: [], error: '' });
 	WAIT(
 		function() {
-			return !!PLUGINS.mail?.store;
+			return !!(PLUGINS.mail && PLUGINS.mail.store);
 		},
 		function() {
 

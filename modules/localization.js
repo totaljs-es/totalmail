@@ -34,11 +34,7 @@ exports.clientResources = function(language) {
 	language = exports.resolve(language);
 	// Total.js has already loaded and parsed these resources at startup.
 	// Deliver that state to jComponent; do not maintain another resource loader.
-	var resources = {
-		...Total.resources.default,
-		...Total.resources.en,
-		...Total.resources[language]
-	};
+	var resources = Object.assign({}, Total.resources.default, Total.resources.en, Total.resources[language]);
 	var text = Object.keys(resources)
 		.map(function(key) { return key + ' : ' + resources[key]; })
 		.join('\n');

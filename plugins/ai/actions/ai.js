@@ -55,7 +55,7 @@ NEWACTION('Assistant|knowledge', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -assistant_knowledge --> Assistant|knowledge',
-	action: function($) { return FUNC.run($, function() { return { ...MODS.knowledge.view(), accept: Extract.supported }; }); }
+	action: function($) { return FUNC.run($, function() { return Object.assign({}, MODS.knowledge.view(), { accept: Extract.supported }); }); }
 });
 
 NEWACTION('Assistant|collection', {
@@ -194,9 +194,9 @@ NEWACTION('Assistant|run', {
 							: MODS.ai.context(data.messages, message.id, settings.maxChars, visible);
 					input.other = String(message.sender || message.email || '').replace(/[\r\n]+/g, ' ');
 				}
-				if (owner?.assistant === false)
+				if ((owner && owner.assistant) === false)
 					throw Error('@(The assistant is turned off for this account.)');
-				input.me = String(owner?.name || owner?.email || '').replace(/[\r\n]+/g, ' ');
+				input.me = String((owner && owner.name) || (owner && owner.email) || '').replace(/[\r\n]+/g, ' ');
 				var sources = [],
 					release = MODS.ai.guard($.user.id);
 				try {

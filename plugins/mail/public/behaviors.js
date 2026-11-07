@@ -32,7 +32,7 @@ COMPONENT('filepicker', function(self) {
 // Files dragged over the window: its path is true while they are over it, and what is dropped goes to config.exec(files).
 COMPONENT('dropfiles', function(self, config) {
 
-	var has = function(event) { return [...(event.dataTransfer?.types || [])].includes('Files'); };
+	var has = function(event) { return [...((event.dataTransfer && event.dataTransfer.types) || [])].includes('Files'); };
 	self.singleton();
 	self.nocompile && self.nocompile();
 	self.make = function() {
@@ -169,10 +169,10 @@ COMPONENT('modalguard', function(self, config) {
 				last = controls[controls.length - 1];
 			if (event.shiftKey && document.activeElement === first) {
 				event.preventDefault();
-				last?.focus();
+				(last && last.focus());
 			} else if (!event.shiftKey && document.activeElement === last) {
 				event.preventDefault();
-				first?.focus();
+				(first && first.focus());
 			}
 		});
 	};
@@ -188,7 +188,7 @@ COMPONENT('modalguard', function(self, config) {
 			requestAnimationFrame(function() { return document.querySelector('#' + name + ' button')?.focus(); });
 		} else {
 			shell.inert = false;
-			remembered?.focus();
+			(remembered && remembered.focus());
 		}
 	};
 });
@@ -440,7 +440,7 @@ COMPONENT('mailbody', function(self, config) {
 		self.element.on('paste', 'textarea', function(event) {
 
 			var data = (event.originalEvent || event).clipboardData,
-				files = [...(data?.files || [])];
+				files = [...((data && data.files) || [])];
 			// Text (even with a picture alongside, as Word and web pages put it) pastes as text; only a bare file is attached.
 			if (!files.length || data.getData('text/plain'))
 				return;

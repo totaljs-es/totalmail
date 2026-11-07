@@ -2,7 +2,7 @@
 function overview($) {
 	var now = new Date();
 	return {
-		devices: MODS.security.devices.list($.user.id, now).map(function(d) { return { ...d, current: d.id === $.user.deviceId }; })
+		devices: MODS.security.devices.list($.user.id, now).map(function(d) { return Object.assign({}, d, { current: d.id === $.user.deviceId }); })
 	};
 }
 
@@ -33,7 +33,7 @@ NEWACTION('Devices|create', {
 				app: model.app,
 				address: MODS.security.address($)
 			});
-			return { token: made.token, device: { ...made.record, current: true } };
+			return { token: made.token, device: Object.assign({}, made.record, { current: true }) };
 		});
 	}
 });

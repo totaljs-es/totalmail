@@ -18,7 +18,7 @@ FUNC.run = function($, fn, fallback) {
 		.then(fn)
 		.then(function(value) { return $.callback(value); })
 		.catch(function(err) {
-			if (err.message?.startsWith('@(') || err.plain)
+			if ((err.message && err.message.startsWith('@(')) || err.plain)
 				$.invalid(err.message);
 			else {
 				Total.error(err, 'TotalMail');

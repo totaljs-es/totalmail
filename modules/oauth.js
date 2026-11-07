@@ -33,8 +33,8 @@ exports.complete = async function(provider, grant) {
 			authType: 'oauth2',
 			secret: null,
 			oauth: grant.oauth,
-			imap: { ...servers.imap, username: grant.username },
-			smtp: { ...servers.smtp, username: grant.username }
+			imap: Object.assign({}, servers.imap, { username: grant.username }),
+			smtp: Object.assign({}, servers.smtp, { username: grant.username })
 		});
 		exports.remember(existing.id, grant.access);
 		return 'ok';
@@ -55,8 +55,8 @@ exports.complete = async function(provider, grant) {
 		status: 'pending',
 		authType: 'oauth2',
 		oauth: grant.oauth,
-		imap: { ...servers.imap, username: grant.username },
-		smtp: { ...servers.smtp, username: grant.username }
+		imap: Object.assign({}, servers.imap, { username: grant.username }),
+		smtp: Object.assign({}, servers.smtp, { username: grant.username })
 	});
 	exports.remember(account.id, grant.access);
 	return 'ok';

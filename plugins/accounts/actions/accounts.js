@@ -118,13 +118,10 @@ NEWACTION('Accounts|providers', {
 				return p;
 			var ready = MODS.oauth.configured(p.id);
 			// The exact return address this server sends, to compare with the one registered at the provider.
-			return {
-				...p,
-				available: ready,
+			return Object.assign({}, p, { available: ready,
 				steps: ready ? p.steps : p.setup,
 				note: ready ? '' : p.note,
-				redirectUri: MODS.oauth.redirectUri($.controller || $, p.id)
-			};
+				redirectUri: MODS.oauth.redirectUri($.controller || $, p.id) });
 		});
 		$.callback({ providers: list, defaultProvider: MODS.providers.defaultId() });
 	}

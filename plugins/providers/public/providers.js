@@ -1,7 +1,7 @@
 PLUGIN('providers', function(exports) {
 	WAIT(
 		function() {
-			return !!PLUGINS.mail?.store && !!PLUGINS.accounts;
+			return !!(PLUGINS.mail && PLUGINS.mail.store) && !!PLUGINS.accounts;
 		},
 		function() {
 
@@ -214,7 +214,7 @@ PLUGIN('providers', function(exports) {
 			// The return address of a provider (data-field is msReturn or googleReturn).
 			exports.copy = async function(element) {
 				try {
-					await navigator.clipboard.writeText(exports.get(element?.[0]?.dataset.field || 'msReturn') || '');
+					await navigator.clipboard.writeText(exports.get((element && (element[0] && element[0].dataset.field)) || 'msReturn') || '');
 					mailbox.notify(TRANSLATE('@(Link copied.)'));
 				} catch {}
 			};

@@ -12,7 +12,7 @@ NEWACTION('Rules|save', {
 	action: function($, model) {
 		return run($, function(store) {
 
-			var rule = Rules.validate({ ...model, id: model.id || UID() }, store.account(model.accountId));
+			var rule = Rules.validate(Object.assign({}, model, { id: model.id || UID() }), store.account(model.accountId));
 			if (model.id && !(store.account(model.accountId).rules || []).some(function(r) { return r.id === model.id; }))
 				throw Error('@(Rule not found.)');
 			return store.saveRule(model.accountId, rule, Rules.limits.rules);

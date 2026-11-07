@@ -1,7 +1,7 @@
 PLUGIN('rules', function(exports) {
 	WAIT(
 		function() {
-			return !!PLUGINS.mail?.store && !!PLUGINS.accounts;
+			return !!(PLUGINS.mail && PLUGINS.mail.store) && !!PLUGINS.accounts;
 		},
 		function() {
 
@@ -46,8 +46,8 @@ PLUGIN('rules', function(exports) {
 			function render() {
 
 				var a = account(),
-					rules = a?.rules || [],
-					log = a?.ruleLog || [];
+					rules = (a && a.rules) || [],
+					log = (a && a.ruleLog) || [];
 				SET(
 					'rules.items',
 					rules.map(function(r) {
@@ -74,7 +74,7 @@ PLUGIN('rules', function(exports) {
 				);
 				SET(
 					'rules.folderOptions',
-					(a?.mailboxes || []).filter(function(f) { return f.path.toUpperCase() !== 'INBOX'; }).map(function(f) { return { id: f.path, name: f.name }; })
+					((a && a.mailboxes) || []).filter(function(f) { return f.path.toUpperCase() !== 'INBOX'; }).map(function(f) { return { id: f.path, name: f.name }; })
 				);
 			}
 			function merge(result) {
@@ -136,7 +136,7 @@ PLUGIN('rules', function(exports) {
 				if (payload.action !== 'move')
 					payload.path = '';
 				var enabled = (account()?.rules || []).find(function(r) { return r.id === payload.id; })?.enabled;
-				var result = await call('rule_save', { ...payload, enabled: enabled !== false });
+				var result = await call('rule_save', Object.assign({}, payload, { enabled: enabled !== false }));
 				if (result) {
 					merge(result);
 					clear();
@@ -182,12 +182,9 @@ PLUGIN('rules', function(exports) {
 				var r = (account()?.rules || []).find(function(x) { return x.id === element[0].dataset.id; });
 				if (!r)
 					return;
-				var result = await call('rule_save', {
-					...r,
-					path: r.path || '',
+				var result = await call('rule_save', Object.assign({}, r, { path: r.path || '',
 					accountId: GET('rules.accountId'),
-					enabled: r.enabled === false
-				});
+					enabled: r.enabled === false }));
 				if (result)
 					merge(result);
 			};

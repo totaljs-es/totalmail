@@ -36,7 +36,7 @@ PLUGIN('accounts', function(exports) {
 	exports.set('error', '');
 	WAIT(
 		function() {
-			return !!PLUGINS.mail?.store;
+			return !!(PLUGINS.mail && PLUGINS.mail.store);
 		},
 		function() {
 
@@ -122,7 +122,7 @@ PLUGIN('accounts', function(exports) {
 					shown: !!p,
 					summary: p ? TRANSLATE(p.summary) : '',
 					note: p && p.note ? TRANSLATE(p.note) : '',
-					steps: (p?.steps || []).map(function(s) { return { text: TRANSLATE(s.text), url: s.url || '' }; })
+					steps: ((p && p.steps) || []).map(function(s) { return { text: TRANSLATE(s.text), url: s.url || '' }; })
 				});
 			}
 			// The type of an account can be chosen when it is created and changed later. An OAuth type needs a sign-in
@@ -131,7 +131,7 @@ PLUGIN('accounts', function(exports) {
 				var p = provider(selected),
 					known = !!p && !p.discover,
 					oauth = !!p && p.auth === 'oauth2',
-					granted = !!editing?.oauth,
+					granted = !!(editing && editing.oauth),
 					signin = oauth && p.available !== false && !granted;
 				ui({
 					known,
@@ -156,9 +156,9 @@ PLUGIN('accounts', function(exports) {
 
 				if (!a)
 					return providers.some(function(p) { return p.id === defaultid; }) ? defaultid : 'other';
-				if (a.oauth?.provider && provider(a.oauth.provider))
+				if ((a.oauth && a.oauth.provider) && provider(a.oauth.provider))
 					return a.oauth.provider;
-				return providers.find(function(p) { return !p.discover && p.imap?.host === a.imap?.host; })?.id || 'other';
+				return providers.find(function(p) { return !p.discover && (p.imap && p.imap.host) === (a.imap && a.imap.host); })?.id || 'other';
 			}
 			function applyprovider(id) {
 
@@ -169,9 +169,7 @@ PLUGIN('accounts', function(exports) {
 				ui({ suggestion: false });
 				suggested = '';
 				if (p && !p.discover)
-					SET('accounts.form', {
-						...accounts.form,
-						authType: p.auth === 'oauth2' ? 'oauth2' : 'password',
+					SET('accounts.form', Object.assign({}, accounts.form, { authType: p.auth === 'oauth2' ? 'oauth2' : 'password',
 						imapHost: p.imap.host,
 						imapPort: p.imap.port,
 						imapSecurity: p.imap.security,
@@ -183,14 +181,11 @@ PLUGIN('accounts', function(exports) {
 						email,
 						name: GET('accounts.form.name'),
 						id: editing ? editing.id : '',
-						password: GET('accounts.form.password')
-					});
+						password: GET('accounts.form.password') }));
 				else if (p)
 					if (before && !before.discover)
 						// Back to discovery: servers that came from another provider must not linger.
-						SET('accounts.form', {
-							...accounts.form,
-							authType: 'password',
+						SET('accounts.form', Object.assign({}, accounts.form, { authType: 'password',
 							imapHost: '',
 							imapPort: 993,
 							imapSecurity: 'tls',
@@ -202,8 +197,7 @@ PLUGIN('accounts', function(exports) {
 							email,
 							name: GET('accounts.form.name'),
 							id: editing ? editing.id : '',
-							password: GET('accounts.form.password')
-						});
+							password: GET('accounts.form.password') }));
 					else
 						SET('accounts.form.authType', 'password');
 
@@ -346,9 +340,7 @@ PLUGIN('accounts', function(exports) {
 						GET('accounts.form.email').trim() !== email
 					)
 						return;
-					var model = {
-						...accounts.form,
-						authType: data.oauth ? 'oauth2' : 'password',
+					var model = Object.assign({}, accounts.form, { authType: data.oauth ? 'oauth2' : 'password',
 						email,
 						name: GET('accounts.form.name') || email,
 						imapHost: data.imap.host,
@@ -359,8 +351,7 @@ PLUGIN('accounts', function(exports) {
 						smtpPort: data.smtp.port,
 						smtpSecurity: data.smtp.security,
 						smtpUsername: data.smtp.username,
-						password: GET('accounts.form.password')
-					};
+						password: GET('accounts.form.password') });
 					SET('accounts.form', model);
 					ui({
 						discoveryStatus: TRANSLATE(
@@ -446,7 +437,7 @@ PLUGIN('accounts', function(exports) {
 			}
 			// Whether the assistant may be used with this account's mail; only shown once the administrator turned it on.
 			function setassistant(on) {
-				ui({ assistant: on, assistantShown: !!state.ai?.configured });
+				ui({ assistant: on, assistantShown: !!(state.ai && state.ai.configured) });
 			}
 			exports.toggleassistant = function() {
 				ui({ assistant: !exports.get('ui').assistant });

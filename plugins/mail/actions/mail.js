@@ -19,12 +19,9 @@ NEWACTION('Mailboxes|bootstrap', {
 		// Keep submitted records in storage to prevent duplicate sends, but do not list sent mail as drafts.
 		data.drafts = data.drafts.filter(function(draft) { return draft.status !== 'sent'; });
 		data.messages = data.messages.map(function(item) { return Welcome.decorate(item, $.language); });
-		$.callback({
-			user: $.user,
+		$.callback(Object.assign({ user: $.user,
 			mode: data.accounts.some(function(a) { return a.configured; }) ? 'configured' : 'empty',
-			ai: aistatus(),
-			...data
-		});
+			ai: aistatus() }, data));
 	}
 });
 

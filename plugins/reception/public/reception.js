@@ -69,7 +69,7 @@ else
 			timer,
 			scheduler,
 			listener,
-			tick = function() { return scheduler?.tick().catch(function() {}); };
+			tick = function() { return (scheduler && scheduler.tick().catch(function() {})); };
 		exports.set('', { enabled: true });
 		// The switch of the settings window follows reception.enabled (a ui-bind in the view).
 		function status() {
@@ -80,8 +80,8 @@ else
 		exports.leaving = function() {
 
 			clearInterval(timer);
-			scheduler?.stop();
-			listener?.stop();
+			(scheduler && scheduler.stop());
+			(listener && listener.stop());
 		};
 		exports.toggle = function() {
 
@@ -92,7 +92,7 @@ else
 			status();
 		};
 		WAIT(
-			function() { return !!PLUGINS.mail?.store.user && !PLUGINS.mail.store.loading; },
+			function() { return !!(PLUGINS.mail && PLUGINS.mail.store.user) && !PLUGINS.mail.store.loading; },
 			function() {
 
 				var user = PLUGINS.mail.store.user.id;

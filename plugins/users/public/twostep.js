@@ -4,7 +4,7 @@
 PLUGIN('twostep', function(exports) {
 	WAIT(
 		function() {
-			return !!PLUGINS.mail?.store?.user && !!PLUGINS.accounts && !!PLUGINS.users;
+			return !!(PLUGINS.mail && (PLUGINS.mail.store && PLUGINS.mail.store.user)) && !!PLUGINS.accounts && !!PLUGINS.users;
 		},
 		function() {
 

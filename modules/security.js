@@ -115,7 +115,7 @@ exports.device = function(ctrl) {
 	if (!user)
 		return null;
 	devices.touch(record.id, clientip(ctrl)).catch(function() {});
-	return { ...user, deviceId: record.id };
+	return Object.assign({}, user, { deviceId: record.id });
 };
 
 exports.revoke = function(userid) {
@@ -158,7 +158,7 @@ exports.address = function($) { return clientip($); };
 
 var clientip = function($) {
 	var ctrl = $.controller || $;
-	return require('../lib/clientip')(ctrl.headers, ctrl.req?.connection?.remoteAddress, String(CONF.trust_proxy) !== 'false');
+	return require('../lib/clientip')(ctrl.headers, (ctrl.req && (ctrl.req.connection && ctrl.req.connection.remoteAddress)), String(CONF.trust_proxy) !== 'false');
 };
 
 exports.allowLogin = function($, email) {

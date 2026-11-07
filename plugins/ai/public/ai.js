@@ -86,7 +86,7 @@ PLUGIN('ai', function(exports) {
 	exports.set('', model);
 	WAIT(
 		function() {
-			return !!PLUGINS.mail?.store && !!PLUGINS.accounts;
+			return !!(PLUGINS.mail && PLUGINS.mail.store) && !!PLUGINS.accounts;
 		},
 		function() {
 
@@ -176,7 +176,7 @@ PLUGIN('ai', function(exports) {
 			}
 			async function save(extra) {
 
-				var next = await call('assistant_save', { enabled: exports.get('enabled') === true, ...fields(), ...extra });
+				var next = await call('assistant_save', Object.assign({ enabled: exports.get('enabled') === true }, fields(), extra));
 				if (next) {
 					data = next;
 					renderadmin();
@@ -209,7 +209,7 @@ PLUGIN('ai', function(exports) {
 
 				var next = await call(schema, payload);
 				if (next) {
-					library = { ...next, accept: library.accept };
+					library = Object.assign({}, next, { accept: library.accept });
 					drawlibrary();
 				}
 				return next;
@@ -333,7 +333,7 @@ PLUGIN('ai', function(exports) {
 			};
 			// ---- What people see: a card under the message and a box in the composer
 			function available() {
-				return !!state.ai?.configured;
+				return !!(state.ai && state.ai.configured);
 			}
 			function where(draft) {
 				var inside = state.ai.scope === 'network';
@@ -377,8 +377,8 @@ PLUGIN('ai', function(exports) {
 			// What the person is told besides the suggestion: the message hides text, or the model tried to add a link.
 			var flags = function(answer) {
 				return {
-					warnHidden: !!answer.warnings?.includes('hidden'),
-					warnLinks: !!answer.warnings?.includes('links')
+					warnHidden: !!(answer.warnings && answer.warnings.includes('hidden')),
+					warnLinks: !!(answer.warnings && answer.warnings.includes('links'))
 				};
 			};
 			// ---- The card: its state follows the message that is open
@@ -400,14 +400,10 @@ PLUGIN('ai', function(exports) {
 					});
 					return;
 				}
-				patch('card', {
-					resultShown: true,
-					text: found.text,
-					...flags(found),
-					sources: (found.sources || []).map(function(s) { return [s.document, s.section].filter(Boolean).join(' — '); }),
-					sourcesShown: !!found.sources?.length,
-					canReply: key.replace(/k$/, '') === 'reply'
-				});
+				patch('card', Object.assign({ resultShown: true,
+					text: found.text }, flags(found), { sources: (found.sources || []).map(function(s) { return [s.document, s.section].filter(Boolean).join(' — '); }),
+					sourcesShown: !!(found.sources && found.sources.length),
+					canReply: key.replace(/k$/, '') === 'reply' }));
 			}
 			function drawcard() {
 
@@ -510,12 +506,12 @@ PLUGIN('ai', function(exports) {
 					return;
 				}
 				patch('composer', { busy: true, working: TRANSLATE('@(The assistant is working…)'), resultShown: false, replaced: false });
-				var answer = await run({ task, ...extra, accountId: GET('mail.compose.accountId') });
+				var answer = await run(Object.assign({ task }, extra, { accountId: GET('mail.compose.accountId') }));
 				patch('composer', { busy: false, working: '' });
 				if (!answer)
 					return;
 				mailbox.say(TRANSLATE('@(The assistant has a suggestion.)'));
-				patch('composer', { resultShown: true, text: answer.text, ...flags(answer), replaced: false });
+				patch('composer', Object.assign({ resultShown: true, text: answer.text }, flags(answer), { replaced: false }));
 			};
 			exports.replace = function() {
 

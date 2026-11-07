@@ -33,12 +33,12 @@ function overview($) {
 				note: p.note,
 				domains: p.domains.join(', '),
 				steps: p.steps.map(function(s) { return s.url ? s.text + ' | ' + s.url : s.text; }).join('\n'),
-				imapHost: p.imap?.host || '',
-				imapPort: p.imap?.port || 993,
-				imapSecurity: p.imap?.security || 'tls',
-				smtpHost: p.smtp?.host || '',
-				smtpPort: p.smtp?.port || 465,
-				smtpSecurity: p.smtp?.security || 'tls'
+				imapHost: (p.imap && p.imap.host) || '',
+				imapPort: (p.imap && p.imap.port) || 993,
+				imapSecurity: (p.imap && p.imap.security) || 'tls',
+				smtpHost: (p.smtp && p.smtp.host) || '',
+				smtpPort: (p.smtp && p.smtp.port) || 465,
+				smtpSecurity: (p.smtp && p.smtp.security) || 'tls'
 			};
 		})
 	};
@@ -109,7 +109,7 @@ NEWACTION('Instance|type', {
 
 			var catalogue = MODS.providers,
 				existing = model.id ? catalogue.get(model.id) : null;
-			if (model.id && !existing?.custom)
+			if (model.id && !(existing && existing.custom))
 				throw Error('@(Account type not found.)');
 			var id = model.id;
 			if (!id) {

@@ -123,7 +123,7 @@ PLUGIN('mail', function(exports) {
 	// Conversations: messages are grouped by their Message-ID, In-Reply-To and References links.
 	function isgrouping() {
 		try {
-			return localStorage.getItem('totalmail-threads-' + state.user?.id) !== '0';
+			return localStorage.getItem('totalmail-threads-' + (state.user && state.user.id)) !== '0';
 		} catch {
 			return true;
 		}
@@ -211,7 +211,7 @@ PLUGIN('mail', function(exports) {
 					(!state.account || item.accountId === state.account) &&
 					(state.folder === 'drafts' || (state.folder === 'starred' ? item.starred : item.folder === state.folder)) &&
 					(filter !== 'unread' || item.unread) &&
-					(parsed.empty || totalmailquery.matches(parsed, item) || (searchhits?.query === query && searchhits.ids.has(item.id)));
+					(parsed.empty || totalmailquery.matches(parsed, item) || ((searchhits && searchhits.query) === query && searchhits.ids.has(item.id)));
 			}
 		);
 		// Newest first across accounts and loaded pages; drafts keep their saved order.
@@ -226,8 +226,8 @@ PLUGIN('mail', function(exports) {
 			return [];
 		var pairs = [];
 		for (var a of state.accounts.filter(function(a) { return a.configured && (!state.account || a.id === state.account); })) {
-			var path = state.folder === 'inbox' ? 'INBOX' : a.mailboxes?.find(function(f) { return f.id === state.folder; })?.path;
-			if (path && a.remaining?.[path] > 0)
+			var path = state.folder === 'inbox' ? 'INBOX' : (a.mailboxes && a.mailboxes.find(function(f) { return f.id === state.folder; })?.path);
+			if (path && (a.remaining && a.remaining[path]) > 0)
 				pairs.push({ accountId: a.id, path, remaining: a.remaining[path] });
 		}
 		return pairs;
@@ -248,7 +248,7 @@ PLUGIN('mail', function(exports) {
 		for (var a of state.accounts.filter(
 			function(a) { return a.configured && ['verified', 'synced'].includes(a.status) && (!state.account || a.id === state.account); }
 		)) {
-			var path = state.folder === 'inbox' ? 'INBOX' : a.mailboxes?.find(function(f) { return f.id === state.folder; })?.path;
+			var path = state.folder === 'inbox' ? 'INBOX' : (a.mailboxes && a.mailboxes.find(function(f) { return f.id === state.folder; })?.path);
 			if (path)
 				pairs.push({ accountId: a.id, path });
 		}
@@ -257,7 +257,7 @@ PLUGIN('mail', function(exports) {
 	function renderserversearch() {
 
 		var query = (mail.search || '').trim();
-		var show = query.length >= 2 && serverpairs().length > 0 && searchhits?.query !== query.toLocaleLowerCase();
+		var show = query.length >= 2 && serverpairs().length > 0 && (searchhits && searchhits.query) !== query.toLocaleLowerCase();
 		ui(
 			show
 				? { searchShown: true, searchLabel: TRANSLATE('@(Search the whole mailbox for “{0}”)').format(query) }
@@ -418,7 +418,7 @@ PLUGIN('mail', function(exports) {
 		folders.push(['sent-local', 'envelope', TRANSLATE('@(Sent from TotalMail)'), 0]);
 		if (state.account) {
 			var a = account(state.account);
-			for (var f of a?.mailboxes || [])
+			for (var f of (a && a.mailboxes) || [])
 				if (!['inbox', 'archive', 'trash'].includes(f.id))
 					folders.push([f.id, 'folder', f.name, 0]);
 		}
@@ -437,14 +437,11 @@ PLUGIN('mail', function(exports) {
 		SET(
 			'mail.accounts',
 			state.accounts.map(function(a) {
-				return {
-					...a,
-					active: state.account === a.id,
+				return Object.assign({}, a, { active: state.account === a.id,
 					unreadCount: state.messages.filter(function(m) { return m.accountId === a.id && m.folder === 'inbox' && m.unread && !m.welcome; }).length,
 					syncFailed: !!syncfailures[a.id],
 					// The reason the server gave, so the warning explains itself on hover.
-					syncMessage: TRANSLATE('@(Automatic sync failed. Use Sync to retry.)') + (syncerrors[a.id] ? ' ' + syncerrors[a.id] : '')
-				};
+					syncMessage: TRANSLATE('@(Automatic sync failed. Use Sync to retry.)') + (syncerrors[a.id] ? ' ' + syncerrors[a.id] : '') });
 			})
 		);
 		var names = {
@@ -512,9 +509,7 @@ PLUGIN('mail', function(exports) {
 				.slice(0, shown)
 				.map(function({ m, members, all }) {
 					var a = account(m.accountId);
-					return {
-						...m,
-						count: all.length,
+					return Object.assign({}, m, { count: all.length,
 						threaded: all.length > 1,
 						unread: members.some(function(x) { return x.unread; }),
 						selected: members.some(function(x) { return x.id === state.selected; }),
@@ -526,8 +521,7 @@ PLUGIN('mail', function(exports) {
 						displaySubject: m.subject || TRANSLATE('@(No subject)'),
 						preview: m.body.replace(/\n/g, ' '),
 						accountName: a.name,
-						color: a.color
-					};
+						color: a.color });
 				})
 				.map(function(row) {
 					// What a screen reader says for the line: the state first, then who, what, when and which account.
@@ -587,7 +581,7 @@ PLUGIN('mail', function(exports) {
 		}
 		var start = show(invite.start),
 			end = '';
-		if (invite.end && !invite.start?.allDay)
+		if (invite.end && !(invite.start && invite.start.allDay))
 			end = invite.end.iso.slice(0, 10) === invite.start.iso.slice(0, 10) ? show(invite.end, false) : show(invite.end);
 		return {
 			title: invite.summary || TRANSLATE('@(No subject)'),
@@ -614,13 +608,13 @@ PLUGIN('mail', function(exports) {
 					off: off('archive'),
 					label: TRANSLATE(m && ['archive', 'trash'].includes(m.folder) ? '@(Move to inbox)' : '@(Archive message)')
 				},
-				star: { off: off('star'), starred: !!m?.starred },
+				star: { off: off('star'), starred: !!(m && m.starred) },
 				move: { off: off('move') },
-				trash: { off: off('trash'), label: TRANSLATE(m?.folder === 'trash' ? '@(Delete permanently)' : '@(Move to trash)') },
+				trash: { off: off('trash'), label: TRANSLATE((m && m.folder) === 'trash' ? '@(Delete permanently)' : '@(Move to trash)') },
 				unread: {
 					off: off('unread'),
-					label: TRANSLATE(m?.unread ? '@(Mark as read)' : '@(Mark as unread)'),
-					icon: 'ti ti-' + (m?.unread ? 'envelope-open' : 'envelope')
+					label: TRANSLATE((m && m.unread) ? '@(Mark as read)' : '@(Mark as unread)'),
+					icon: 'ti ti-' + ((m && m.unread) ? 'envelope-open' : 'envelope')
 				},
 				print: { off: off('print') },
 				source: { off: off('source') }
@@ -636,9 +630,7 @@ PLUGIN('mail', function(exports) {
 		}
 		var a = account(m.accountId);
 		var chain = conversation(m);
-		SET('mail.reader', {
-			...m,
-			thread:
+		SET('mail.reader', Object.assign({}, m, { thread:
 				isgrouping() && chain.length > 1
 					? chain.map(function(x) {
 						return {
@@ -651,31 +643,30 @@ PLUGIN('mail', function(exports) {
 						};
 					})
 					: [],
-			unsubscribe: m.unsubscribe || null,
-			invite: m.invite ? invitecard(m.invite) : null,
-			showHtml: !!m.hasHtml && !plainview,
-			viewLabel: TRANSLATE(plainview ? '@(Show formatted)' : '@(Show plain text)'),
-			frameSrc: '/html/' + encodeURIComponent(m.id) + '/' + (imagesfor.has(m.id) ? '?images=1' : ''),
-			remoteBlocked: !!m.hasHtml && !plainview && m.remoteImages > 0 && !imagesfor.has(m.id),
-			empty: false,
-			color: a.color,
-			accountName: a.name,
-			accountEmail: m.outgoing ? m.to : a.email,
-			messageKind: m.welcome ? TRANSLATE('@(Message)') : '',
-			files: (m.attachments || []).map(function(f) {
-				return {
-					name: f.name,
-					size: filesize(f.size),
-					href: '/attachment/' + encodeURIComponent(m.id) + '/' + f.index + '/'
-				};
-			}),
-			body: m.remote && !m.bodyLoaded ? TRANSLATE('@(Loading message securely…)') : m.body,
-			initials: m.sender
-				.split(' ')
-				.map(function(s) { return s[0]; })
-				.slice(0, 2)
-				.join('')
-		});
+		unsubscribe: m.unsubscribe || null,
+		invite: m.invite ? invitecard(m.invite) : null,
+		showHtml: !!m.hasHtml && !plainview,
+		viewLabel: TRANSLATE(plainview ? '@(Show formatted)' : '@(Show plain text)'),
+		frameSrc: '/html/' + encodeURIComponent(m.id) + '/' + (imagesfor.has(m.id) ? '?images=1' : ''),
+		remoteBlocked: !!m.hasHtml && !plainview && m.remoteImages > 0 && !imagesfor.has(m.id),
+		empty: false,
+		color: a.color,
+		accountName: a.name,
+		accountEmail: m.outgoing ? m.to : a.email,
+		messageKind: m.welcome ? TRANSLATE('@(Message)') : '',
+		files: (m.attachments || []).map(function(f) {
+			return {
+				name: f.name,
+				size: filesize(f.size),
+				href: '/attachment/' + encodeURIComponent(m.id) + '/' + f.index + '/'
+			};
+		}),
+		body: m.remote && !m.bodyLoaded ? TRANSLATE('@(Loading message securely…)') : m.body,
+		initials: m.sender
+			.split(' ')
+			.map(function(s) { return s[0]; })
+			.slice(0, 2)
+			.join('') }));
 	}
 	async function selectmessage(id) {
 
@@ -688,7 +679,7 @@ PLUGIN('mail', function(exports) {
 		renderlist();
 		renderreader();
 		var m = state.messages.find(function(m) { return m.id === id; });
-		if (m?.remote && (!m.bodyLoaded || m.hasHtml === undefined || (m.attachmentCount && !m.attachments))) {
+		if ((m && m.remote) && (!m.bodyLoaded || m.hasHtml === undefined || (m.attachmentCount && !m.attachments))) {
 			reading = reading
 				.catch(function() {})
 				.then(async function() {
@@ -794,7 +785,7 @@ PLUGIN('mail', function(exports) {
 		drafttimer = setTimeout(function() { return savedraft().catch(function(e) { return toast(e.message); }); }, 650);
 	}
 	function draftfiles(source) {
-		return (source?.attachments || []).map(function(f) { return { id: f.id, name: f.name, size: filesize(f.size) }; });
+		return ((source && source.attachments) || []).map(function(f) { return { id: f.id, name: f.name, size: filesize(f.size) }; });
 	}
 	function draftchanged(saved) {
 
@@ -814,7 +805,7 @@ PLUGIN('mail', function(exports) {
 		dirty = true;
 		await savedraft();
 		await saving;
-		if (!draft?.id)
+		if (!(draft && draft.id))
 			return;
 		for (var file of list) {
 			if (!file.size || file.size > 15 * 1024 * 1024) {
@@ -832,7 +823,7 @@ PLUGIN('mail', function(exports) {
 		refreshsendbutton();
 	}
 	async function removeattachment(id) {
-		if (!draft?.id)
+		if (!(draft && draft.id))
 			return;
 		try {
 			draftchanged(await api('draft_attachment_remove', { id: draft.id, attachmentId: id }));
@@ -1052,7 +1043,7 @@ PLUGIN('mail', function(exports) {
 	// The list asks for more when its end comes near (the scrollend component).
 	exports.scrolled = function() { return GET('mail.ui').moreShown && showmore(); };
 	// The checkbox of a line (Shift for a range), the one that selects all, and the buttons of the bar.
-	exports.check = function(element, event) { return togglecheck(element[0].dataset.row, !!event?.shiftKey, true); };
+	exports.check = function(element, event) { return togglecheck(element[0].dataset.row, !!(event && event.shiftKey), true); };
 	exports.bulkall = function(element) {
 		if (element[0].checked)
 			for (var id of lineids())
@@ -1066,8 +1057,8 @@ PLUGIN('mail', function(exports) {
 	exports.bulkstate = function(value, path, element) {
 		var box = element.find('input')[0];
 		if (box) {
-			box.checked = !!value?.bulkAll;
-			box.indeterminate = !!value?.bulkSome;
+			box.checked = !!(value && value.bulkAll);
+			box.indeterminate = !!(value && value.bulkSome);
 		}
 	};
 	// Keyboard: move through the list, act on the open message or, when some are selected, on all of them.
@@ -1169,7 +1160,7 @@ PLUGIN('mail', function(exports) {
 	// The input component of a path, to give it the focus.
 	function focusfield(path) {
 		FIND('input', true)
-			.find(function(c) { return c.path?.path === path; })
+			.find(function(c) { return (c.path && c.path.path) === path; })
 			?.autofocus();
 	}
 	// The window measures itself when it opens, before the assistant's box or a row of the form has appeared: it measures again,
@@ -1248,7 +1239,7 @@ PLUGIN('mail', function(exports) {
 		dirty = true;
 		await savedraft();
 		await saving;
-		if (!draft?.id)
+		if (!(draft && draft.id))
 			return;
 		try {
 			var { skippedFiles: skippedfiles, ...next } = await api('draft_forward_files', { id: draft.id, messageId: id });
@@ -1273,9 +1264,7 @@ PLUGIN('mail', function(exports) {
 		var started =
 			reply && !existing ? totalmailquote(forward ? 'forward' : 'reply', reply, signature(reply.accountId), quotetext()) : null;
 		draft = existing
-			? {
-				...existing
-			}
+			? Object.assign({}, existing)
 			: {
 				id: '',
 				accountId: reply ? reply.accountId : state.account || state.accounts[0].id,
@@ -1289,7 +1278,7 @@ PLUGIN('mail', function(exports) {
 			};
 		if (all && reply && !existing) {
 			var mine = account(reply.accountId),
-				used = new Set([mine?.email.toLowerCase(), ...(mine?.aliases || [])]);
+				used = new Set([(mine && mine.email.toLowerCase()), ...((mine && mine.aliases) || [])]);
 			function recipients(values) {
 				return values
 					.filter(function(value) {
@@ -1458,9 +1447,9 @@ PLUGIN('mail', function(exports) {
 				'_blank',
 				'noopener'
 			);
-		else if (name === 'source' && m?.remote)
+		else if (name === 'source' && (m && m.remote))
 			SETTER('page/download', '/source/' + encodeURIComponent(m.id) + '/');
-		else if (name === 'unsubscribe-mail' && m?.unsubscribe?.mail) {
+		else if (name === 'unsubscribe-mail' && (m && (m.unsubscribe && m.unsubscribe.mail))) {
 			await opencomposer();
 			SET('mail.compose.accountId', m.accountId);
 			SET('mail.compose.to', m.unsubscribe.mail);
@@ -1477,9 +1466,9 @@ PLUGIN('mail', function(exports) {
 			var i = lines.findIndex(function(line) { return line.members.some(function(item) { return item.id === state.selected; }); });
 			if (lines.length)
 				await selectmessage(lines[(i + 1) % lines.length].m.id);
-		} else if (name === 'move' && m?.remote)
+		} else if (name === 'move' && (m && m.remote))
 			PLUGINS.folders.move(m.id);
-		else if (name === 'trash' && m?.remote && m.folder === 'trash')
+		else if (name === 'trash' && (m && m.remote) && m.folder === 'trash')
 			await erasemessage(m);
 		else if (name === 'empty-trash')
 			await emptytrash();
@@ -1578,7 +1567,7 @@ PLUGIN('mail', function(exports) {
 	WATCH('mail.compose.accountId', function(next) {
 
 		var body = GET('mail.compose.body'),
-			previous = signedfor || draft?.accountId;
+			previous = signedfor || (draft && draft.accountId);
 		signedfor = next;
 		// Another account has its own addresses; the first one is the account's own.
 		if (draft && next && previous && next !== previous)
@@ -1624,7 +1613,7 @@ PLUGIN('mail', function(exports) {
 	};
 	WAIT(
 		function() {
-			return PLUGINS.accounts?.refresh && PLUGINS.users?.open;
+			return (PLUGINS.accounts && PLUGINS.accounts.refresh) && (PLUGINS.users && PLUGINS.users.open);
 		},
 		async function() {
 
@@ -1724,10 +1713,10 @@ PLUGIN('mail', function(exports) {
 	};
 	function refreshsendbutton() {
 
-		var selected = GET('mail.compose.accountId') || draft?.accountId;
+		var selected = GET('mail.compose.accountId') || (draft && draft.accountId);
 		var a = account(selected);
-		var locked = ['sending', 'sent', 'unknown'].includes(draft?.status);
-		ui({ sendOff: !a?.configured || locked, locked });
+		var locked = ['sending', 'sent', 'unknown'].includes((draft && draft.status));
+		ui({ sendOff: !(a && a.configured) || locked, locked });
 		SETTER('#compose-account', 'reconfigure', { disabled: locked });
 		SETTER('#compose-alias', 'reconfigure', { disabled: locked });
 	}
@@ -1745,14 +1734,14 @@ PLUGIN('mail', function(exports) {
 	// System notifications (Total.js j-NativeNotifications), only when the person turned them on in this browser.
 	function notificationsenabled() {
 		try {
-			return localStorage.getItem('totalmail-notify-' + state.user?.id) === '1' && window.Notification?.permission === 'granted';
+			return localStorage.getItem('totalmail-notify-' + (state.user && state.user.id)) === '1' && (window.Notification && window.Notification.permission) === 'granted';
 		} catch {
 			return false;
 		}
 	}
 	function notifylabel() {
 
-		var denied = window.Notification?.permission === 'denied';
+		var denied = (window.Notification && window.Notification.permission) === 'denied';
 		ui({ notifications: notificationsenabled() });
 		SET(
 			'mail.notifyHint',
@@ -1859,7 +1848,7 @@ PLUGIN('mail', function(exports) {
 			return;
 		}
 		var accounts = id ? [account(id)] : state.account ? [account(state.account)] : state.accounts.filter(function(a) { return a.configured; });
-		if (!accounts.length || accounts.some(function(a) { return !a?.configured; })) {
+		if (!accounts.length || accounts.some(function(a) { return !(a && a.configured); })) {
 			toast(TRANSLATE('@(Save the account before connecting.)'));
 			return;
 		}
@@ -1868,7 +1857,7 @@ PLUGIN('mail', function(exports) {
 		try {
 			await reading;
 			for (var a of accounts) {
-				var folderpath = path || a.mailboxes?.find(function(f) { return f.id === state.folder; })?.path || 'INBOX';
+				var folderpath = path || (a.mailboxes && a.mailboxes.find(function(f) { return f.id === state.folder; })?.path) || 'INBOX';
 				await api('account_sync', { accountId: a.id, path: folderpath });
 				delete syncfailures[a.id];
 				delete retryafter[a.id];
@@ -1888,15 +1877,15 @@ PLUGIN('mail', function(exports) {
 	}
 	async function previewsend() {
 
-		if (['sending', 'sent', 'unknown'].includes(draft?.status))
+		if (['sending', 'sent', 'unknown'].includes((draft && draft.status)))
 			return;
 		dirty = true;
 		await savedraft();
 		await saving;
-		if (!draft?.id)
+		if (!(draft && draft.id))
 			return;
 		var a = account(draft.accountId);
-		if (!a?.configured) {
+		if (!(a && a.configured)) {
 			toast(TRANSLATE('@(Save the account before connecting.)'));
 			return;
 		}
@@ -1917,7 +1906,7 @@ PLUGIN('mail', function(exports) {
 	}
 	async function confirmsend() {
 
-		if (sendbusy || !draft?.id)
+		if (sendbusy || !(draft && draft.id))
 			return;
 		sendbusy = true;
 		ui({ confirmOff: true, editSendOff: true, sendError: '' });
@@ -1941,14 +1930,14 @@ PLUGIN('mail', function(exports) {
 		} catch (e) {
 			ui({ sendError: e.message });
 			await reloadmail();
-			var saved = state.drafts.find(function(d) { return d.id === draft?.id; });
+			var saved = state.drafts.find(function(d) { return d.id === (draft && draft.id); });
 			if (saved)
 				Object.assign(draft, saved);
 			refreshsendbutton();
 		} finally {
 			sendbusy = false;
 			// A message that was submitted cannot be sent again.
-			ui({ editSendOff: false, confirmOff: ['unknown', 'sending', 'sent'].includes(draft?.status) });
+			ui({ editSendOff: false, confirmOff: ['unknown', 'sending', 'sent'].includes((draft && draft.status)) });
 		}
 	}
 	exports.backgroundReady = function() {
@@ -1957,7 +1946,7 @@ PLUGIN('mail', function(exports) {
 			!networkbusy &&
 			!sendbusy &&
 			!mail.window &&
-			!PLUGINS.accounts?.busy &&
+			!(PLUGINS.accounts && PLUGINS.accounts.busy) &&
 			state.accounts.some(function(a) { return a.configured && ['verified', 'synced'].includes(a.status); });
 	};
 	exports.backgroundSync = async function() {
@@ -2052,7 +2041,7 @@ PLUGIN('mail', function(exports) {
 		renderreader();
 		updatesyncstatus();
 		// The assistant depends on the accounts' settings, which may have just changed.
-		PLUGINS.ai?.refresh?.();
+		(PLUGINS.ai && (PLUGINS.ai.refresh && PLUGINS.ai.refresh()));
 	};
 	// Formatting: the message stays plain text; the mailbody component writes the small markup the server turns into HTML on send.
 	exports.format = function(element) {

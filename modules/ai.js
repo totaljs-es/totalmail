@@ -78,7 +78,7 @@ exports.parseendpoint = function(text) {
 
 // What people are told about the assistant: whether it exists, and where the text of a conversation goes.
 exports.status = function(settings) {
-	if (!settings?.enabled || !settings.endpoint || !settings.model || (settings.provider === 'anthropic' && !settings.key))
+	if (!(settings && settings.enabled) || !settings.endpoint || !settings.model || (settings.provider === 'anthropic' && !settings.key))
 		return { configured: false };
 	try {
 		var target = exports.parseendpoint(settings.endpoint);
@@ -149,7 +149,7 @@ function adapter($, next) {
 		var reason =
 			typeof err === 'string'
 				? err
-				: err?.errors?.length
+				: (err && (err.errors && err.errors.length))
 					? err.errors.map(function(e) { return e.message; }).join('; ')
 					: err
 						? String(err.message || err)
@@ -167,14 +167,14 @@ function adapter($, next) {
 		if (status >= 400 || err)
 			return next(failure('@(The assistant could not answer.)', status + ' ' + JSON.stringify(response).slice(0, 300)));
 		var text = claude
-			? Array.isArray(response?.content)
+			? Array.isArray((response && response.content))
 				? response.content
-					.filter(function(part) { return part?.type === 'text'; })
+					.filter(function(part) { return (part && part.type) === 'text'; })
 					.map(function(part) { return part.text; })
 					.join('')
 				: ''
-			: response?.choices?.[0]?.message?.content;
-		next(null, { content: text || '', finish: claude ? response?.stop_reason : response?.choices?.[0]?.finish_reason });
+			: (response && (response.choices && (response.choices[0] && (response.choices[0].message && response.choices[0].message.content))));
+		next(null, { content: text || '', finish: claude ? (response && response.stop_reason) : (response && (response.choices && (response.choices[0] && response.choices[0].finish_reason))) });
 	});
 }
 
