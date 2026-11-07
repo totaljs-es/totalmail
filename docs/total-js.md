@@ -40,6 +40,7 @@ The code follows the [Total.js guidelines](https://github.com/totaljs-es/guideli
 
 - Tabs, single quotes, semicolons.
 - `var` (or `let` inside functions); no `const`, not even for requires and `REG_*` constants.
+- `function` instead of arrow functions, `Object.assign()` instead of object spread, `&&` instead of `?.`, `findItem()` for lookups by `id`. `async`/`await`, `Map`/`Set` and destructuring stay where the libraries (imapflow, mailparser) or the data need them.
 - No braces around a single statement; the statement goes on the next line.
 - A blank line after the opening of a function with several statements, and between top-level blocks.
 - Comments say why, above the code they explain.
