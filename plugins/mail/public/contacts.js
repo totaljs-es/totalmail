@@ -24,19 +24,27 @@ function totalmailcontacts(messages, own) {
 		found.set(email, item);
 	}
 	// People you write to count more than people who wrote to you.
-	for (var m of messages)
+	for (var arr = Array.from(messages), j = 0; j < arr.length; j++) {
+		var m = arr[j];
 		if (m.outgoing) {
-			for (var to of String(m.to || '').split(/[,;]/))
+			for (var list = String(m.to || '').split(/[,;]/), i = 0; i < list.length; i++) {
+				var to = list[i];
 				add(to, '', m.date, 3);
-			for (var cc of String(m.cc || '').split(/[,;]/))
+			}
+			for (var list = String(m.cc || '').split(/[,;]/), i = 0; i < list.length; i++) {
+				var cc = list[i];
 				add(cc, '', m.date, 2);
+			}
 		} else {
 			add(m.email, m.sender, m.date, 1);
-			for (var other of [...(m.toRecipients || []), ...(m.ccRecipients || [])])
+			for (var list = Array.from(m.toRecipients || []).concat(Array.from(m.ccRecipients || [])), i = 0; i < list.length; i++) {
+				var other = list[i];
 				add(other, '', m.date, 1);
+			}
 		}
+	}
 
-	return [...found.values()].sort(function(a, b) { return b.count - a.count || b.last - a.last; });
+	return Array.from(found.values()).sort(function(a, b) { return b.count - a.count || b.last - a.last; });
 }
 
 // Suggestions for the text being typed: the start of a name or address first, then any part of them.

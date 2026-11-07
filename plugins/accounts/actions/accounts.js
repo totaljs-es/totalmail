@@ -29,9 +29,11 @@ NEWACTION('Accounts|save', {
 	action: function($, model) {
 		return FUNC.run($, function() {
 
-			for (var port of [model.imapPort, model.smtpPort])
+			for (var arr = [model.imapPort, model.smtpPort], i = 0; i < arr.length; i++) {
+				var port = arr[i];
 				if (!Number.isInteger(port) || port < 1 || port > 65535)
 					throw Error('@(Enter a port between 1 and 65535.)');
+			}
 			var account = {
 				id: model.id || '',
 				name: model.name.trim(),
@@ -100,8 +102,10 @@ NEWACTION('Accounts|delete', {
 		return FUNC.run($, async function() {
 
 			var removed = await MODS.users.forUser($.user).deleteAccount(model.id);
-			for (var file of removed.files)
+			for (var list = Array.from(removed.files), i = 0; i < list.length; i++) {
+				var file = list[i];
 				await MODS.users.files($.user).remove($.user.id, file);
+			}
 			return { id: removed.id };
 		});
 	}

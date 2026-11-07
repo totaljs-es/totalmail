@@ -25,14 +25,15 @@ async function ask(text) {
 
 exports.main = async function(argv, out = function(line) { return console.log(line); }) {
 
-	var args = [...argv],
+	var args = Array.from(argv),
 		index = args.indexOf('--database'),
 		directory = Total.Path.resolve(__dirname, '../database');
 	if (index >= 0) {
 		directory = Total.Path.resolve(args[index + 1] || '');
 		args.splice(index, 2);
 	}
-	var [command, email] = args;
+	var tmp = args;
+	var command = tmp[0], email = tmp[1];
 	var table = Tables.in(directory);
 	// The people live in the database (or, before the first start of a newer version, in users.json).
 	if (!Total.Fs.existsSync(Total.Path.join(directory, 'users.json')) && !Total.Fs.existsSync(Total.Path.join(directory, 'users_users')))
@@ -42,8 +43,10 @@ exports.main = async function(argv, out = function(line) { return console.log(li
 	// A password reset or a removed code should end the sessions that were opened before: they are forgotten here.
 	var signout = function() { return table('sessions_sessions').remove().where('id', '!=', '').promise(); };
 	if (command === 'list') {
-		for (var u of users)
+		for (var arr = Array.from(users), i = 0; i < arr.length; i++) {
+			var u = arr[i];
 			out([u.email, u.role, u.disabled ? 'disabled' : '', u.totp ? 'two-step' : ''].filter(Boolean).join('  '));
+		}
 		return;
 	}
 	var user = users.find(

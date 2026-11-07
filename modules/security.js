@@ -22,7 +22,8 @@ exports.install = function() {
 		require('../lib/identities').open({ directory, table: Tables, legacy: { file: Total.Path.join(directory, 'users.json') } }),
 		require('../lib/sessions').open({ table: Tables, legacy: { file: Total.Path.join(directory, 'sessions.json') } }),
 		require('../lib/devices').open({ table: Tables })
-	]).then(function([accounts, signedin, apps]) {
+	]).then(function(entry) {
+		var accounts = entry[0], signedin = entry[1], apps = entry[2];
 
 		Object.assign(identities, accounts);
 		Object.assign(sessions, signedin);
@@ -164,10 +165,12 @@ var clientip = function($) {
 exports.allowLogin = function($, email) {
 
 	var ip = clientip($);
-	for (var [key, limit] of [
-		[ip, 100],
-		[ip + '|' + String(email).toLowerCase(), 15]
-	]) {
+	for (var list = [
+			[ip, 100],
+			[ip + '|' + String(email).toLowerCase(), 15]
+		], i = 0; i < list.length; i++) {
+		var key = list[i][0],
+			limit = list[i][1];
 		var entry = attempts.get(key);
 		if (!entry || entry.until < Date.now()) {
 			entry = {
@@ -196,7 +199,10 @@ ON('service', function() {
 
 	var now = Date.now();
 	sessions.sweep();
-	for (var [k, v] of attempts)
+	for (var list = Array.from(attempts), i = 0; i < list.length; i++) {
+		var k = list[i][0],
+			v = list[i][1];
 		if (v.until < now)
 			attempts.delete(k);
+	}
 });

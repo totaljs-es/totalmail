@@ -241,7 +241,8 @@ PLUGIN('ai', function(exports) {
 					lines = [];
 				// Total.js refuses a whole upload that carries a real image, so what cannot be read is set aside here, with its reason.
 				var allowed = String(library.accept || '').split(',');
-				for (var file of chosen)
+				for (var list = Array.from(chosen), i = 0; i < list.length; i++) {
+					var file = list[i];
 					if (allowed.includes((file.name.match(/\.[A-Za-z0-9]+$/) || [''])[0].toLowerCase()))
 						files.push(file);
 					else
@@ -252,6 +253,7 @@ PLUGIN('ai', function(exports) {
 									'@(This type of file is not supported yet. Supported: text, Markdown, HTML, JSON, CSV, Word, OpenDocument, PowerPoint, Excel and PDF.)'
 								)
 						);
+				}
 
 				if (!files.length) {
 					fail(lines.join(' '));
@@ -260,16 +262,20 @@ PLUGIN('ai', function(exports) {
 				fail(TRANSLATE('@(Reading the documents…)'));
 				var body = new FormData();
 				body.append('collectionid', collectionid);
-				for (var item of files)
+				for (var list = Array.from(files), i = 0; i < list.length; i++) {
+					var item = list[i];
 					body.append('file', item, item.name);
+				}
 				try {
 					var result = await mailbox.upload('/knowledge/upload/', body);
 					library = { collections: result.collections, accept: library.accept };
 					drawlibrary();
 					if (result.added.length)
 						lines.push(TRANSLATE('@(Documents added: {count}.)').replace('{count}', function() { return result.added.length; }));
-					for (var failed of result.failed)
+					for (var list = Array.from(result.failed), i = 0; i < list.length; i++) {
+						var failed = list[i];
 						lines.push(failed.name + ': ' + failed.error);
+					}
 					fail(lines.join(' '));
 					mailbox.say(lines.join(' '));
 				} catch (e) {

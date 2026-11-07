@@ -406,8 +406,10 @@ PLUGIN('accounts', function(exports) {
 				error('');
 				try {
 					var model = {};
-					for (var field of Object.keys(accounts.form))
+					for (var list = Object.keys(accounts.form), i = 0; i < list.length; i++) {
+						var field = list[i];
 						model[field] = GET('accounts.form.' + field);
+					}
 					model.imapPort = Number(model.imapPort);
 					model.smtpPort = Number(model.smtpPort);
 					model.assistant = exports.get('ui').assistant;

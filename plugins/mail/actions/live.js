@@ -187,8 +187,10 @@ NEWACTION('Drafts|delete', {
 		return run($, async function(store) {
 
 			var draft = await store.deleteDraft(m.id);
-			for (var item of draft.attachments || [])
+			for (var list = Array.from(draft.attachments || []), i = 0; i < list.length; i++) {
+				var item = list[i];
 				await MODS.users.files($.user).remove($.user.id, item.id);
+			}
 			return { id: draft.id };
 		});
 	}

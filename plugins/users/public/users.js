@@ -69,8 +69,10 @@ PLUGIN('users', function(exports) {
 				exports.set('profileError', '');
 				try {
 					var model = {};
-					for (var field of ['name', 'email', 'currentPassword', 'newPassword', 'confirmPassword'])
+					for (var list = ['name', 'email', 'currentPassword', 'newPassword', 'confirmPassword'], i = 0; i < list.length; i++) {
+						var field = list[i];
 						model[field] = GET('users.profileform.' + field);
+					}
 					model.color = GET('users.profileform.color');
 					model.language = GET('users.profileform.language');
 					if (model.newPassword !== model.confirmPassword)
@@ -213,8 +215,10 @@ PLUGIN('users', function(exports) {
 				exports.set('error', '');
 				try {
 					var model = {};
-					for (var field of ['name', 'email', 'password'])
+					for (var list = ['name', 'email', 'password'], i = 0; i < list.length; i++) {
+						var field = list[i];
 						model[field] = GET('users.form.' + field);
+					}
 					await mailbox.api('user_create', model);
 					await openusers();
 					mailbox.notify(TRANSLATE('@(User created with a private workspace.)'));

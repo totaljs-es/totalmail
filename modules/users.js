@@ -35,8 +35,10 @@ exports.install = function() {
 	// Changed and removed messages are wiped from the files every six hours (the service runs every minute).
 	ON('service', function(minutes) {
 		if (minutes % 360 === 0)
-			for (var store of stores.values())
+			for (var list = Array.from(stores.values()), i = 0; i < list.length; i++) {
+				var store = list[i];
 				store.clean().catch(function(error) { return Total.error(error, 'TotalMail mailbox clean'); });
+			}
 	});
 };
 
@@ -74,11 +76,13 @@ exports.drop = async function(userid) {
 		throw Error('Authentication required');
 	stores.delete(userid);
 	var spec = Mailbox.spec(Tables, userid);
-	for (var list of spec.lists)
+	for (var arr = Array.from(spec.lists), i = 0; i < arr.length; i++) {
+		var list = arr[i];
 		await spec
 			.table(spec.prefix + '_' + list)
 			.clear()
 			.promise();
+	}
 	await Total.Fs.promises.rm(Total.Path.join(database, 'mail-' + userid + '.json'), { force: true });
 	await Total.Fs.promises.rm(Total.Path.join(database, 'mail-' + userid + '.json.migrated'), { force: true });
 	await Total.Fs.promises.rm(Total.Path.join(database, 'attachments', userid), { recursive: true, force: true });

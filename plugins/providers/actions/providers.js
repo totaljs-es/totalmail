@@ -5,7 +5,8 @@ function overview($) {
 		hidden = MODS.instance.hidden(),
 		defaultid = catalogue.defaultId();
 	var oauth = {};
-	for (var provider of catalogue.all().filter(function(p) { return p.auth === 'oauth2'; })) {
+	for (var list = catalogue.all().filter(function(p) { return p.auth === 'oauth2'; }), i = 0; i < list.length; i++) {
+		var provider = list[i];
 		var own = MODS.instance.view().oauth[provider.id] || {};
 		oauth[provider.id] = {
 			name: provider.name,
@@ -133,9 +134,11 @@ NEWACTION('Instance|type', {
 				smtp: { host: model.smtpHost.trim(), port: model.smtpPort, security: model.smtpSecurity },
 				steps: steps(model.steps)
 			};
-			for (var key of ['summary', 'note'])
+			for (var list = ['summary', 'note'], i = 0; i < list.length; i++) {
+				var key = list[i];
 				if (!raw[key])
 					delete raw[key];
+			}
 			try {
 				MODS.providers.validate(raw);
 			} catch {

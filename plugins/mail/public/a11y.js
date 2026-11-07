@@ -12,7 +12,8 @@
 	}
 	function fix() {
 		queued = false;
-		for (var box of document.querySelectorAll('ui-component.ui-input')) {
+		for (var list = Array.from(document.querySelectorAll('ui-component.ui-input')), i = 0; i < list.length; i++) {
+			var box = list[i];
 			var label = box.querySelector(':scope > .ui-input-label'),
 				dropdown = box.querySelector('.ui-input-value[tabindex]'),
 				field = box.querySelector('input, textarea');
@@ -40,7 +41,8 @@
 	// A field that has no visible label of its own says what it is with data-label (the text) or data-labelledby (the id of the text
 	// that is already on the page): the dropdown keeps its value in what is read out.
 	function named() {
-		for (var box of document.querySelectorAll('[data-label],[data-labelledby]')) {
+		for (var list = Array.from(document.querySelectorAll('[data-label],[data-labelledby]')), i = 0; i < list.length; i++) {
+			var box = list[i];
 			var dropdown = box.querySelector('.ui-input-value[tabindex]'),
 				field = dropdown || box.querySelector('input');
 			if (!field || field.hasAttribute('data-named'))

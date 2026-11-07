@@ -13,7 +13,8 @@ function totalmailthreads(messages) {
 	var owner = new Map();
 	for (var i = 0; i < messages.length; i++) {
 		var m = messages[i];
-		for (var token of [m.messageId, m.inReplyTo, ...(m.references || [])]) {
+		for (var list = [m.messageId, m.inReplyTo].concat(Array.from(m.references || [])), k = 0; k < list.length; k++) {
+			var token = list[k];
 			if (!token)
 				continue;
 			var key = m.accountId + '\0' + token;
@@ -34,11 +35,15 @@ function totalmailthreads(messages) {
 			groups.set(root, []);
 		groups.get(root).push(messages[j]);
 	}
-	for (var [root, members] of groups) {
+	for (var arr = Array.from(groups), l = 0; l < arr.length; l++) {
+		var root = arr[l][0],
+			members = arr[l][1];
 		// A date is text in the server's files and a Date once jComponent has parsed an answer: compare the moments.
 		members.sort(function(x, y) { return (x.date ? new Date(x.date).getTime() || 0 : 0) - (y.date ? new Date(y.date).getTime() || 0 : 0); });
-		for (var m of members)
+		for (var list = Array.from(members), k = 0; k < list.length; k++) {
+			var m = list[k];
 			threadof.set(m.id, root);
+		}
 	}
 	return {
 		// Every message of the conversation the given one belongs to, oldest first.

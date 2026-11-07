@@ -122,8 +122,10 @@ PLUGIN('rules', function(exports) {
 			var form = function() {
 
 				var payload = { accountId: GET('rules.accountId') };
-				for (var field of ['name', 'field', 'op', 'value', 'action', 'path'])
+				for (var list = ['name', 'field', 'op', 'value', 'action', 'path'], i = 0; i < list.length; i++) {
+					var field = list[i];
 					payload[field] = GET('rules.form.' + field);
+				}
 				payload.id = GET('rules.form.id') || '';
 				return payload;
 			};

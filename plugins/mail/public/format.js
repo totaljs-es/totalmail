@@ -65,7 +65,8 @@ var totalmailformat = (function() {
 		var html = '',
 			open = 0,
 			fresh = true;
-		for (var level of levels) {
+		for (var list = Array.from(levels), i = 0; i < list.length; i++) {
+			var level = list[i];
 			var changed = level.depth !== open;
 			while (open < level.depth) {
 				html +=

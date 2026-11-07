@@ -146,7 +146,8 @@ PLUGIN('mail', function(exports) {
 		var threads = totalmailthreads(state.messages),
 			seen = new Map(),
 			list = [];
-		for (var m of items) {
+		for (var arr = Array.from(items), i = 0; i < arr.length; i++) {
+			var m = arr[i];
 			var key = threads.key(m.id);
 			if (key === undefined) {
 				list.push({ m, members: [m], all: [m] });
@@ -225,7 +226,8 @@ PLUGIN('mail', function(exports) {
 		if (['starred', 'drafts', 'sent-local'].includes(state.folder))
 			return [];
 		var pairs = [];
-		for (var a of state.accounts.filter(function(a) { return a.configured && (!state.account || a.id === state.account); })) {
+		for (var list = state.accounts.filter(function(a) { return a.configured && (!state.account || a.id === state.account); }), i = 0; i < list.length; i++) {
+			var a = list[i];
 			var path = state.folder === 'inbox' ? 'INBOX' : (a.mailboxes && (a.mailboxes.findItem('id', state.folder) || {}).path);
 			if (path && (a.remaining && a.remaining[path]) > 0)
 				pairs.push({ accountId: a.id, path, remaining: a.remaining[path] });
@@ -245,9 +247,10 @@ PLUGIN('mail', function(exports) {
 		if (['starred', 'drafts', 'sent-local'].includes(state.folder))
 			return [];
 		var pairs = [];
-		for (var a of state.accounts.filter(
-			function(a) { return a.configured && ['verified', 'synced'].includes(a.status) && (!state.account || a.id === state.account); }
-		)) {
+		for (var list = state.accounts.filter(
+				function(a) { return a.configured && ['verified', 'synced'].includes(a.status) && (!state.account || a.id === state.account); }
+			), i = 0; i < list.length; i++) {
+			var a = list[i];
 			var path = state.folder === 'inbox' ? 'INBOX' : (a.mailboxes && (a.mailboxes.findItem('id', state.folder) || {}).path);
 			if (path)
 				pairs.push({ accountId: a.id, path });
@@ -281,10 +284,13 @@ PLUGIN('mail', function(exports) {
 			var ids = new Set(),
 				found = 0,
 				limited = false;
-			for (var p of pairs) {
+			for (var arr = Array.from(pairs), j = 0; j < arr.length; j++) {
+				var p = arr[j];
 				var result = await api('account_search', { accountId: p.accountId, path: p.path, query });
-				for (var id of result.ids)
+				for (var list = Array.from(result.ids), i = 0; i < list.length; i++) {
+					var id = list[i];
 					ids.add(id);
+				}
 				found += result.found;
 				limited = limited || result.limited;
 			}
@@ -326,8 +332,10 @@ PLUGIN('mail', function(exports) {
 		var list = targets(m);
 		await perform(async function() {
 			try {
-				for (var t of list)
+				for (var arr = Array.from(list), i = 0; i < arr.length; i++) {
+					var t = arr[i];
 					await api('message_erase', { id: t.id });
+				}
 			} finally {
 				state.selected = '';
 				await reloadmail();
@@ -367,8 +375,10 @@ PLUGIN('mail', function(exports) {
 		}
 		await perform(async function() {
 			try {
-				for (var a of list)
+				for (var arr = Array.from(list), i = 0; i < arr.length; i++) {
+					var a = arr[i];
 					await api('trash_empty', { accountId: a.id });
+				}
 			} finally {
 				state.selected = '';
 				await reloadmail();
@@ -389,8 +399,10 @@ PLUGIN('mail', function(exports) {
 		renderolder();
 		try {
 			await reading;
-			for (var p of pairs)
+			for (var list = Array.from(pairs), i = 0; i < list.length; i++) {
+				var p = list[i];
 				await api('account_older', { accountId: p.accountId, path: p.path });
+			}
 			await reloadmail();
 		} catch (e) {
 			toast(e.message);
@@ -418,13 +430,16 @@ PLUGIN('mail', function(exports) {
 		folders.push(['sent-local', 'envelope', TRANSLATE('@(Sent from TotalMail)'), 0]);
 		if (state.account) {
 			var a = account(state.account);
-			for (var f of (a && a.mailboxes) || [])
+			for (var list = Array.from((a && a.mailboxes) || []), i = 0; i < list.length; i++) {
+				var f = list[i];
 				if (!['inbox', 'archive', 'trash'].includes(f.id))
 					folders.push([f.id, 'folder', f.name, 0]);
+			}
 		}
 		SET(
 			'mail.folders',
-			folders.map(function([id, icon, label, count]) {
+			folders.map(function(entry) {
+				var id = entry[0], icon = entry[1], label = entry[2], count = entry[3];
 				return {
 					id,
 					icon,
@@ -507,7 +522,8 @@ PLUGIN('mail', function(exports) {
 			'mail.rows',
 			lines
 				.slice(0, shown)
-				.map(function({ m, members, all }) {
+				.map(function(entry) {
+					var m = entry.m, members = entry.members, all = entry.all;
 					var a = account(m.accountId);
 					return Object.assign({}, m, { count: all.length,
 						threaded: all.length > 1,
@@ -807,7 +823,8 @@ PLUGIN('mail', function(exports) {
 		await saving;
 		if (!(draft && draft.id))
 			return;
-		for (var file of list) {
+		for (var arr = Array.from(list), i = 0; i < arr.length; i++) {
+			var file = arr[i];
 			if (!file.size || file.size > 15 * 1024 * 1024) {
 				toast(TRANSLATE('@(Attachments can add up to 15 MB per message.)'));
 				continue;
@@ -868,7 +885,8 @@ PLUGIN('mail', function(exports) {
 		try {
 			await perform(async function() {
 				try {
-					for (var item of items) {
+					for (var list = Array.from(items), i = 0; i < list.length; i++) {
+						var item = list[i];
 						var found = state.messages.find(
 							function(x) {
 								return x.accountId === item.accountid &&
@@ -904,9 +922,11 @@ PLUGIN('mail', function(exports) {
 	function renderbulk() {
 
 		var ids = lineids();
-		for (var id of checked)
+		for (var list = Array.from(checked), i = 0; i < list.length; i++) {
+			var id = list[i];
 			if (!ids.includes(id))
 				checked.delete(id);
+		}
 		ui({
 			bulkShown: checked.size > 0,
 			bulkCount: TRANSLATE('@({count} selected)').replace('{count}', function() { return checked.size; }),
@@ -949,7 +969,8 @@ PLUGIN('mail', function(exports) {
 		}
 		var done = 0,
 			left = 0;
-		for (var id of ids)
+		for (var list = Array.from(ids), i = 0; i < list.length; i++) {
+			var id = list[i];
 			try {
 				await api('draft_delete', { id });
 				state.drafts = state.drafts.filter(function(d) { return d.id !== id; });
@@ -958,6 +979,7 @@ PLUGIN('mail', function(exports) {
 			} catch {
 				left++;
 			}
+		}
 		renderlist();
 		toast(
 			TRANSLATE(left ? '@({done} done, {left} could not be changed.)' : '@({done} done.)')
@@ -976,12 +998,16 @@ PLUGIN('mail', function(exports) {
 			return op === 'trash' ? discarddrafts(lines.map(function(line) { return line.m.id; })) : undefined;
 		var list = [],
 			seen = new Set();
-		for (var line of lines)
-			for (var t of op === 'star' ? [line.m] : targets(line.m))
+		for (var items = Array.from(lines), j = 0; j < items.length; j++) {
+			var line = items[j];
+			for (var arr = Array.from(op === 'star' ? [line.m] : targets(line.m)), i = 0; i < arr.length; i++) {
+				var t = arr[i];
 				if (!seen.has(t.id)) {
 					seen.add(t.id);
 					list.push(t);
 				}
+			}
+		}
 		var erasing = op === 'trash' && state.folder === 'trash';
 		if (erasing && !arm('erase-bulk')) {
 			toast(TRANSLATE('@(Press again to delete permanently.)'));
@@ -993,7 +1019,8 @@ PLUGIN('mail', function(exports) {
 			moved = [];
 		await perform(async function() {
 			try {
-				for (var t of list) {
+				for (var arr = Array.from(list), i = 0; i < arr.length; i++) {
+					var t = arr[i];
 					var operation = op === 'archive' ? (['archive', 'trash'].includes(t.folder) ? 'restore' : 'archive') : op;
 					if ((op === 'read' && !t.unread) || (op === 'unread' && t.unread))
 						continue;
@@ -1046,8 +1073,10 @@ PLUGIN('mail', function(exports) {
 	exports.check = function(element, event) { return togglecheck(element[0].dataset.row, !!(event && event.shiftKey), true); };
 	exports.bulkall = function(element) {
 		if (element[0].checked)
-			for (var id of lineids())
+			for (var list = Array.from(lineids()), i = 0; i < list.length; i++) {
+				var id = list[i];
 				checked.add(id);
+			}
 		else
 			checked.clear();
 		renderlist();
@@ -1151,7 +1180,7 @@ PLUGIN('mail', function(exports) {
 			size: state.messages.length,
 			list: totalmailcontacts(
 				state.messages,
-				state.accounts.flatMap(function(a) { return [a.email, ...(a.aliases || [])]; })
+				state.accounts.flatMap(function(a) { return [a.email].concat(Array.from(a.aliases || [])); })
 			)
 		};
 		SET('mail.contacts', contactcache.list);
@@ -1178,8 +1207,10 @@ PLUGIN('mail', function(exports) {
 			}, 40);
 		};
 		// The window also measures itself once more when its opening animation ends (the first time it takes longer).
-		for (var later of [0, 800, 1800])
+		for (var list = [0, 800, 1800], i = 0; i < list.length; i++) {
+			var later = list[i];
 			setTimeout(fit, delay + later);
+		}
 	}
 	exports.fitwindow = fitwindow;
 	function revealextra(field, focus) {
@@ -1191,15 +1222,17 @@ PLUGIN('mail', function(exports) {
 	}
 	function resetextras(values) {
 		ui({ ccLink: true, bccLink: true });
-		for (var field of ['cc', 'bcc'])
+		for (var list = ['cc', 'bcc'], i = 0; i < list.length; i++) {
+			var field = list[i];
 			if (values[field])
 				revealextra(field, false);
+		}
 	}
 	// The addresses an account can send from: its own and its aliases. The row to choose appears only when there are aliases.
 	function fillfrom(accountid, chosen) {
 
 		var a = account(accountid),
-			list = a ? [a.email, ...(a.aliases || [])] : [];
+			list = a ? [a.email].concat(Array.from(a.aliases || [])) : [];
 		SET(
 			'mail.fromOptions',
 			list.map(function(address) { return { id: address, name: address }; })
@@ -1211,7 +1244,7 @@ PLUGIN('mail', function(exports) {
 	function replyfrom(message) {
 
 		var a = account(message.accountId),
-			wanted = [...(message.toRecipients || []), ...(message.ccRecipients || [])].map(function(x) { return String(x).toLowerCase(); });
+			wanted = Array.from(message.toRecipients || []).concat(Array.from(message.ccRecipients || [])).map(function(x) { return String(x).toLowerCase(); });
 		if (!a || wanted.includes(a.email.toLowerCase()))
 			return '';
 		return (a.aliases || []).find(function(x) { return wanted.includes(x); }) || '';
@@ -1277,7 +1310,7 @@ PLUGIN('mail', function(exports) {
 			};
 		if (all && reply && !existing) {
 			var mine = account(reply.accountId),
-				used = new Set([(mine && mine.email.toLowerCase()), ...((mine && mine.aliases) || [])]);
+				used = new Set([mine && mine.email.toLowerCase()].concat(Array.from((mine && mine.aliases) || [])));
 			function recipients(values) {
 				return values
 					.filter(function(value) {
@@ -1289,7 +1322,7 @@ PLUGIN('mail', function(exports) {
 					})
 					.join(', ');
 			}
-			draft.to = recipients([reply.replyAddress || reply.email, ...(reply.toRecipients || [])]);
+			draft.to = recipients([reply.replyAddress || reply.email].concat(Array.from(reply.toRecipients || [])));
 			draft.cc = recipients(reply.ccRecipients || []);
 		}
 		composeloading = true;
@@ -1492,8 +1525,10 @@ PLUGIN('mail', function(exports) {
 				origin = m.folder;
 			await perform(async function() {
 				try {
-					for (var t of list)
+					for (var arr = Array.from(list), i = 0; i < arr.length; i++) {
+						var t = arr[i];
 						await api('message_change', { id: t.id, operation, enabled: !t.starred });
+					}
 				} finally {
 					// Even when one of them fails the screen shows what the server really holds.
 					if (['archive', 'restore', 'trash', 'unread'].includes(operation))
@@ -1855,7 +1890,8 @@ PLUGIN('mail', function(exports) {
 
 		try {
 			await reading;
-			for (var a of accounts) {
+			for (var list = Array.from(accounts), i = 0; i < list.length; i++) {
+				var a = list[i];
 				var folderpath = path || (a.mailboxes && (a.mailboxes.findItem('id', state.folder) || {}).path) || 'INBOX';
 				await api('account_sync', { accountId: a.id, path: folderpath });
 				delete syncfailures[a.id];
@@ -1955,7 +1991,8 @@ PLUGIN('mail', function(exports) {
 		busy(true);
 		try {
 			await reading;
-			for (var a of state.accounts.filter(function(a) { return a.configured && ['verified', 'synced'].includes(a.status); })) {
+			for (var list = state.accounts.filter(function(a) { return a.configured && ['verified', 'synced'].includes(a.status); }), i = 0; i < list.length; i++) {
+				var a = list[i];
 				if (retryafter[a.id] > Date.now())
 					continue;
 				try {

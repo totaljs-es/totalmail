@@ -25,7 +25,8 @@ exports.importFiles = async function(collectionid, files, language) {
 
 	var added = [],
 		failed = [];
-	for (var file of files) {
+	for (var list = Array.from(files), i = 0; i < list.length; i++) {
+		var file = list[i];
 		var name =
 			String(file.filename || '')
 				.replace(/[\x00-\x1f\x7f\\\/:*?"<>|]+/g, '_')

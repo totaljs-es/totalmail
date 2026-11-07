@@ -49,7 +49,8 @@ totalmailquery.matches = function(q, item) {
 	var everywhere = [item.sender, item.email, item.to, item.subject, item.body].join(' ').toLowerCase();
 	if (!q.words.every(function(word) { return everywhere.includes(word); }))
 		return false;
-	for (var f of q.fields) {
+	for (var list = Array.from(q.fields), i = 0; i < list.length; i++) {
+		var f = list[i];
 		var source =
 			f.key === 'from' ? [item.sender, item.email] : f.key === 'to' ? [item.to, (item.toRecipients || []).join(' ')] : [item[f.key]];
 		if (!source.some(function(value) { return has(value, f.value); }))
@@ -80,10 +81,14 @@ totalmailquery.toImap = function(q) {
 	var plain = {},
 		groups = [];
 	var put = function(key, value) { return key in plain ? groups.push({ [key]: value }) : (plain[key] = value); };
-	for (var f of q.fields)
+	for (var list = Array.from(q.fields), i = 0; i < list.length; i++) {
+		var f = list[i];
 		put(f.key, f.value);
-	for (var word of q.words)
+	}
+	for (var list = Array.from(q.words), i = 0; i < list.length; i++) {
+		var word = list[i];
 		groups.push({ or: [{ subject: word }, { from: word }, { to: word }, { body: word }] });
+	}
 	if (q.is.includes('unread'))
 		plain.seen = false;
 	if (q.is.includes('read'))

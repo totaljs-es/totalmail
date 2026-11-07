@@ -137,8 +137,10 @@ function adapter($, next) {
 		body = { model: config.model, messages: $.payload.messages, temperature: 0.3, max_tokens: config.maxtokens, stream: false };
 	}
 	var request = RESTBuilder.POST(address, body);
-	for (var key of Object.keys(headers))
+	for (var list = Object.keys(headers), i = 0; i < list.length; i++) {
+		var key = list[i];
 		request.header(key, headers[key]);
+	}
 	request.timeout(config.timeout * 1000);
 	request.redirect(false);
 	request.callback(function(err, response, output) {
@@ -196,8 +198,10 @@ exports.complete = async function(settings, messages, options = {}) {
 		maxtokens: options.maxTokens || exports.defaults.maxTokens,
 		timeout: options.timeout || settings.timeout || exports.defaults.timeout
 	});
-	for (var m of messages)
+	for (var list = Array.from(messages), i = 0; i < list.length; i++) {
+		var m = list[i];
 		model.message(m.role, m.content);
+	}
 	var answer = await model.promise();
 	var text = clean(answer.content);
 	if (!text) {

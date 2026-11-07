@@ -20,16 +20,19 @@ exports.key = function(text) {
 };
 
 function walk(dir, found) {
-	for (var entry of Fs.readdirSync(dir, { withFileTypes: true })) {
+	for (var arr = Fs.readdirSync(dir, { withFileTypes: true }), j = 0; j < arr.length; j++) {
+		var entry = arr[j];
 		if (entry.name === 'vendor' || entry.name === 'node_modules')
 			continue;
 		var path = Path.join(dir, entry.name);
 		if (entry.isDirectory())
 			walk(path, found);
 		else if (/\.(html|js|json)$/.test(entry.name) && !/\.min\.js$/.test(entry.name))
-			for (var match of Fs.readFileSync(path, 'utf8').matchAll(/@\(([^()]*)\)/g))
+			for (var list = Array.from(Fs.readFileSync(path, 'utf8').matchAll(/@\(([^()]*)\)/g)), i = 0; i < list.length; i++) {
+				var match = list[i];
 				if (match[1] !== "'")
 					found.add(match[1]);
+			}
 	}
 }
 
@@ -37,10 +40,12 @@ function walk(dir, found) {
 exports.texts = function() {
 
 	var found = new Set();
-	for (var folder of folders)
+	for (var list = Array.from(folders), i = 0; i < list.length; i++) {
+		var folder = list[i];
 		if (Fs.existsSync(Path.join(root, folder)))
 			walk(Path.join(root, folder), found);
-	return [...found].sort();
+	}
+	return Array.from(found).sort();
 };
 
 exports.languages = function() {
@@ -52,7 +57,8 @@ exports.languages = function() {
 function keys(language) {
 
 	var have = new Set();
-	for (var line of Fs.readFileSync(Path.join(root, 'resources', language + '.resource'), 'utf8').split('\n')) {
+	for (var list = Fs.readFileSync(Path.join(root, 'resources', language + '.resource'), 'utf8').split('\n'), i = 0; i < list.length; i++) {
+		var line = list[i];
 		var match = /^(\S+) : /.exec(line);
 		if (match)
 			have.add(match[1]);
@@ -65,7 +71,8 @@ exports.missing = function() {
 
 	var texts = exports.texts(),
 		result = {};
-	for (var language of exports.languages()) {
+	for (var list = Array.from(exports.languages()), i = 0; i < list.length; i++) {
+		var language = list[i];
 		var have = keys(language);
 		result[language] = texts.filter(function(text) { return !have.has(exports.key(text)); });
 	}
@@ -76,12 +83,14 @@ exports.add = function() {
 
 	var result = exports.missing(),
 		added = 0;
-	for (var language of Object.keys(result)) {
+	for (var arr = Object.keys(result), j = 0; j < arr.length; j++) {
+		var language = arr[j];
 		if (!result[language].length)
 			continue;
 		var file = Path.join(root, 'resources', language + '.resource'),
 			lines = Fs.readFileSync(file, 'utf8').replace(/\n+$/, '').split('\n');
-		for (var text of result[language]) {
+		for (var list = Array.from(result[language]), i = 0; i < list.length; i++) {
+			var text = list[i];
 			lines.push(exports.key(text) + ' : ' + text);
 			added++;
 		}
@@ -96,11 +105,14 @@ if (require.main === module)
 	else {
 		var result = exports.missing(),
 			total = 0;
-		for (var language of Object.keys(result)) {
+		for (var arr = Object.keys(result), k = 0; k < arr.length; k++) {
+			var language = arr[k];
 			total += result[language].length;
 			console.log(language + ': ' + (result[language].length ? result[language].length + ' missing' : 'complete'));
-			for (var text of result[language])
+			for (var list = Array.from(result[language]), j = 0; j < list.length; j++) {
+				var text = list[j];
 				console.log('  ' + text);
+			}
 		}
 		process.exitCode = total ? 1 : 0;
 	}

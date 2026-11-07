@@ -16,7 +16,7 @@ COMPONENT('filepicker', function(self) {
 		input = self.find('input');
 		input.on('change', function() {
 
-			var files = [...input[0].files];
+			var files = Array.from(input[0].files);
 			input[0].value = '';
 			files.length && self.opt && self.opt.callback && self.opt.callback(files);
 		});
@@ -32,7 +32,7 @@ COMPONENT('filepicker', function(self) {
 // Files dragged over the window: its path is true while they are over it, and what is dropped goes to config.exec(files).
 COMPONENT('dropfiles', function(self, config) {
 
-	var has = function(event) { return [...((event.dataTransfer && event.dataTransfer.types) || [])].includes('Files'); };
+	var has = function(event) { return Array.from((event.dataTransfer && event.dataTransfer.types) || []).includes('Files'); };
 	self.singleton();
 	self.nocompile && self.nocompile();
 	self.make = function() {
@@ -57,7 +57,7 @@ COMPONENT('dropfiles', function(self, config) {
 			// The browser would otherwise leave the app to show the file.
 			event.preventDefault();
 			self.set(false);
-			self.EXEC(config.exec, [...event.dataTransfer.files]);
+			self.EXEC(config.exec, Array.from(event.dataTransfer.files));
 		});
 	};
 });
@@ -168,7 +168,7 @@ COMPONENT('modalguard', function(self, config) {
 				root = name && document.getElementById(name);
 			if (!root || event.key !== 'Tab')
 				return;
-			var controls = [...root.querySelectorAll('button:not([disabled]),input,textarea,select,[tabindex="0"]')].filter(
+			var controls = Array.from(root.querySelectorAll('button:not([disabled]),input,textarea,select,[tabindex="0"]')).filter(
 				function(el) { return el.offsetParent !== null; }
 			);
 			var first = controls[0],
@@ -247,7 +247,7 @@ COMPONENT('addresssuggest', function(self, config) {
 
 		var done = parts(input.value).map(function(v) { return v.trim(); });
 		done.pop();
-		self.set([...done.filter(Boolean), email].join(', ') + ', ');
+		self.set(Array.from(done.filter(Boolean)).concat([email]).join(', ') + ', ');
 		hide();
 		input.focus();
 	}
@@ -412,8 +412,10 @@ COMPONENT('mailbody', function(self, config) {
 		if (!el || !mirror)
 			return;
 		var style = getComputedStyle(el);
-		for (var key of ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'wordSpacing', 'textIndent', 'tabSize', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'direction', 'textAlign'])
+		for (var list = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'wordSpacing', 'textIndent', 'tabSize', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'direction', 'textAlign'], i = 0; i < list.length; i++) {
+			var key = list[i];
 			mirror.style[key] = style[key];
+		}
 		mirror.style.width = el.clientWidth + 'px';
 		mirror.style.height = el.clientHeight + 'px';
 		mirror.style.left = el.offsetLeft + 'px';
@@ -449,7 +451,7 @@ COMPONENT('mailbody', function(self, config) {
 		self.element.on('paste', 'textarea', function(event) {
 
 			var data = (event.originalEvent || event).clipboardData,
-				files = [...((data && data.files) || [])];
+				files = Array.from((data && data.files) || []);
 			// Text (even with a picture alongside, as Word and web pages put it) pastes as text; only a bare file is attached.
 			if (!files.length || data.getData('text/plain'))
 				return;

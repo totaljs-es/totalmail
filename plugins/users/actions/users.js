@@ -296,8 +296,10 @@ NEWACTION('Users|remove', {
 			var user = await MODS.security.identities.remove(model.id);
 			MODS.security.revoke(model.id);
 			MODS.changes.forget(model.id);
-			for (var account of accounts)
+			for (var list = Array.from(accounts), i = 0; i < list.length; i++) {
+				var account = list[i];
 				MODS.oauth.forget(account.id);
+			}
 			await MODS.users.drop(model.id);
 			return { user };
 		});

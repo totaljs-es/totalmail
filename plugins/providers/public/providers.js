@@ -202,8 +202,10 @@ PLUGIN('providers', function(exports) {
 
 				var payload = {};
 				// `id` has no input: it belongs to the type being edited.
-				for (var field of Object.keys(blank()))
+				for (var list = Object.keys(blank()), i = 0; i < list.length; i++) {
+					var field = list[i];
 					payload[field] = field === 'id' ? GET('providers.type.id') || '' : GET('providers.type.' + field);
+				}
 				payload.imapPort = Number(payload.imapPort);
 				payload.smtpPort = Number(payload.smtpPort);
 				if (await call('instance_type', payload)) {
