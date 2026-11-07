@@ -1,13 +1,13 @@
 // The files for agents: AGENTS.md and the pointers to it, the instructions of each area, the skills and the settings of Claude Code.
 // They are only useful if they are true, so they are tested.
-const { test, describe } = require('node:test');
-const assert = require('node:assert/strict');
-const Fs = require('node:fs');
-const Path = require('node:path');
+var { test, describe } = require('node:test');
+var assert = require('node:assert/strict');
+var Fs = require('node:fs');
+var Path = require('node:path');
 
-const root = Path.join(__dirname, '..');
-const read = (file) => Fs.readFileSync(Path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
-const pkg = JSON.parse(read('package.json'));
+var root = Path.join(__dirname, '..');
+var read = (file) => Fs.readFileSync(Path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+var pkg = JSON.parse(read('package.json'));
 
 // Every file and folder that git keeps, to check the paths that a text mentions
 var everything = [];
@@ -114,7 +114,7 @@ describe('AGENTS.md', () => {
 		var eslint = read('eslint.config.cjs');
 
 		assert.ok(eslint.includes('forEach'), 'forEach is not forbidden');
-		assert.ok(eslint.includes('No const inside methods'));
+		assert.ok(eslint.includes('No const: use var'));
 		assert.ok(eslint.includes("'no-restricted-modules'"));
 
 		for (var module of ['fs', 'path', 'crypto'])

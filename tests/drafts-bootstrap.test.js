@@ -1,11 +1,11 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path'),
 	Vm = require('node:vm');
-const Db = require('./db');
+var Db = require('./db');
 
 test('bootstrap excludes sent drafts after restart while retaining pending drafts and duplicate-send protection', async (t) => {
 	var directory = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-draft-list-'));

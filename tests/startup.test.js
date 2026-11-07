@@ -1,11 +1,11 @@
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var Fs = require('node:fs'),
 	Path = require('node:path'),
 	Os = require('node:os'),
 	Net = require('node:net'),
 	{ spawn } = require('node:child_process');
-const root = Path.join(__dirname, '..');
+var root = Path.join(__dirname, '..');
 
 async function start(t, mode) {
 	var directory = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-startup-'));

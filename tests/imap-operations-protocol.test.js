@@ -1,12 +1,12 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict'),
 	Tls = require('node:tls'),
 	Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const { execFileSync } = require('node:child_process');
+var { execFileSync } = require('node:child_process');
 require('total5');
-const { ImapFlow } = require('imapflow'),
+var { ImapFlow } = require('imapflow'),
 	Imap = require('../lib/imap');
 test(
 	'actual ImapFlow confirms flag removal, native UID MOVE/COPYUID and namespace folder creation over TLS',

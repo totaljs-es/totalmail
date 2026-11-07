@@ -1,7 +1,7 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Query = require('../plugins/mail/public/query');
-const item = {
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Query = require('../plugins/mail/public/query');
+var item = {
 	sender: 'Lucía Martín',
 	email: 'lucia@cliente.es',
 	to: 'info@totaljs.es',

@@ -1,10 +1,10 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
 require('total5');
-const Imap = require('../lib/imap');
-const target = { address: '127.0.0.1', servername: 'localhost' },
+var Imap = require('../lib/imap');
+var target = { address: '127.0.0.1', servername: 'localhost' },
 	account = { id: 'a', imap: { port: 993, security: 'tls', username: 'fixture' } };
-const id = '<fixture@totalmail.local>',
+var id = '<fixture@totalmail.local>',
 	source = 'Message-ID: ' + id + '\r\n\r\nBody\r\n';
 function fixture(mode) {
 	let appended = 0,

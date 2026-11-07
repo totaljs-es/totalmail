@@ -1,15 +1,15 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Imap = require('../lib/imap'),
+var Imap = require('../lib/imap'),
 	Store = require('../lib/store'),
 	Live = require('../lib/live');
-const Db = require('./db');
-const account = { id: 'a', imap: { security: 'tls', port: 993, username: 'u' } };
-const target = { address: '127.0.0.1', servername: 'localhost' };
+var Db = require('./db');
+var account = { id: 'a', imap: { security: 'tls', port: 993, username: 'u' } };
+var target = { address: '127.0.0.1', servername: 'localhost' };
 
 // A mailbox of 120 messages: seq n has UID 1000 + n; UIDs 1000+7 and 1000+40 were deleted elsewhere.
 function mailbox(total = 120, gone = [7, 40], seen = new Set()) {
@@ -84,7 +84,7 @@ function store(t) {
 	t.after(() => Fs.rmSync(dir, { recursive: true, force: true }));
 	return Db.store(dir, { accounts: [{ id: 'a', configured: true, email: 'a@example.test' }], messages: [], drafts: [] });
 }
-const msg = (uid, extra = {}) => ({
+var msg = (uid, extra = {}) => ({
 	id: 'imap-' + uid,
 	accountId: 'a',
 	remote: true,

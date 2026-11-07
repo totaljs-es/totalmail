@@ -1,4 +1,4 @@
-const Extract = require('../../../lib/extract');
+var Extract = require('../../../lib/extract');
 
 function overview() {
 	return MODS.instance.aiView();

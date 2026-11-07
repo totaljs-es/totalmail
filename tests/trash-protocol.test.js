@@ -1,13 +1,13 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Tls = require('node:tls'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Tls = require('node:tls'),
 	Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const { execFileSync } = require('node:child_process');
-const { ImapFlow } = require('imapflow');
-const Imap = require('../lib/imap');
+var { execFileSync } = require('node:child_process');
+var { ImapFlow } = require('imapflow');
+var Imap = require('../lib/imap');
 
 // A server with INBOX and Trash. Trash holds UIDs 5, 6 and 7; `uidplus` switches the capability on or off.
 function build(t, { uidplus = true } = {}) {
@@ -138,7 +138,7 @@ function build(t, { uidplus = true } = {}) {
 		});
 	});
 }
-const message = (uid, path = 'Trash') => ({ id: 'imap-' + uid, accountId: 'a', mailboxPath: path, uidValidity: '9', uid });
+var message = (uid, path = 'Trash') => ({ id: 'imap-' + uid, accountId: 'a', mailboxPath: path, uidValidity: '9', uid });
 
 test(
 	'permanent deletion removes exactly the chosen message of the trash with UID EXPUNGE and confirms it',

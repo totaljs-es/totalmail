@@ -1,6 +1,6 @@
 // The mailbox of each person, in the database and in memory: used as MODS.users.forUser(user). Everyone who exists is loaded when
 // the module is installed; a person who is added later starts with an empty mailbox.
-const Mailbox = require('../lib/store'),
+var Mailbox = require('../lib/store'),
 	Mirror = require('../lib/mirror'),
 	Tables = require('../lib/tables').in(PATH.root('database')),
 	Files = require('../lib/files');
@@ -9,7 +9,7 @@ var stores = new Map(),
 	database = PATH.root('database'),
 	files = Files.create(Total.Path.join(database, 'attachments'));
 
-const REG_ID = /^[a-f0-9]{32}$/;
+var REG_ID = /^[a-f0-9]{32}$/;
 
 var valid = (id) => REG_ID.test(id || '');
 
@@ -43,7 +43,7 @@ exports.forUser = function(user) {
 
 	if (!user || !valid(user.id))
 		throw Error('Authentication required');
-	let store = stores.get(user.id);
+	var store = stores.get(user.id);
 	if (store)
 		return store;
 	// Nobody has written to this mailbox yet, so nothing is in the database; a file an earlier version left is imported.

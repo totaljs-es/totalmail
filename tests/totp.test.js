@@ -1,8 +1,8 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Totp = require('../lib/totp');
-const RFC = Totp.encode(Buffer.from('12345678901234567890'));
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Totp = require('../lib/totp');
+var RFC = Totp.encode(Buffer.from('12345678901234567890'));
 test('the codes match the RFC 6238 test vectors, so any authenticator app agrees', () => {
 	Assert.equal(RFC, 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ');
 	for (var [seconds, code] of [

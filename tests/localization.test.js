@@ -1,11 +1,11 @@
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
+var { test } = require('node:test');
+var assert = require('node:assert/strict');
+var fs = require('node:fs');
+var path = require('node:path');
 require('total5');
-const localization = require('../modules/localization');
-const root = path.join(__dirname, '..');
-for (const language of fs
+var localization = require('../modules/localization');
+var root = path.join(__dirname, '..');
+for (var language of fs
 	.readdirSync(path.join(root, 'resources'))
 	.filter((name) => name.endsWith('.resource'))
 	.map((name) => name.slice(0, -9)))

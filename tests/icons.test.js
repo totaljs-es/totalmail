@@ -1,11 +1,11 @@
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	assert = require('node:assert/strict'),
 	fs = require('node:fs'),
 	path = require('node:path');
-const root = path.join(__dirname, '..');
+var root = path.join(__dirname, '..');
 // The icons of the Total.js icon font that the page loads (cdn.componentator.com/spa.min@20.css), one name per line without "ti-".
 // Refresh the list when the CDN version changes: every `.ti-name` rule of that stylesheet.
-const exists = new Set(
+var exists = new Set(
 	fs
 		.readFileSync(path.join(__dirname, 'fixtures', 'icons.txt'), 'utf8')
 		.split('\n')

@@ -1,6 +1,6 @@
 // The settings of this installation: the sign-in application of each OAuth provider, the account types the administrator
 // added, the writing assistant and what it costs. Used as MODS.instance; the logic is in lib/instance.js.
-const Lib = require('../lib/instance'),
+var Lib = require('../lib/instance'),
 	Tables = require('../lib/tables').in(PATH.root('database'));
 
 exports.install = function() {

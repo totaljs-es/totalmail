@@ -1,7 +1,7 @@
 require('total5');
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const Oauth = require('../modules/oauth');
+var { test } = require('node:test');
+var assert = require('node:assert/strict');
+var Oauth = require('../modules/oauth');
 function fixture(existing) {
 	let saved = [],
 		remembered = [];

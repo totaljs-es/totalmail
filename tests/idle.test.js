@@ -1,13 +1,13 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Tls = require('node:tls'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Tls = require('node:tls'),
 	Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const { execFileSync } = require('node:child_process');
-const { ImapFlow } = require('imapflow');
-const Imap = require('../lib/imap'),
+var { execFileSync } = require('node:child_process');
+var { ImapFlow } = require('imapflow');
+var Imap = require('../lib/imap'),
 	Watch = require('../lib/watch');
 
 function clock() {
@@ -68,7 +68,7 @@ function fixture(ids = ['a']) {
 	});
 	return { watch, time, connections, failures, user: { id: 'u'.repeat(32) } };
 }
-const flush = () => new Promise((resolve) => setImmediate(resolve));
+var flush = () => new Promise((resolve) => setImmediate(resolve));
 
 test('waiting starts one IDLE connection per verified account with the account credentials', async () => {
 	var f = fixture(['a', 'b']);

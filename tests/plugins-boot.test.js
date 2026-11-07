@@ -1,10 +1,10 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Path = require('node:path'),
 	Vm = require('node:vm');
-const root = Path.join(__dirname, '..');
-const files = [
+var root = Path.join(__dirname, '..');
+var files = [
 	'plugins/mail/public/a11y.js',
 	'plugins/mail/public/behaviors.js',
 	'plugins/mail/public/threads.js',
@@ -42,7 +42,7 @@ function dummy() {
 // Syntax checks cannot see a plugin that throws while it starts (a mistyped arrow, an unknown variable): the browser then
 // shows no accounts and no mail. Running each plugin's startup against fake globals catches that.
 // `const`, not `var`: each test body runs later and must see its own file.
-for (const file of files)
+for (var file of files)
 	test('the browser plugin starts without errors: ' + file, () => {
 		var D = dummy(),
 			errors = [],

@@ -1,11 +1,11 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs');
-const Path = require('node:path');
-const Os = require('node:os');
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs');
+var Path = require('node:path');
+var Os = require('node:os');
 require('total5');
-const Db = require('./db');
-const Welcome = require('../lib/welcome');
+var Db = require('./db');
+var Welcome = require('../lib/welcome');
 for (var language of ['en', 'es', 'sk'])
 	Total.loadresource(language, Fs.readFileSync(Path.join(__dirname, '../resources', language + '.resource'), 'utf8'));
 test('welcome appears once per account after successful INBOX sync and survives restart', async (t) => {

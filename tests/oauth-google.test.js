@@ -1,14 +1,14 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Crypto = require('node:crypto');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Crypto = require('node:crypto');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Oauth = require('../lib/oauth'),
+var Oauth = require('../lib/oauth'),
 	Instance = require('../lib/instance'),
 	Providers = require('../lib/providers');
-const CLIENT = '123456789012-abc123def456.apps.googleusercontent.com';
+var CLIENT = '123456789012-abc123def456.apps.googleusercontent.com';
 var own = { clientId: CLIENT, clientSecret: 'GOCSPX-test' };
 Oauth.useInstance({ oauth: () => own });
 var jwt = (claims) => 'x.' + Buffer.from(JSON.stringify(claims)).toString('base64url') + '.y';
@@ -26,8 +26,8 @@ function service(responses) {
 	});
 	return { oauth, calls };
 }
-const redirectUri = 'https://mail.example.test/oauth/google/callback';
-const begin = (oauth) =>
+var redirectUri = 'https://mail.example.test/oauth/google/callback';
+var begin = (oauth) =>
 	new URL(oauth.start({ userId: 'u'.repeat(32), provider: 'google', email: 'Ana@Gmail.com', name: 'Ana', redirectUri }));
 test('the Google authorization URL asks for offline access and the whole mailbox, with PKCE', () => {
 	var url = begin(service([]).oauth),

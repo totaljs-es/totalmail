@@ -1,13 +1,13 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Store = require('../lib/store'),
+var Store = require('../lib/store'),
 	Live = require('../lib/live');
-const Db = require('./db');
-const target = { address: '127.0.0.1', servername: 'localhost' };
+var Db = require('./db');
+var target = { address: '127.0.0.1', servername: 'localhost' };
 function fixture(t) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-compose-'));
 	t.after(() => Fs.rmSync(dir, { recursive: true, force: true }));
@@ -37,7 +37,7 @@ function send(store, calls) {
 		}
 	});
 }
-const user = { id: 'u'.repeat(32) };
+var user = { id: 'u'.repeat(32) };
 test('recipient suggestions can leave a trailing separator without blocking delivery', async (t) => {
 	var store = fixture(t),
 		calls = [],

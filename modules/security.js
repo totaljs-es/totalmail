@@ -1,4 +1,4 @@
-const Tables = require('../lib/tables').in(PATH.root('database'));
+var Tables = require('../lib/tables').in(PATH.root('database'));
 var directory = PATH.root('database');
 
 // The accounts and the sessions live in the database. They are opened when the module is installed and filled into these
@@ -168,7 +168,7 @@ exports.allowLogin = function($, email) {
 		[ip, 100],
 		[ip + '|' + String(email).toLowerCase(), 15]
 	]) {
-		let entry = attempts.get(key);
+		var entry = attempts.get(key);
 		if (!entry || entry.until < Date.now()) {
 			entry = {
 				count: 0,

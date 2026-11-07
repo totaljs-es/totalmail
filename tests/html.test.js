@@ -1,9 +1,9 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Module = require('node:module');
-const Html = require('../lib/html');
-const clean = (html, attachments) => Html.clean(html, attachments)?.html || '';
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Module = require('node:module');
+var Html = require('../lib/html');
+var clean = (html, attachments) => Html.clean(html, attachments)?.html || '';
 
 test('scripts, handlers, frames, forms and every other active construct disappear', () => {
 	var attacks = [

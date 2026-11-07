@@ -1,14 +1,14 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Store = require('../lib/store'),
+var Store = require('../lib/store'),
 	Live = require('../lib/live');
-const Db = require('./db');
-const target = { address: '127.0.0.1', servername: 'localhost' };
-const msg = (uid, extra = {}) => ({
+var Db = require('./db');
+var target = { address: '127.0.0.1', servername: 'localhost' };
+var msg = (uid, extra = {}) => ({
 	id: 'imap-' + uid,
 	accountId: 'a',
 	remote: true,

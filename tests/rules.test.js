@@ -1,14 +1,14 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Rules = require('../lib/rules');
-const mail = {
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Rules = require('../lib/rules');
+var mail = {
 	sender: 'GitHub',
 	email: 'noreply@github.com',
 	toRecipients: ['me@mine.test', 'team@mine.test'],
 	ccRecipients: ['boss@mine.test'],
 	subject: 'Release v5.0.19 is out'
 };
-const rule = (extra) => ({
+var rule = (extra) => ({
 	id: 'r',
 	name: 'x',
 	enabled: true,

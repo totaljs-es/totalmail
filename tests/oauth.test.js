@@ -1,11 +1,11 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Crypto = require('node:crypto');
-const Oauth = require('../lib/oauth'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Crypto = require('node:crypto');
+var Oauth = require('../lib/oauth'),
 	Imap = require('../lib/imap'),
 	Smtp = require('../lib/smtp');
-const CLIENT = '00000000-0000-4000-8000-000000000001';
+var CLIENT = '00000000-0000-4000-8000-000000000001';
 // The settings of the installation, as the administrator's window stores them.
 var own = { clientId: CLIENT };
 Oauth.useInstance({ oauth: () => own });
@@ -27,8 +27,8 @@ function service(responses, clock = { t: 1000000 }) {
 	});
 	return { oauth, calls, clock };
 }
-const redirectUri = 'https://mail.example.test/oauth/microsoft/callback';
-const begin = (oauth, extra = {}) =>
+var redirectUri = 'https://mail.example.test/oauth/microsoft/callback';
+var begin = (oauth, extra = {}) =>
 	new URL(
 		oauth.start({
 			userId: 'u'.repeat(32),

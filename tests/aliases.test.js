@@ -1,13 +1,13 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Aliases = require('../lib/aliases');
-const Store = require('../lib/store'),
+var Aliases = require('../lib/aliases');
+var Store = require('../lib/store'),
 	Live = require('../lib/live');
-const Db = require('./db');
+var Db = require('./db');
 test('aliases are cleaned: lower case, no repeats, never the account address, bad input refused', () => {
 	Assert.deepEqual(Aliases.parse('Ventas@Example.com, info@example.com;  ventas@example.com  soporte@example.com', 'info@example.com'), {
 		list: ['ventas@example.com', 'soporte@example.com'],

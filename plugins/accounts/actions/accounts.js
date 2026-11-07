@@ -1,4 +1,4 @@
-const Aliases = require('../../../lib/aliases'),
+var Aliases = require('../../../lib/aliases'),
 	Discovery = require('../../../lib/discovery');
 
 var running = new Map();

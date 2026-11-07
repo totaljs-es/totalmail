@@ -1,6 +1,6 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Translations = require('../bin/translations');
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Translations = require('../bin/translations');
 test('every text of the application is in every language file', () => {
 	var missing = Translations.missing();
 	for (var language of Object.keys(missing))

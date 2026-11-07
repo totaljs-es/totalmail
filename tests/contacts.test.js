@@ -1,7 +1,7 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const contacts = require('../plugins/mail/public/contacts');
-const mail = [
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var contacts = require('../plugins/mail/public/contacts');
+var mail = [
 	{
 		email: 'lucia@cliente.es',
 		sender: 'Lucía Martín',

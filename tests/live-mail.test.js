@@ -1,10 +1,10 @@
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	assert = require('node:assert/strict'),
 	fs = require('node:fs'),
 	path = require('node:path'),
 	os = require('node:os');
 require('total5');
-const Db = require('./db'),
+var Db = require('./db'),
 	{ create } = require('../lib/live'),
 	imap = require('../lib/imap');
 function fixture(t) {
@@ -22,7 +22,7 @@ function fixture(t) {
 	};
 	return { account, store: Db.store(dir, { accounts: [account], messages: [], drafts: [] }) };
 }
-const user = { id: 'fixture' },
+var user = { id: 'fixture' },
 	resolve = async (host) => ({ address: '8.8.8.8', servername: host }),
 	decrypt = () => 'fixture-secret';
 test('read-only IMAP sync selects stable UIDs and limits the header window without source fetch', async () => {

@@ -1,25 +1,25 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path'),
 	Db = require('./db');
-const Instance = require('../lib/instance'),
+var Instance = require('../lib/instance'),
 	Providers = require('../lib/providers'),
 	Oauth = require('../lib/oauth');
-const root = Path.join(__dirname, '../plugins');
-const sealer = {
+var root = Path.join(__dirname, '../plugins');
+var sealer = {
 	encrypt: (v) => ({ sealed: Buffer.from(v).toString('base64') }),
 	decrypt: (v) => Buffer.from(v.sealed, 'base64').toString()
 };
-const ID = '00000000-0000-4000-8000-000000000001';
+var ID = '00000000-0000-4000-8000-000000000001';
 function fixture(t) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-instance-'));
 	t.after(() => Fs.rmSync(dir, { recursive: true, force: true }));
 	return { dir, make: () => Instance.open({ table: Db.table(dir), crypto: sealer }) };
 }
-const good = {
+var good = {
 	id: 'acme',
 	order: 200,
 	name: 'Acme mail',

@@ -1,11 +1,11 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Crypto = require('node:crypto'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Crypto = require('node:crypto'),
 	Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Db = require('./db'),
+var Db = require('./db'),
 	Totp = require('../lib/totp'),
 	Pending = require('../lib/pending');
 async function fixture(t) {

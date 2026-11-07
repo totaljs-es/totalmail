@@ -5,11 +5,11 @@
 //
 // A key is made from the text itself (the same algorithm Total.js uses), so nothing has to be numbered. A text must not contain
 // parentheses: the framework would cut it there.
-const Fs = require('node:fs'),
+var Fs = require('node:fs'),
 	Path = require('node:path');
 
-const root = Path.join(__dirname, '..');
-const folders = ['views', 'plugins', 'modules', 'controllers', 'lib', 'definitions'];
+var root = Path.join(__dirname, '..');
+var folders = ['views', 'plugins', 'modules', 'controllers', 'lib', 'definitions'];
 
 exports.key = function(text) {
 

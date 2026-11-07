@@ -1,13 +1,13 @@
 require('total5');
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const extract = require('../lib/extract');
-const knowledge = require('../lib/knowledge');
-const ai = require('../modules/ai');
-const fixture = (name) => fs.readFileSync(path.join(__dirname, 'fixtures/documents', name));
+var { test } = require('node:test');
+var assert = require('node:assert/strict');
+var fs = require('node:fs');
+var os = require('node:os');
+var path = require('node:path');
+var extract = require('../lib/extract');
+var knowledge = require('../lib/knowledge');
+var ai = require('../modules/ai');
+var fixture = (name) => fs.readFileSync(path.join(__dirname, 'fixtures/documents', name));
 async function base(t) {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-knowledge-'));
 	t.after(() => fs.rmSync(dir, { recursive: true, force: true }));

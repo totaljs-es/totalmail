@@ -1,12 +1,12 @@
 require('total5');
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	assert = require('node:assert/strict'),
 	fs = require('node:fs'),
 	path = require('node:path'),
 	os = require('node:os'),
 	net = require('node:net'),
 	{ spawn } = require('node:child_process');
-const root = path.join(__dirname, '..');
+var root = path.join(__dirname, '..');
 test('a person removes one of their accounts with its mail and drafts, and nothing of anyone else', { timeout: 40000 }, async (t) => {
 	let directory = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-http-'));
 	for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'lib', 'views', 'resources'])

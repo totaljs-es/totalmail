@@ -1,7 +1,7 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const threads = require('../plugins/mail/public/threads');
-const msg = (id, extra = {}) => ({
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var threads = require('../plugins/mail/public/threads');
+var msg = (id, extra = {}) => ({
 	id,
 	accountId: 'a',
 	date: '2026-10-0' + id.replace(/\D/g, '') + 'T10:00:00.000Z',
@@ -10,7 +10,7 @@ const msg = (id, extra = {}) => ({
 	references: [],
 	...extra
 });
-const ids = (list) => list.map((m) => m.id);
+var ids = (list) => list.map((m) => m.id);
 
 test('replies join their parent by In-Reply-To and References, oldest first', () => {
 	var all = [

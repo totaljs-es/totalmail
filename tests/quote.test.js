@@ -1,8 +1,8 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Quote = require('../plugins/mail/public/quote');
-const Format = require('../plugins/mail/public/format');
-const text = {
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Quote = require('../plugins/mail/public/quote');
+var Format = require('../plugins/mail/public/format');
+var text = {
 	wrote: (date, who) => 'On ' + date + ', ' + who + ' wrote:',
 	forwarded: 'Forwarded message',
 	from: 'From',
@@ -11,7 +11,7 @@ const text = {
 	to: 'To',
 	format: (d) => String(d).slice(0, 10)
 };
-const message = {
+var message = {
 	sender: 'Lucía Martín',
 	email: 'lucia@cliente.es',
 	date: '2026-10-09T10:00:00Z',

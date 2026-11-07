@@ -1,11 +1,11 @@
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
-const source = fs.readFileSync(path.join(__dirname, '../plugins/access/public/access.js'), 'utf8');
+var { test } = require('node:test');
+var assert = require('node:assert/strict');
+var fs = require('node:fs');
+var path = require('node:path');
+var vm = require('node:vm');
+var source = fs.readFileSync(path.join(__dirname, '../plugins/access/public/access.js'), 'utf8');
 
-for (const value of ['012345', 'abcd-efgh-ijkl', ''])
+for (var value of ['012345', 'abcd-efgh-ijkl', ''])
 	test('OTP submission uses the visible autofilled value: ' + JSON.stringify(value), async () => {
 		let state = {}, calls = [];
 		let plugin;

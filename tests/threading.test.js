@@ -1,6 +1,6 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Threading = require('../lib/threading');
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Threading = require('../lib/threading');
 test('invalid and injected parent IDs never become outgoing headers', () => {
 	for (let id of ['bad', '<a@b>\r\nBcc: victim@example.test', '<a b@c>', '<a@b> <c@d>'])
 		Assert.deepEqual(Threading.headers({ messageId: id }), {});

@@ -1,12 +1,12 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Crypto = require('node:crypto'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Crypto = require('node:crypto'),
 	Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Db = require('./db');
-const password = 'first-administrator-pass-1';
+var Db = require('./db');
+var password = 'first-administrator-pass-1';
 function fixture(t) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-identities-'));
 	t.after(() => Fs.rmSync(dir, { recursive: true, force: true }));

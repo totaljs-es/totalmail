@@ -1,15 +1,15 @@
 require('total5');
 // Two-step verification through the real server: the password alone is not a session, codes and recovery codes work once,
 // five wrong tries spend a sign-in, and an administrator can remove it from someone who lost their phone.
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	assert = require('node:assert/strict');
-const fs = require('node:fs'),
+var fs = require('node:fs'),
 	path = require('node:path'),
 	os = require('node:os'),
 	net = require('node:net'),
 	{ spawn } = require('node:child_process');
-const Totp = require('../lib/totp');
-const root = path.join(__dirname, '..');
+var Totp = require('../lib/totp');
+var root = path.join(__dirname, '..');
 test('two-step verification guards the sign-in end to end', { timeout: 60000 }, async (t) => {
 	let directory = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-2fa-http-'));
 	for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'lib', 'views', 'resources'])

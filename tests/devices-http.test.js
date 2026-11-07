@@ -1,12 +1,12 @@
 require('total5');
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	assert = require('node:assert/strict'),
 	fs = require('node:fs'),
 	path = require('node:path'),
 	os = require('node:os'),
 	net = require('node:net'),
 	{ spawn } = require('node:child_process');
-const root = path.join(__dirname, '..');
+var root = path.join(__dirname, '..');
 test(
 	'an app signs in once, stays signed in with a device token, and the person sees and ends their devices',
 	{ timeout: 40000 },

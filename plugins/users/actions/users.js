@@ -1,4 +1,4 @@
-const Totp = require('../../../lib/totp');
+var Totp = require('../../../lib/totp');
 
 NEWACTION('Users|setup', {
 	route: 'API /api/ +user_setup --> Users|setup',

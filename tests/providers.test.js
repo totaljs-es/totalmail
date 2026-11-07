@@ -1,12 +1,12 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Path = require('node:path');
-const Providers = require('../lib/providers'),
+var Providers = require('../lib/providers'),
 	Live = require('../lib/live');
-const root = Path.join(__dirname, '../plugins');
-const shipped = Fs.readdirSync(Path.join(root, 'accounts/providers')).filter((n) => n.endsWith('.json'));
+var root = Path.join(__dirname, '../plugins');
+var shipped = Fs.readdirSync(Path.join(root, 'accounts/providers')).filter((n) => n.endsWith('.json'));
 
 test('every shipped provider file is valid, unique and ordered, with Other first', () => {
 	var list = Providers.create(root).list();

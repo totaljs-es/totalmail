@@ -1,8 +1,8 @@
-const Files = require('../lib/files');
-const Html = require('../lib/html');
+var Files = require('../lib/files');
+var Html = require('../lib/html');
 
-const REG_MESSAGE = /^imap-[a-f0-9]{64}$/;
-const REG_ANYID = /^[A-Za-z0-9_-]{1,100}$/;
+var REG_MESSAGE = /^imap-[a-f0-9]{64}$/;
+var REG_ANYID = /^[A-Za-z0-9_-]{1,100}$/;
 
 exports.install = function() {
 

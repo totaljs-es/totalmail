@@ -1,12 +1,12 @@
 require('total5');
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	assert = require('node:assert/strict'),
 	fs = require('node:fs'),
 	path = require('node:path'),
 	os = require('node:os'),
 	net = require('node:net'),
 	{ spawn } = require('node:child_process');
-const root = path.join(__dirname, '..'),
+var root = path.join(__dirname, '..'),
 	Db = require('./db');
 test('native Actions enforce session, administrator privileges and private mailbox ownership', { timeout: 30000 }, async (t) => {
 	let directory = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-http-'));

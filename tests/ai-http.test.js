@@ -1,12 +1,12 @@
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const http = require('node:http');
-const net = require('node:net');
-const os = require('node:os');
-const path = require('node:path');
-const { spawn } = require('node:child_process');
-const root = path.join(__dirname, '..');
+var { test } = require('node:test');
+var assert = require('node:assert/strict');
+var fs = require('node:fs');
+var http = require('node:http');
+var net = require('node:net');
+var os = require('node:os');
+var path = require('node:path');
+var { spawn } = require('node:child_process');
+var root = path.join(__dirname, '..');
 test(
 	"the assistant is configured by administrators, runs on a person's own mail and never leaks the key",
 	{ timeout: 60000 },

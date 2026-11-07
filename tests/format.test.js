@@ -1,6 +1,6 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Format = require('../plugins/mail/public/format');
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Format = require('../plugins/mail/public/format');
 
 test('text without formatting stays plain text, even with bare links', () => {
 	Assert.equal(Format.render('Hola,\n\nmira https://totaljs.es y 2 * 3 = 6\n\nUn abrazo'), null);

@@ -1,5 +1,5 @@
 // OAuth sign-in to mail providers. Used as MODS.oauth; the logic is in lib/oauth.js.
-const Lib = require('../lib/oauth');
+var Lib = require('../lib/oauth');
 
 exports.install = function() {
 	Object.assign(exports, Lib.create());

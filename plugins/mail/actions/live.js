@@ -1,4 +1,4 @@
-const Welcome = require('../../../lib/welcome');
+var Welcome = require('../../../lib/welcome');
 
 // A message's sanitized HTML has its own route; no Action answer carries it.
 function strip(value) {

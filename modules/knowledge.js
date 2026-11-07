@@ -1,5 +1,5 @@
 // The documents the assistant may read to draft a reply. Used as MODS.knowledge; the logic is in lib/knowledge.js.
-const Lib = require('../lib/knowledge'),
+var Lib = require('../lib/knowledge'),
 	Extract = require('../lib/extract'),
 	Tables = require('../lib/tables').in(PATH.root('database'));
 

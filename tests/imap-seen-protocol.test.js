@@ -1,4 +1,4 @@
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	assert = require('node:assert/strict'),
 	tls = require('node:tls'),
 	fs = require('node:fs'),
@@ -6,7 +6,7 @@ const { test } = require('node:test'),
 	path = require('node:path'),
 	{ execFileSync } = require('node:child_process');
 require('total5');
-const { ImapFlow } = require('imapflow'),
+var { ImapFlow } = require('imapflow'),
 	imap = require('../lib/imap');
 test('actual ImapFlow adds Seen by UID over verified TLS and preserves Flagged', async (t) => {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tm-imap-'));

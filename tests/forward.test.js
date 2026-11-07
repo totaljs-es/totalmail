@@ -1,14 +1,14 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Store = require('../lib/store'),
+var Store = require('../lib/store'),
 	Live = require('../lib/live'),
 	Files = require('../lib/files');
-const Db = require('./db');
-const user = { id: 'b'.repeat(32) };
+var Db = require('./db');
+var user = { id: 'b'.repeat(32) };
 function fixture(t, attachments) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-forward-'));
 	t.after(() => Fs.rmSync(dir, { recursive: true, force: true }));

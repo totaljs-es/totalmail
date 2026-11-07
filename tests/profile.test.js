@@ -1,18 +1,18 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs');
-const Path = require('node:path');
-const Os = require('node:os');
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs');
+var Path = require('node:path');
+var Os = require('node:os');
 require('total5');
-const Db = require('./db');
-const Appearance = require('../modules/appearance');
+var Db = require('./db');
+var Appearance = require('../modules/appearance');
 async function fixture(t, flag) {
 	var directory = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-profile-'));
 	t.after(() => Fs.rmSync(directory, { recursive: true, force: true }));
 	return { store: await Db.identities(directory, flag), directory };
 }
-const initial = { name: 'Admin', email: 'admin@example.test', password: 'fixture-old-password-26' };
-const preferences = { name: 'Updated Admin', email: initial.email, color: '#225544', language: 'sk' };
+var initial = { name: 'Admin', email: 'admin@example.test', password: 'fixture-old-password-26' };
+var preferences = { name: 'Updated Admin', email: initial.email, color: '#225544', language: 'sk' };
 test('profile preferences persist without changing identity, role or mail encryption key', async (t) => {
 	var { store, directory } = await fixture(t);
 	var user = await store.createUser(initial, true);

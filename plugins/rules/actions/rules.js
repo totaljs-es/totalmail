@@ -1,4 +1,4 @@
-const Rules = require('../../../lib/rules');
+var Rules = require('../../../lib/rules');
 
 // Rules belong to an account of the signed-in person: the account is always resolved from their own store.
 function run($, fn) {

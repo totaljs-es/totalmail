@@ -1,4 +1,4 @@
-const Welcome = require('../../../lib/welcome');
+var Welcome = require('../../../lib/welcome');
 
 // Whether the assistant exists, where its text goes and, if a knowledge base is connected, where a message is searched.
 function aistatus() {

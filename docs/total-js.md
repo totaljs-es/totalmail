@@ -39,7 +39,7 @@ TotalMail is a Total.js 5 application written the way the framework suggests. If
 The code follows the [Total.js guidelines](https://github.com/totaljs-es/guidelines), and ESLint checks what a tool can check (`npm run lint`, `npm run format` to fix):
 
 - Tabs, single quotes, semicolons.
-- `var` or `let` inside functions; `const` only at the top of a file (requires and `REG_*` constants).
+- `var` (or `let` inside functions); no `const`, not even for requires and `REG_*` constants.
 - No braces around a single statement; the statement goes on the next line.
 - A blank line after the opening of a function with several statements, and between top-level blocks.
 - Comments say why, above the code they explain.

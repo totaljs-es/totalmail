@@ -1,4 +1,4 @@
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	assert = require('node:assert/strict'),
 	tls = require('node:tls'),
 	net = require('node:net'),
@@ -7,7 +7,7 @@ const { test } = require('node:test'),
 	path = require('node:path'),
 	{ execFileSync } = require('node:child_process');
 require('total5');
-const { Mailer } = require('../lib/vendor/total5-mail'),
+var { Mailer } = require('../lib/vendor/total5-mail'),
 	smtp = require('../lib/smtp').create(Mailer);
 async function fixture(t, { starttls = false, reply = '250 queued', auth = true } = {}) {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tm-smtp-'));
@@ -146,7 +146,7 @@ test('native SMTP succeeds only after server confirmation of DATA', async (t) =>
 	let parsed = await require('mailparser').simpleParser(f.body.join('\r\n'));
 	assert.equal(parsed.text.trim(), 'Hello\n.world');
 });
-for (const reply of ['451 rejected', 'disconnect'])
+for (var reply of ['451 rejected', 'disconnect'])
 	test('native SMTP rejects unconfirmed DATA: ' + reply, async (t) => {
 		let f = await fixture(t, { reply });
 		await assert.rejects(

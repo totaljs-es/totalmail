@@ -1,6 +1,6 @@
-const { test } = require('node:test'),
+var { test } = require('node:test'),
 	Assert = require('node:assert/strict');
-const Create = require('../plugins/reception/public/reception');
+var Create = require('../plugins/reception/public/reception');
 test('reception pauses when not ready, throttles focus events and never overlaps requests', async () => {
 	let now = 0,
 		ready = false,

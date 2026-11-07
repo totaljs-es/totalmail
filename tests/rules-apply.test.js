@@ -1,15 +1,15 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const Store = require('../lib/store'),
+var Store = require('../lib/store'),
 	Live = require('../lib/live'),
 	Rules = require('../lib/rules');
-const Db = require('./db');
-const target = { address: '127.0.0.1', servername: 'localhost' };
-const msg = (uid, extra = {}) => ({
+var Db = require('./db');
+var target = { address: '127.0.0.1', servername: 'localhost' };
+var msg = (uid, extra = {}) => ({
 	id: 'imap-' + uid,
 	accountId: 'a',
 	remote: true,
@@ -44,7 +44,7 @@ function fixture(t, rules) {
 	};
 	return Db.store(dir, { accounts: [account], messages: [], drafts: [] });
 }
-const r = (id, extra) => ({
+var r = (id, extra) => ({
 	id,
 	name: 'rule ' + id,
 	enabled: true,
@@ -54,7 +54,7 @@ const r = (id, extra) => ({
 	action: 'archive',
 	...extra
 });
-const user = { id: 'u'.repeat(32) };
+var user = { id: 'u'.repeat(32) };
 function live(calls, fail = {}) {
 	return Live.create({
 		resolve: async () => target,

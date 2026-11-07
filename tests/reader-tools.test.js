@@ -1,17 +1,17 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const { Readable } = require('node:stream');
-const Imap = require('../lib/imap');
-const Live = require('../lib/live');
-const Store = require('../lib/store');
-const Db = require('./db');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var { Readable } = require('node:stream');
+var Imap = require('../lib/imap');
+var Live = require('../lib/live');
+var Store = require('../lib/store');
+var Db = require('./db');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const account = { id: 'a', imap: { security: 'tls', port: 993, username: 'user' } };
-const target = { address: '127.0.0.1', servername: 'localhost' };
-const message = { mailboxPath: 'INBOX', uidValidity: '7', uid: 1, size: 3000 };
+var account = { id: 'a', imap: { security: 'tls', port: 993, username: 'user' } };
+var target = { address: '127.0.0.1', servername: 'localhost' };
+var message = { mailboxPath: 'INBOX', uidValidity: '7', uid: 1, size: 3000 };
 function mail(extraHeaders = [], calendar = true) {
 	return [
 		'From: News <news@example.test>',

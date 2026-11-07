@@ -1,13 +1,13 @@
 require('total5');
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Tls = require('node:tls'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Tls = require('node:tls'),
 	Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-const { execFileSync } = require('node:child_process');
-const { ImapFlow } = require('imapflow');
-const Imap = require('../lib/imap');
+var { execFileSync } = require('node:child_process');
+var { ImapFlow } = require('imapflow');
+var Imap = require('../lib/imap');
 
 // 40 messages; UIDs 101..140. Message n replies to message n-1 and lists the earlier ones in References.
 function envelope(n) {

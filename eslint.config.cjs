@@ -18,9 +18,8 @@ module.exports = [
 			'no-restricted-syntax': [
 				'error',
 				{
-					selector:
-						'FunctionDeclaration VariableDeclaration[kind="const"], FunctionExpression VariableDeclaration[kind="const"], ArrowFunctionExpression VariableDeclaration[kind="const"]',
-					message: 'No const inside methods (use var or let).'
+					selector: 'VariableDeclaration[kind="const"]',
+					message: 'No const: use var (Total.js conventions).'
 				},
 				{ selector: 'CallExpression[callee.property.name="forEach"]', message: 'Prefer a classic loop over forEach().' }
 			]

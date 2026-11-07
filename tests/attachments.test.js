@@ -1,12 +1,12 @@
 require('total5');
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { Readable } = require('node:stream');
-const imap = require('../lib/imap');
-const live = require('../lib/live');
-const account = { id: 'a', imap: { security: 'tls', port: 993, username: 'user' } };
-const target = { address: '127.0.0.1', servername: 'localhost' };
-const source = [
+var { test } = require('node:test');
+var assert = require('node:assert/strict');
+var { Readable } = require('node:stream');
+var imap = require('../lib/imap');
+var live = require('../lib/live');
+var account = { id: 'a', imap: { security: 'tls', port: 993, username: 'user' } };
+var target = { address: '127.0.0.1', servername: 'localhost' };
+var source = [
 	'From: Sender <sender@example.test>',
 	'To: me@example.test',
 	'Subject: Files',
@@ -46,7 +46,7 @@ function engine(validity = 7n) {
 	};
 	return imap.create(() => client);
 }
-const message = { mailboxPath: 'INBOX', uidValidity: '7', uid: 1, size: 3000000 };
+var message = { mailboxPath: 'INBOX', uidValidity: '7', uid: 1, size: 3000000 };
 test('reading lists attachment metadata with safe names and no content, beyond the old 2 MB limit', async () => {
 	var result = await engine().read(account, 'x', target, message);
 	assert.match(result.body, /See attached/);

@@ -1,21 +1,21 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Fs = require('node:fs'),
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
 require('total5');
-const Imap = require('../lib/imap'),
+var Imap = require('../lib/imap'),
 	Db = require('./db'),
 	Live = require('../lib/live');
-const account = {
+var account = {
 	id: 'account',
 	configured: true,
 	authType: 'password',
 	secret: {},
 	imap: { host: 'imap.example.test', port: 993, security: 'tls', username: 'fixture' }
 };
-const target = { address: '127.0.0.1', servername: 'localhost' };
-const message = {
+var target = { address: '127.0.0.1', servername: 'localhost' };
+var message = {
 	id: 'source',
 	accountId: 'account',
 	remote: true,

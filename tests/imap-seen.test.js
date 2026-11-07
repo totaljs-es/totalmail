@@ -1,12 +1,12 @@
-const { test } = require('node:test');
-const Assert = require('node:assert/strict');
-const Imap = require('../lib/imap');
-const Fs = require('node:fs');
-const Os = require('node:os');
-const Path = require('node:path');
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Imap = require('../lib/imap');
+var Fs = require('node:fs');
+var Os = require('node:os');
+var Path = require('node:path');
 require('total5');
-const Db = require('./db');
-const Live = require('../lib/live');
+var Db = require('./db');
+var Live = require('../lib/live');
 
 function fixture(overrides = {}) {
 	var seen = false,
@@ -44,9 +44,9 @@ function fixture(overrides = {}) {
 	};
 	return { engine: Imap.create(() => client), count: () => stores, released: () => released };
 }
-const account = { imap: { port: 993, security: 'tls', username: 'fixture' } };
-const target = { address: '127.0.0.1', servername: 'localhost' };
-const message = { mailboxPath: 'INBOX', uidValidity: '123', uid: 42 };
+var account = { imap: { port: 993, security: 'tls', username: 'fixture' } };
+var target = { address: '127.0.0.1', servername: 'localhost' };
+var message = { mailboxPath: 'INBOX', uidValidity: '123', uid: 42 };
 
 test('read status uses UID, adds only Seen, confirms it and is idempotent', async () => {
 	var f = fixture();

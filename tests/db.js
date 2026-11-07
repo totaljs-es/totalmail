@@ -1,5 +1,5 @@
 // Where a test keeps its database: a temporary folder, through the same NOSQL() the application uses.
-const Fs = require('node:fs'),
+var Fs = require('node:fs'),
 	Path = require('node:path');
 exports.table = require('../lib/tables').in;
 // A mailbox store (the id is any name) that starts with `seed` and writes to the tables of `dir`. `name` makes it a different

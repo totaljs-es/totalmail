@@ -1,12 +1,12 @@
 require('total5');
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const http = require('node:http');
-const os = require('node:os');
-const path = require('node:path');
-const ai = require('../modules/ai');
-const instance = require('../lib/instance');
+var { test } = require('node:test');
+var assert = require('node:assert/strict');
+var fs = require('node:fs');
+var http = require('node:http');
+var os = require('node:os');
+var path = require('node:path');
+var ai = require('../modules/ai');
+var instance = require('../lib/instance');
 // A model server that answers according to the model name, and remembers what it was asked.
 async function server(t) {
 	let requests = [];

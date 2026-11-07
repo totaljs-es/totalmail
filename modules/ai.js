@@ -4,7 +4,7 @@
 // come in as an argument, so the tests drive it against a local server.
 //
 // What a model returns is only ever text shown to the person; nothing it says is executed, sent or stored as a rule.
-const Threads = require('../plugins/mail/public/threads'),
+var Threads = require('../plugins/mail/public/threads'),
 	Html = require('../lib/html');
 
 var languages = { en: 'English', es: 'Spanish', sk: 'Slovak', de: 'German', fr: 'French', it: 'Italian', pt: 'Portuguese', el: 'Greek' };
