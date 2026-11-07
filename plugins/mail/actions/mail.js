@@ -17,11 +17,11 @@ NEWACTION('Mailboxes|bootstrap', {
 
 		var data = MODS.users.forUser($.user).snapshot();
 		// Keep submitted records in storage to prevent duplicate sends, but do not list sent mail as drafts.
-		data.drafts = data.drafts.filter((draft) => draft.status !== 'sent');
-		data.messages = data.messages.map((item) => Welcome.decorate(item, $.language));
+		data.drafts = data.drafts.filter(function(draft) { return draft.status !== 'sent'; });
+		data.messages = data.messages.map(function(item) { return Welcome.decorate(item, $.language); });
 		$.callback({
 			user: $.user,
-			mode: data.accounts.some((a) => a.configured) ? 'configured' : 'empty',
+			mode: data.accounts.some(function(a) { return a.configured; }) ? 'configured' : 'empty',
 			ai: aistatus(),
 			...data
 		});
@@ -35,6 +35,6 @@ NEWACTION('Drafts|save', {
 	input: 'id:String(80), *accountId:String(80), from:String(254), to:String(500), cc:String(500), bcc:String(500), subject:String(500), body:String(50000), replyTo:String(80)',
 	action: function($, model) {
 		model.id = model.id || UID();
-		FUNC.run($, () => MODS.users.forUser($.user).saveDraft(model), '@(Unable to save changes. Please try again.)');
+		FUNC.run($, function() { return MODS.users.forUser($.user).saveDraft(model); }, '@(Unable to save changes. Please try again.)');
 	}
 });

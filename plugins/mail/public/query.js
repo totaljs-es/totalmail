@@ -41,17 +41,18 @@ totalmailquery.parse = function(text) {
 // Does a loaded message match? `item` is what the list holds: sender, email, to, subject, body, date, unread, starred.
 totalmailquery.matches = function(q, item) {
 
-	var has = (value, needle) =>
-		String(value || '')
+	var has = function(value, needle) {
+		return String(value || '')
 			.toLowerCase()
 			.includes(needle);
+	};
 	var everywhere = [item.sender, item.email, item.to, item.subject, item.body].join(' ').toLowerCase();
-	if (!q.words.every((word) => everywhere.includes(word)))
+	if (!q.words.every(function(word) { return everywhere.includes(word); }))
 		return false;
 	for (var f of q.fields) {
 		var source =
 			f.key === 'from' ? [item.sender, item.email] : f.key === 'to' ? [item.to, (item.toRecipients || []).join(' ')] : [item[f.key]];
-		if (!source.some((value) => has(value, f.value)))
+		if (!source.some(function(value) { return has(value, f.value); }))
 			return false;
 	}
 	if (q.is.includes('unread') && !item.unread)
@@ -78,7 +79,7 @@ totalmailquery.toImap = function(q) {
 
 	var plain = {},
 		groups = [];
-	var put = (key, value) => (key in plain ? groups.push({ [key]: value }) : (plain[key] = value));
+	var put = function(key, value) { return key in plain ? groups.push({ [key]: value }) : (plain[key] = value); };
 	for (var f of q.fields)
 		put(f.key, f.value);
 	for (var word of q.words)
@@ -98,7 +99,7 @@ totalmailquery.toImap = function(q) {
 	if (groups.length && groups[0].or && !plain.or)
 		plain.or = groups.shift().or;
 	if (groups.length) {
-		var negated = groups.map((g) => ({ not: g }));
+		var negated = groups.map(function(g) { return { not: g }; });
 		plain.not = { or: negated.length > 1 ? negated : [negated[0], negated[0]] };
 	}
 	return plain;

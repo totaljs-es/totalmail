@@ -2,7 +2,7 @@
 // Pure on purpose: the browser and the tests use the same code.
 function totalmailthreads(messages) {
 
-	var parent = messages.map((_, i) => i);
+	var parent = messages.map(function(_, i) { return i; });
 	function find(i) {
 		while (parent[i] !== i) {
 			parent[i] = parent[parent[i]];
@@ -36,14 +36,14 @@ function totalmailthreads(messages) {
 	}
 	for (var [root, members] of groups) {
 		// A date is text in the server's files and a Date once jComponent has parsed an answer: compare the moments.
-		members.sort((x, y) => (x.date ? new Date(x.date).getTime() || 0 : 0) - (y.date ? new Date(y.date).getTime() || 0 : 0));
+		members.sort(function(x, y) { return (x.date ? new Date(x.date).getTime() || 0 : 0) - (y.date ? new Date(y.date).getTime() || 0 : 0); });
 		for (var m of members)
 			threadof.set(m.id, root);
 	}
 	return {
 		// Every message of the conversation the given one belongs to, oldest first.
-		members: (id) => groups.get(threadof.get(id)) || [],
-		key: (id) => threadof.get(id)
+		members: function(id) { return groups.get(threadof.get(id)) || []; },
+		key: function(id) { return threadof.get(id); }
 	};
 }
 

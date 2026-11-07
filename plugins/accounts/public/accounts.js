@@ -102,7 +102,7 @@ PLUGIN('accounts', function(exports) {
 				exports.set('error', text || '');
 			}
 			function provider(id) {
-				return providers.find((p) => p.id === id);
+				return providers.find(function(p) { return p.id === id; });
 			}
 			async function loadproviders() {
 				if (!providers.length) {
@@ -115,14 +115,14 @@ PLUGIN('accounts', function(exports) {
 
 				SET(
 					'accounts.providers',
-					providers.map((p) => ({ id: p.id, icon: p.icon, name: TRANSLATE(p.name), active: p.id === selected }))
+					providers.map(function(p) { return { id: p.id, icon: p.icon, name: TRANSLATE(p.name), active: p.id === selected }; })
 				);
 				var p = provider(selected);
 				SET('accounts.guide', {
 					shown: !!p,
 					summary: p ? TRANSLATE(p.summary) : '',
 					note: p && p.note ? TRANSLATE(p.note) : '',
-					steps: (p?.steps || []).map((s) => ({ text: TRANSLATE(s.text), url: s.url || '' }))
+					steps: (p?.steps || []).map(function(s) { return { text: TRANSLATE(s.text), url: s.url || '' }; })
 				});
 			}
 			// The type of an account can be chosen when it is created and changed later. An OAuth type needs a sign-in
@@ -155,10 +155,10 @@ PLUGIN('accounts', function(exports) {
 			function guess(a) {
 
 				if (!a)
-					return providers.some((p) => p.id === defaultid) ? defaultid : 'other';
+					return providers.some(function(p) { return p.id === defaultid; }) ? defaultid : 'other';
 				if (a.oauth?.provider && provider(a.oauth.provider))
 					return a.oauth.provider;
-				return providers.find((p) => !p.discover && p.imap?.host === a.imap?.host)?.id || 'other';
+				return providers.find(function(p) { return !p.discover && p.imap?.host === a.imap?.host; })?.id || 'other';
 			}
 			function applyprovider(id) {
 
@@ -241,26 +241,30 @@ PLUGIN('accounts', function(exports) {
 			function refreshaccountoptions() {
 				SET(
 					'mail.accountOptions',
-					state.accounts.map((a) => ({
-						id: a.id,
-						name: a.name + ' · ' + a.email
-					}))
+					state.accounts.map(function(a) {
+						return {
+							id: a.id,
+							name: a.name + ' · ' + a.email
+						};
+					})
 				);
 				SET(
 					'mail.setupOptions',
 					[{ id: '', name: TRANSLATE('@(New account)') }].concat(
 						state.accounts
-							.filter((a) => a.configured)
-							.map((a) => ({
-								id: a.id,
-								name: a.name + ' · ' + a.email
-							}))
+							.filter(function(a) { return a.configured; })
+							.map(function(a) {
+								return {
+									id: a.id,
+									name: a.name + ' · ' + a.email
+								};
+							})
 					)
 				);
 			}
 			function accountmodel(id) {
 
-				var a = state.accounts.find((a) => a.id === id && a.configured);
+				var a = state.accounts.find(function(a) { return a.id === id && a.configured; });
 				SET(
 					'accounts.form',
 					a
@@ -416,7 +420,7 @@ PLUGIN('accounts', function(exports) {
 					model.smtpPort = Number(model.smtpPort);
 					model.assistant = exports.get('ui').assistant;
 					var account = await mailbox.api('account_save', model);
-					var index = state.accounts.findIndex((a) => a.id === account.id);
+					var index = state.accounts.findIndex(function(a) { return a.id === account.id; });
 					if (index < 0)
 						state.accounts.push(account);
 					else
@@ -428,7 +432,7 @@ PLUGIN('accounts', function(exports) {
 					SET('accounts.form.password', '');
 					SET('accounts.form.id', account.id);
 					// The saved account is now the one being edited.
-					editing = state.accounts.find((a) => a.id === account.id) || null;
+					editing = state.accounts.find(function(a) { return a.id === account.id; }) || null;
 					selected = guess(editing);
 					renderproviders();
 					setmode();
@@ -469,13 +473,13 @@ PLUGIN('accounts', function(exports) {
 					mailbox.notify(TRANSLATE('@(Link copied.)'));
 				} catch {}
 			};
-			exports.oauth = (element) => startoauth(element[0].dataset.again === '1');
-			exports.pick = (element) => applyprovider(element[0].dataset.provider);
+			exports.oauth = function(element) { return startoauth(element[0].dataset.again === '1'); };
+			exports.pick = function(element) { return applyprovider(element[0].dataset.provider); };
 			// The administrator changed the account types: fetch them again the next time the window opens.
-			exports.reloadtypes = () => {
+			exports.reloadtypes = function() {
 				providers = [];
 			};
-			exports.suggest = () => suggested && applyprovider(suggested);
+			exports.suggest = function() { return suggested && applyprovider(suggested); };
 			exports.set('', accounts);
 			exports.refresh = refreshaccountoptions;
 			exports.open = openaccountsetup;
@@ -491,7 +495,7 @@ PLUGIN('accounts', function(exports) {
 				fail: ['ti ti-times-circle', '@(Problem)'],
 				skip: ['ti ti-minus', '@(Not checked)']
 			};
-			exports.diagnose = async () => {
+			exports.diagnose = async function() {
 
 				var id = GET('accounts.form.id');
 				if (!id || exports.get('ui').diagnosing)
@@ -509,19 +513,23 @@ PLUGIN('accounts', function(exports) {
 								? TRANSLATE('@(Everything works. {0} things could be better.)').format(report.warned)
 								: TRANSLATE('@(Everything checked is fine.)'),
 						groups: Object.keys(sections)
-							.map((key) => ({
-								title: TRANSLATE(sections[key]),
-								items: report.checks
-									.filter((c) => c.section === key)
-									.map((c) => ({
-										icon: statuses[c.status][0],
-										label: TRANSLATE(statuses[c.status][1]),
-										status: c.status,
-										title: c.title,
-										advice: c.advice
-									}))
-							}))
-							.filter((group) => group.items.length)
+							.map(function(key) {
+								return {
+									title: TRANSLATE(sections[key]),
+									items: report.checks
+										.filter(function(c) { return c.section === key; })
+										.map(function(c) {
+											return {
+												icon: statuses[c.status][0],
+												label: TRANSLATE(statuses[c.status][1]),
+												status: c.status,
+												title: c.title,
+												advice: c.advice
+											};
+										})
+								};
+							})
+							.filter(function(group) { return group.items.length; })
 					});
 					mailbox.say(TRANSLATE('@(The check is ready.)'));
 				} catch (e) {
@@ -556,7 +564,7 @@ PLUGIN('accounts', function(exports) {
 				}
 			};
 			// A change of the id (the account chosen in the list) loads that account into the form.
-			WATCH('accounts.form.id', (value, flags) => {
+			WATCH('accounts.form.id', function(value, flags) {
 
 				SET('accounts.diagnosis', null);
 				ui({ saved: !!value });
@@ -565,7 +573,7 @@ PLUGIN('accounts', function(exports) {
 					accountmodel(value);
 			});
 			// Once the address is typed, the provider is looked up (the model follows the keyboard: every input has $delay:1).
-			WATCH('accounts.form.email', () => {
+			WATCH('accounts.form.email', function() {
 
 				clearTimeout(detecttimer);
 				ui({ suggestion: false });

@@ -71,7 +71,7 @@
 		if (queued)
 			return;
 		queued = true;
-		setTimeout(() => {
+		setTimeout(function() {
 			fix();
 			named();
 		}, 30);

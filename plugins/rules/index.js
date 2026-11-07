@@ -1,3 +1,3 @@
 exports.name = '@(Rules)';
 exports.icon = 'ti ti-filter';
-exports.visible = (user) => !!user;
+exports.visible = function(user) { return !!user; };

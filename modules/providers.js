@@ -9,7 +9,7 @@ exports.install = function() {
 		Lib.create(
 			PATH.plugins(),
 			Total.Dns.promises.resolveMx,
-			Lazy(() => MODS.instance)
+			Lazy(function() { return MODS.instance; })
 		)
 	);
 };

@@ -46,7 +46,7 @@ exports.complete = async function(provider, grant) {
 		email: grant.email,
 		initials: grant.name
 			.split(/\s+/)
-			.map((x) => x[0])
+			.map(function(x) { return x[0]; })
 			.slice(0, 2)
 			.join('')
 			.toUpperCase(),

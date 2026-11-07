@@ -2,7 +2,7 @@
 // Pure on purpose: the browser and the tests use the same code. Nothing is stored or sent anywhere.
 function totalmailcontacts(messages, own) {
 
-	var mine = new Set((own || []).map((e) => String(e).toLowerCase())),
+	var mine = new Set((own || []).map(function(e) { return String(e).toLowerCase(); })),
 		found = new Map();
 	var valid = /^[^@\s,;<>"]+@[^@\s,;<>"]+\.[^@\s,;<>"]+$/;
 	function add(address, name, date, weight) {
@@ -36,7 +36,7 @@ function totalmailcontacts(messages, own) {
 				add(other, '', m.date, 1);
 		}
 
-	return [...found.values()].sort((a, b) => b.count - a.count || b.last - a.last);
+	return [...found.values()].sort(function(a, b) { return b.count - a.count || b.last - a.last; });
 }
 
 // Suggestions for the text being typed: the start of a name or address first, then any part of them.
@@ -47,20 +47,21 @@ totalmailcontacts.match = function(list, token, limit) {
 		.toLowerCase();
 	if (token.length < 2)
 		return [];
-	var rank = (c) =>
-		c.email.startsWith(token) ||
-		c.name.toLowerCase().startsWith(token) ||
-		c.name
-			.toLowerCase()
-			.split(/\s+/)
-			.some((w) => w.startsWith(token))
+	var rank = function(c) {
+		return c.email.startsWith(token) ||
+			c.name.toLowerCase().startsWith(token) ||
+			c.name
+				.toLowerCase()
+				.split(/\s+/)
+				.some(function(w) { return w.startsWith(token); })
 			? 0
 			: 1;
+	};
 	return list
-		.filter((c) => c.email.includes(token) || c.name.toLowerCase().includes(token))
-		.map((c, i) => ({ c, i }))
-		.sort((a, b) => rank(a.c) - rank(b.c) || a.i - b.i)
-		.map((x) => x.c)
+		.filter(function(c) { return c.email.includes(token) || c.name.toLowerCase().includes(token); })
+		.map(function(c, i) { return { c, i }; })
+		.sort(function(a, b) { return rank(a.c) - rank(b.c) || a.i - b.i; })
+		.map(function(x) { return x.c; })
 		.slice(0, limit || 6);
 };
 

@@ -1,12 +1,13 @@
 Object.defineProperty(exports, 'languages', {
-	get: () =>
-		Object.keys(Total.resources)
-			.filter((name) => /^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/.test(name))
-			.sort()
+	get: function() {
+		return Object.keys(Total.resources)
+			.filter(function(name) { return /^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/.test(name); })
+			.sort();
+	}
 });
 
 exports.options = function() {
-	return exports.languages.map((id) => {
+	return exports.languages.map(function(id) {
 
 		var name = Total.resource(id, 'language_name');
 		if (!name)
@@ -39,7 +40,7 @@ exports.clientResources = function(language) {
 		...Total.resources[language]
 	};
 	var text = Object.keys(resources)
-		.map((key) => key + ' : ' + resources[key])
+		.map(function(key) { return key + ' : ' + resources[key]; })
 		.join('\n');
 	return JSON.stringify(text)
 		.replace(/</g, '\\u003c')

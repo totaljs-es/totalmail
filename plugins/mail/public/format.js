@@ -26,7 +26,7 @@ var totalmailformat = (function() {
 			plain = '',
 			last = 0,
 			marked = false;
-		text.replace(inlinepattern, (match, label, url, bare, bold, italic, at) => {
+		text.replace(inlinepattern, function(match, label, url, bare, bold, italic, at) {
 
 			var gap = text.slice(last, at);
 			html += escape(gap);
@@ -93,7 +93,7 @@ var totalmailformat = (function() {
 
 		var html = '',
 			last = 0;
-		text.replace(/(https?:\/\/[^\s<>()]+[^\s<>().,;:!?'"])|([\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g, (match, web, mail, at) => {
+		text.replace(/(https?:\/\/[^\s<>()]+[^\s<>().,;:!?'"])|([\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g, function(match, web, mail, at) {
 
 			html += escape(text.slice(last, at)) + '<a href="' + (web ? '' : 'mailto:') + escape(match) + '" style="color:#7b8794">' + escape(match) + '</a>';
 			last = at + match.length;
@@ -107,7 +107,7 @@ var totalmailformat = (function() {
 
 		text = String(text || '').replace(/\r\n?/g, '\n');
 		var lines = text.split('\n'),
-			signature = lines.findIndex((line) => signatureline.test(line));
+			signature = lines.findIndex(function(line) { return signatureline.test(line); });
 		var tail = signature === -1 ? [] : lines.splice(signature);
 		var blocks = [],
 			plain = [],
@@ -148,7 +148,7 @@ var totalmailformat = (function() {
 					'<' +
 						kind +
 						' style="margin:0 0 12px;padding-left:24px">' +
-						items.map((item) => '<li>' + item + '</li>').join('') +
+						items.map(function(item) { return '<li>' + item + '</li>'; }).join('') +
 						'</' +
 						kind +
 						'>'
@@ -189,7 +189,7 @@ var totalmailformat = (function() {
 
 			var html = '',
 				last = 0;
-			line.replace(inlinepattern, (match, label, url, bare, bold, italic, at) => {
+			line.replace(inlinepattern, function(match, label, url, bare, bold, italic, at) {
 
 				html += escape(line.slice(last, at));
 				last = at + match.length;
@@ -208,7 +208,7 @@ var totalmailformat = (function() {
 		return String(text || '')
 			.replace(/\r\n?/g, '\n')
 			.split('\n')
-			.map((line) => {
+			.map(function(line) {
 
 				if (!signature && signatureline.test(line))
 					signature = true;

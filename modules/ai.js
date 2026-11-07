@@ -119,14 +119,14 @@ function adapter($, next) {
 		headers['anthropic-version'] = '2023-06-01';
 		address = config.baseurl + '/messages';
 		var system = $.payload.messages
-			.filter((m) => m.role === 'system')
-			.map((m) => m.content)
+			.filter(function(m) { return m.role === 'system'; })
+			.map(function(m) { return m.content; })
 			.join('\n\n');
 		body = {
 			model: config.model,
 			max_tokens: config.maxtokens,
 			temperature: 0.3,
-			messages: $.payload.messages.filter((m) => m.role !== 'system')
+			messages: $.payload.messages.filter(function(m) { return m.role !== 'system'; })
 		};
 		if (system)
 			body.system = system;
@@ -150,7 +150,7 @@ function adapter($, next) {
 			typeof err === 'string'
 				? err
 				: err?.errors?.length
-					? err.errors.map((e) => e.message).join('; ')
+					? err.errors.map(function(e) { return e.message; }).join('; ')
 					: err
 						? String(err.message || err)
 						: '';
@@ -169,8 +169,8 @@ function adapter($, next) {
 		var text = claude
 			? Array.isArray(response?.content)
 				? response.content
-					.filter((part) => part?.type === 'text')
-					.map((part) => part.text)
+					.filter(function(part) { return part?.type === 'text'; })
+					.map(function(part) { return part.text; })
 					.join('')
 				: ''
 			: response?.choices?.[0]?.message?.content;
@@ -217,22 +217,22 @@ function plain(body) {
 	var text = String(body || '')
 		.replace(/\r\n?/g, '\n')
 		.split('\n')
-		.filter((line) => !/^\s*>/.test(line))
+		.filter(function(line) { return !/^\s*>/.test(line); })
 		.join('\n')
 		.replace(/\n{3,}/g, '\n\n')
 		.trim();
 	return exports.wrap(text);
 }
 
-exports.wrap = (text) => String(text).replace(/<(\/?)(email|draft|sources)/gi, '‹$1$2');
+exports.wrap = function(text) { return String(text).replace(/<(\/?)(email|draft|sources)/gi, '‹$1$2'); };
 
 // The conversation of a message, oldest first, newest kept when it does not fit. Attachments are never included.
 exports.context = function(messages, id, limit, textof) {
 
 	var chain = Threads(messages).members(id);
 	if (!chain.length)
-		chain = messages.filter((m) => m.id === id);
-	chain = chain.slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+		chain = messages.filter(function(m) { return m.id === id; });
+	chain = chain.slice().sort(function(a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
 	var parts = [],
 		left = limit || exports.defaults.maxChars,
 		cut = false;
@@ -300,9 +300,9 @@ var links = /\b(?:https?:\/\/|www\.)[^\s<>"')\]]+|[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g
 
 exports.vet = function(output, source) {
 
-	var known = new Set((String(source).match(links) || []).map((x) => x.toLowerCase().replace(/[.,;:!?]+$/, ''))),
+	var known = new Set((String(source).match(links) || []).map(function(x) { return x.toLowerCase().replace(/[.,;:!?]+$/, ''); })),
 		removed = 0;
-	var text = String(output).replace(links, (found) => {
+	var text = String(output).replace(links, function(found) {
 
 		var tail = (found.match(/[.,;:!?]+$/) || [''])[0],
 			bare = found.slice(0, found.length - tail.length);
@@ -437,7 +437,7 @@ exports.tidy = function(task, text) {
 	return text.trim();
 };
 
-exports.languagename = (code) => languages[code] || languages.en;
+exports.languagename = function(code) { return languages[code] || languages.en; };
 
 // One request at a time per person and a ceiling per ten minutes: the assistant costs money or time on someone's server.
 var running = new Set(),
@@ -447,16 +447,16 @@ exports.guard = function(userid, now = Date.now()) {
 
 	if (running.has(userid))
 		throw Error('@(The assistant is still working on your previous request.)');
-	var stamps = (history.get(userid) || []).filter((t) => now - t < 600000);
+	var stamps = (history.get(userid) || []).filter(function(t) { return now - t < 600000; });
 	if (stamps.length >= 30)
 		throw Error('@(Too many assistant requests. Try again in a few minutes.)');
 	stamps.push(now);
 	history.set(userid, stamps);
 	running.add(userid);
-	return () => running.delete(userid);
+	return function() { return running.delete(userid); };
 };
 
-exports.reset = () => {
+exports.reset = function() {
 	running.clear();
 	history.clear();
 };

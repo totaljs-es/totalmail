@@ -32,7 +32,7 @@ COMPONENT('filepicker', function(self) {
 // Files dragged over the window: its path is true while they are over it, and what is dropped goes to config.exec(files).
 COMPONENT('dropfiles', function(self, config) {
 
-	var has = (event) => [...(event.dataTransfer?.types || [])].includes('Files');
+	var has = function(event) { return [...(event.dataTransfer?.types || [])].includes('Files'); };
 	self.singleton();
 	self.nocompile && self.nocompile();
 	self.make = function() {
@@ -70,7 +70,7 @@ COMPONENT('keys', function(self, config) {
 	self.nocompile && self.nocompile();
 	self.make = function() {
 		self.aclass('hidden');
-		document.addEventListener('keydown', (event) => self.EXEC(config.exec, event));
+		document.addEventListener('keydown', function(event) { return self.EXEC(config.exec, event); });
 	};
 });
 
@@ -93,9 +93,9 @@ COMPONENT('page', function(self) {
 	self.singleton();
 	self.readonly();
 	self.nocompile && self.nocompile();
-	self.make = () => self.aclass('hidden');
-	self.focus = (selector) => document.querySelector(selector)?.focus();
-	self.reveal = (selector) => document.querySelector(selector)?.scrollIntoView({ block: 'nearest' });
+	self.make = function() { return self.aclass('hidden'); };
+	self.focus = function(selector) { return document.querySelector(selector)?.focus(); };
+	self.reveal = function(selector) { return document.querySelector(selector)?.scrollIntoView({ block: 'nearest' }); };
 	self.download = function(url, name) {
 
 		var link = document.createElement('a');
@@ -107,7 +107,7 @@ COMPONENT('page', function(self) {
 
 		var url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
 		self.download(url, name);
-		setTimeout(() => URL.revokeObjectURL(url), 1000);
+		setTimeout(function() { return URL.revokeObjectURL(url); }, 1000);
 	};
 });
 
@@ -121,10 +121,10 @@ COMPONENT('pageevents', function(self, config) {
 	self.make = function() {
 
 		self.aclass('hidden');
-		var call = (path, event) => path && self.EXEC(path, event);
-		document.addEventListener('visibilitychange', (event) => call(config.visible, event));
-		window.addEventListener('online', (event) => call(config.online, event));
-		window.addEventListener('pagehide', (event) => !event.persisted && call(config.leaving, event));
+		var call = function(path, event) { return path && self.EXEC(path, event); };
+		document.addEventListener('visibilitychange', function(event) { return call(config.visible, event); });
+		window.addEventListener('online', function(event) { return call(config.online, event); });
+		window.addEventListener('pagehide', function(event) { return !event.persisted && call(config.leaving, event); });
 	};
 });
 
@@ -163,7 +163,7 @@ COMPONENT('modalguard', function(self, config) {
 			if (!root || event.key !== 'Tab')
 				return;
 			var controls = [...root.querySelectorAll('button:not([disabled]),input,textarea,select,[tabindex="0"]')].filter(
-				(el) => el.offsetParent !== null
+				function(el) { return el.offsetParent !== null; }
 			);
 			var first = controls[0],
 				last = controls[controls.length - 1];
@@ -185,7 +185,7 @@ COMPONENT('modalguard', function(self, config) {
 			if (!shell.inert)
 				remembered = document.activeElement;
 			shell.inert = true;
-			requestAnimationFrame(() => document.querySelector('#' + name + ' button')?.focus());
+			requestAnimationFrame(function() { return document.querySelector('#' + name + ' button')?.focus(); });
 		} else {
 			shell.inert = false;
 			remembered?.focus();
@@ -202,7 +202,7 @@ COMPONENT('addresssuggest', function(self, config) {
 		items = [],
 		active = -1,
 		input = null;
-	var parts = (value) => String(value || '').split(/[,;]/);
+	var parts = function(value) { return String(value || '').split(/[,;]/); };
 	function hide() {
 
 		menu.attr('hidden', '');
@@ -236,7 +236,7 @@ COMPONENT('addresssuggest', function(self, config) {
 	}
 	function pick(email) {
 
-		var done = parts(input.value).map((v) => v.trim());
+		var done = parts(input.value).map(function(v) { return v.trim(); });
 		done.pop();
 		self.set([...done.filter(Boolean), email].join(', ') + ', ');
 		hide();
@@ -247,9 +247,9 @@ COMPONENT('addresssuggest', function(self, config) {
 		var chosen = new Set(
 			parts(input.value)
 				.slice(0, -1)
-				.map((v) => v.trim().toLowerCase())
+				.map(function(v) { return v.trim().toLowerCase(); })
 		);
-		var found = totalmailcontacts.match(GET(config.source) || [], parts(input.value).pop()).filter((c) => !chosen.has(c.email));
+		var found = totalmailcontacts.match(GET(config.source) || [], parts(input.value).pop()).filter(function(c) { return !chosen.has(c.email); });
 		if (!found.length)
 			return hide();
 		items = found;
@@ -257,22 +257,23 @@ COMPONENT('addresssuggest', function(self, config) {
 		menu.html(
 			found
 				.map(
-					(c, i) =>
-						'<button type="button" role="option" id="' +
-						menu.attr('id') +
-						'-' +
-						i +
-						'" tabindex="-1" aria-selected="' +
-						(i === 0) +
-						'" class="contact-option' +
-						(i === 0 ? ' active' : '') +
-						'" data-email="' +
-						Thelpers.encode(c.email) +
-						'"><strong>' +
-						Thelpers.encode(c.name || c.email) +
-						'</strong>' +
-						(c.name ? '<small>' + Thelpers.encode(c.email) + '</small>' : '') +
-						'</button>'
+					function(c, i) {
+						return '<button type="button" role="option" id="' +
+							menu.attr('id') +
+							'-' +
+							i +
+							'" tabindex="-1" aria-selected="' +
+							(i === 0) +
+							'" class="contact-option' +
+							(i === 0 ? ' active' : '') +
+							'" data-email="' +
+							Thelpers.encode(c.email) +
+							'"><strong>' +
+							Thelpers.encode(c.name || c.email) +
+							'</strong>' +
+							(c.name ? '<small>' + Thelpers.encode(c.email) + '</small>' : '') +
+							'</button>';
+					}
 				)
 				.join('')
 		);
@@ -320,13 +321,13 @@ COMPONENT('addresssuggest', function(self, config) {
 			show();
 		});
 		self.element.on('keydown', 'input', keys);
-		self.element.on('focusout', 'input', () => setTimeout(hide, 150));
+		self.element.on('focusout', 'input', function() { return setTimeout(hide, 150); });
 	};
 	self.destroy = function() {
 		menu && menu.remove();
 	};
 	// The list belongs to the composer: it must not outlive it.
-	WATCH('mail.window', (value) => value !== 'composer' && menu && hide());
+	WATCH('mail.window', function(value) { return value !== 'composer' && menu && hide(); });
 });
 
 // The text of a message: the formatting buttons and keys write the small markup the server turns into HTML on send, files can
@@ -334,7 +335,7 @@ COMPONENT('addresssuggest', function(self, config) {
 //   config.paste: function(files)  called with the files pasted from the clipboard (a screenshot, say)
 COMPONENT('mailbody', function(self, config) {
 
-	var area = () => self.find('textarea')[0];
+	var area = function() { return self.find('textarea')[0]; };
 	// The model follows the text: written by a command, it must be told.
 	function changed(el) {
 		el.focus();
@@ -386,9 +387,9 @@ COMPONENT('mailbody', function(self, config) {
 			var lines = text.slice(first, last).split('\n'),
 				number = 0;
 			var pattern = kind === 'ul' ? /^- / : kind === 'quote' ? /^> / : /^\d+\. /;
-			var prefix = () => (kind === 'ul' ? '- ' : kind === 'quote' ? '> ' : ++number + '. ');
-			var all = lines.every((line) => !line.trim() || pattern.test(line));
-			var result = lines.map((line) => (!line.trim() ? line : all ? line.replace(pattern, '') : prefix() + line)).join('\n');
+			var prefix = function() { return kind === 'ul' ? '- ' : kind === 'quote' ? '> ' : ++number + '. '; };
+			var all = lines.every(function(line) { return !line.trim() || pattern.test(line); });
+			var result = lines.map(function(line) { return !line.trim() ? line : all ? line.replace(pattern, '') : prefix() + line; }).join('\n');
 			el.setRangeText(result, first, last, 'select');
 		}
 		changed(el);
@@ -421,7 +422,7 @@ COMPONENT('mailbody', function(self, config) {
 			mirror.setAttribute('aria-hidden', 'true');
 			el.parentNode.classList.add('mailbody-live');
 			el.parentNode.insertBefore(mirror, el);
-			el.addEventListener('scroll', () => (mirror.scrollTop = el.scrollTop));
+			el.addEventListener('scroll', function() { return mirror.scrollTop = el.scrollTop; });
 			if (window.ResizeObserver)
 				new ResizeObserver(sync).observe(el);
 		}

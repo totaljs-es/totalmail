@@ -3,8 +3,8 @@ var Totp = require('../../../lib/totp');
 NEWACTION('Users|setup', {
 	route: 'API /api/ +user_setup --> Users|setup',
 	input: '*name:String(80), *email:Email, *password:String(128)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			if (MODS.security.identities.configured())
 				throw Error('@(Setup has already been completed.)');
@@ -15,21 +15,22 @@ NEWACTION('Users|setup', {
 			return {
 				success: true
 			};
-		})
+		});
+	}
 });
 
 NEWACTION('Users|login', {
 	route: 'API /api/ +user_login --> Users|login',
 	input: '*email:Email, *password:String(128)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			if (!MODS.security.allowLogin($, model.email))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
 			var user = await MODS.security.identities.login(model.email, model.password);
 			if (!user)
 				throw Error('@(Email or password is incorrect.)');
-			// With two-step verification the password is only the first step: no session until the code is right.
+				// With two-step verification the password is only the first step: no session until the code is right.
 			if (user.totp)
 				return { totp: true, token: MODS.security.pending.login(user.id) };
 			MODS.security.loginSucceeded($, model.email);
@@ -37,14 +38,15 @@ NEWACTION('Users|login', {
 			return {
 				success: true
 			};
-		})
+		});
+	}
 });
 
 NEWACTION('Users|totp', {
 	route: 'API /api/ +user_totp --> Users|totp',
 	input: '*token:String(80), *code:String(40)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			var pending = MODS.security.pending.attempt(model.token);
 			if (!pending)
@@ -62,7 +64,8 @@ NEWACTION('Users|totp', {
 			MODS.security.loginSucceeded($, 'totp-' + user.id);
 			MODS.security.start($, user);
 			return { success: true, via: result.via, left: result.left };
-		})
+		});
+	}
 });
 
 // Two-step verification of the signed-in person. Every step asks for the password again: an open window is not proof of who is at it.
@@ -83,8 +86,8 @@ NEWACTION('Users|totpbegin', {
 	user: true,
 	route: '+API /api/ +user_totp_begin --> Users|totpbegin',
 	input: '*password:String(128)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			await mine($, model.password);
 			if (MODS.security.identities.get($.user.id).totp)
@@ -92,15 +95,16 @@ NEWACTION('Users|totpbegin', {
 			var secret = Totp.secret();
 			MODS.security.pending.setup($.user.id, secret);
 			return { secret, uri: Totp.uri(secret, $.user.email, 'TotalMail') };
-		})
+		});
+	}
 });
 
 NEWACTION('Users|totpenable', {
 	user: true,
 	route: '+API /api/ +user_totp_enable --> Users|totpenable',
 	input: '*code:String(40)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			if (!MODS.security.allowLogin($, 'totp-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
@@ -110,48 +114,52 @@ NEWACTION('Users|totpenable', {
 			var result = await MODS.security.identities.enableTotp($.user.id, secret, model.code);
 			MODS.security.pending.finishSetup($.user.id);
 			return { user: result.user, recovery: result.recovery };
-		})
+		});
+	}
 });
 
 NEWACTION('Users|totpdisable', {
 	user: true,
 	route: '+API /api/ +user_totp_disable --> Users|totpdisable',
 	input: '*password:String(128), *code:String(40)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 			await second($, model.password, model.code);
 			return { user: await MODS.security.identities.disableTotp($.user.id) };
-		})
+		});
+	}
 });
 
 NEWACTION('Users|totprecovery', {
 	user: true,
 	route: '+API /api/ +user_totp_recovery --> Users|totprecovery',
 	input: '*password:String(128), *code:String(40)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 			await second($, model.password, model.code);
 			return { recovery: await MODS.security.identities.newRecovery($.user.id) };
-		})
+		});
+	}
 });
 
 NEWACTION('Users|logout', {
 	user: true,
 	route: '+API /api/ -user_logout --> Users|logout',
-	action: ($) =>
-		FUNC.run($, () => {
+	action: function($) {
+		return FUNC.run($, function() {
 			MODS.security.logout($);
 			return {
 				success: true
 			};
-		})
+		});
+	}
 });
 
 NEWACTION('Users|list', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -user_list --> Users|list',
-	action: ($) => {
+	action: function($) {
 		$.callback({
 			users: MODS.security.identities.list()
 		});
@@ -163,8 +171,8 @@ NEWACTION('Users|create', {
 	permissions: 'admin',
 	route: '+API /api/ +user_create --> Users|create',
 	input: '*name:String(80), *email:Email, *password:String(128)',
-	action: ($, model) => {
-		FUNC.run($, () => MODS.security.identities.createUser(model, false));
+	action: function($, model) {
+		FUNC.run($, function() { return MODS.security.identities.createUser(model, false); });
 	}
 });
 
@@ -172,8 +180,8 @@ NEWACTION('Users|profile', {
 	user: true,
 	route: '+API /api/ +user_profile --> Users|profile',
 	input: '*name:String(80), *email:Email, *color:String(7), *language:String(35), currentPassword:String(128), newPassword:String(128), confirmPassword:String(128)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			if (!MODS.localization.languages.includes(model.language))
 				throw Error('@(Choose an available language.)');
@@ -187,7 +195,8 @@ NEWACTION('Users|profile', {
 				MODS.security.start($, result.user);
 			}
 			return result;
-		})
+		});
+	}
 });
 
 // Managing other people needs an administrator who proves it is them: their own password is asked every time.
@@ -208,8 +217,8 @@ NEWACTION('Users|reset', {
 	permissions: 'admin',
 	route: '+API /api/ +user_reset --> Users|reset',
 	input: '*id:String(32), *password:String(128), *adminPassword:String(128)',
-	action: ($, model) => {
-		FUNC.run($, async () => {
+	action: function($, model) {
+		FUNC.run($, async function() {
 
 			await confirmed($, model);
 			others($, model.id);
@@ -225,8 +234,8 @@ NEWACTION('Users|totpreset', {
 	permissions: 'admin',
 	route: '+API /api/ +user_totp_reset --> Users|totpreset',
 	input: '*id:String(32), *adminPassword:String(128)',
-	action: ($, model) => {
-		FUNC.run($, async () => {
+	action: function($, model) {
+		FUNC.run($, async function() {
 
 			await confirmed($, model);
 			others($, model.id);
@@ -243,8 +252,8 @@ NEWACTION('Users|role', {
 	permissions: 'admin',
 	route: '+API /api/ +user_role --> Users|role',
 	input: '*id:String(32), *role:{admin|member}, *adminPassword:String(128)',
-	action: ($, model) => {
-		FUNC.run($, async () => {
+	action: function($, model) {
+		FUNC.run($, async function() {
 
 			await confirmed($, model);
 			others($, model.id);
@@ -258,8 +267,8 @@ NEWACTION('Users|disable', {
 	permissions: 'admin',
 	route: '+API /api/ +user_disable --> Users|disable',
 	input: '*id:String(32), disabled:Boolean, *adminPassword:String(128)',
-	action: ($, model) => {
-		FUNC.run($, async () => {
+	action: function($, model) {
+		FUNC.run($, async function() {
 
 			await confirmed($, model);
 			others($, model.id);
@@ -278,8 +287,8 @@ NEWACTION('Users|remove', {
 	permissions: 'admin',
 	route: '+API /api/ +user_remove --> Users|remove',
 	input: '*id:String(32), *adminPassword:String(128)',
-	action: ($, model) => {
-		FUNC.run($, async () => {
+	action: function($, model) {
+		FUNC.run($, async function() {
 
 			await confirmed($, model);
 			others($, model.id);

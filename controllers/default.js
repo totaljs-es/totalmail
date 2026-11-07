@@ -73,15 +73,15 @@ exports.install = function() {
 		if (!REG_MESSAGE.test($.params.id))
 			return $.invalid(404);
 		Promise.resolve()
-			.then(() => MODS.live.source($.user, MODS.users.forUser($.user), $.params.id))
-			.then((file) => {
+			.then(function() { return MODS.live.source($.user, MODS.users.forUser($.user), $.params.id); })
+			.then(function(file) {
 
 				$.response.headers['cache-control'] = 'private, no-store';
 				$.response.headers['x-content-type-options'] = 'nosniff';
 				$.response.headers['content-security-policy'] = "default-src 'none'; sandbox";
 				$.binary(file.content, 'application/octet-stream', file.name);
 			})
-			.catch(() => $.invalid(404));
+			.catch(function() { return $.invalid(404); });
 	});
 	// Attachments leave the server only as opaque downloads of the signed-in user's own messages.
 	ROUTE('+GET /attachment/{id}/{index}/', function($) {
@@ -90,15 +90,15 @@ exports.install = function() {
 		if (!REG_MESSAGE.test($.params.id) || index < 0)
 			return $.invalid(404);
 		Promise.resolve()
-			.then(() => MODS.live.attachment($.user, MODS.users.forUser($.user), $.params.id, index))
-			.then((file) => {
+			.then(function() { return MODS.live.attachment($.user, MODS.users.forUser($.user), $.params.id, index); })
+			.then(function(file) {
 
 				$.response.headers['cache-control'] = 'private, no-store';
 				$.response.headers['x-content-type-options'] = 'nosniff';
 				$.response.headers['content-security-policy'] = "default-src 'none'; sandbox";
 				$.binary(file.content, 'application/octet-stream', file.name);
 			})
-			.catch(() => $.invalid(404));
+			.catch(function() { return $.invalid(404); });
 	});
 	// Outgoing attachments: stored privately per user and linked to one of the user's own drafts.
 	ROUTE('+POST /upload/{draft}/ @upload <16mb', function($) {
@@ -119,8 +119,8 @@ exports.install = function() {
 		var saved = '';
 		// The framework's temporary file can end with bytes of the next part of the upload: only the size it measured is the file.
 		file.read()
-			.then((content) => files.put($.user.id, content.subarray(0, file.size)))
-			.then((id) => {
+			.then(function(content) { return files.put($.user.id, content.subarray(0, file.size)); })
+			.then(function(id) {
 				saved = id;
 				return store.addAttachment(
 					$.params.draft.slice(0, 80),
@@ -133,8 +133,8 @@ exports.install = function() {
 					Files.limits
 				);
 			})
-			.then((draft) => $.json(draft))
-			.catch((err) => {
+			.then(function(draft) { return $.json(draft); })
+			.catch(function(err) {
 				if (saved)
 					files.remove($.user.id, saved);
 				$.invalid(err.message?.startsWith('@(') ? err.message : '@(The operation could not be completed.)');
@@ -155,12 +155,12 @@ exports.install = function() {
 	ROUTE('+GET /changes/ <40s', function($) {
 		var since = /^\d{1,12}$/.test($.query.since || '') ? parseInt($.query.since) : 0;
 		MODS.changes
-			.wait($.user, since, (fn) => $.req.once('close', fn))
-			.then((value) => {
+			.wait($.user, since, function(fn) { return $.req.once('close', fn); })
+			.then(function(value) {
 				$.response.headers['cache-control'] = 'private, no-store';
 				$.json(value);
 			})
-			.catch(() => $.invalid(500));
+			.catch(function() { return $.invalid(500); });
 	});
 	// The provider sends the browser back here. The session cookie (SameSite=Strict) does not travel with that
 	// cross-site navigation, so the one-time state created by the signed-in user identifies who this belongs to,
@@ -188,9 +188,9 @@ exports.install = function() {
 		}
 		service
 			.finish({ state: String(query.state || ''), code: String(query.code || '') })
-			.then((grant) => service.complete(provider, grant))
+			.then(function(grant) { return service.complete(provider, grant); })
 			.then(done)
-			.catch((err) => {
+			.catch(function(err) {
 
 				var exists = /already exists/.test(err.message || '');
 				if (!exists && err.message !== 'invalid_state')

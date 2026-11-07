@@ -69,7 +69,7 @@ else
 			timer,
 			scheduler,
 			listener,
-			tick = () => scheduler?.tick().catch(() => {});
+			tick = function() { return scheduler?.tick().catch(function() {}); };
 		exports.set('', { enabled: true });
 		// The switch of the settings window follows reception.enabled (a ui-bind in the view).
 		function status() {
@@ -92,7 +92,7 @@ else
 			status();
 		};
 		WAIT(
-			() => !!PLUGINS.mail?.store.user && !PLUGINS.mail.store.loading,
+			function() { return !!PLUGINS.mail?.store.user && !PLUGINS.mail.store.loading; },
 			function() {
 
 				var user = PLUGINS.mail.store.user.id;
@@ -102,20 +102,19 @@ else
 				status();
 				scheduler = totalmailreception({
 					now: Date.now,
-					ready: () => enabled && !document.hidden && navigator.onLine && PLUGINS.mail.backgroundReady(),
-					run: async () => {
+					ready: function() { return enabled && !document.hidden && navigator.onLine && PLUGINS.mail.backgroundReady(); },
+					run: async function() {
 						if (navigator.locks)
-							await navigator.locks.request('totalmail-reception-' + user, { ifAvailable: true }, (lock) =>
-								lock ? PLUGINS.mail.backgroundSync() : undefined
+							await navigator.locks.request('totalmail-reception-' + user, { ifAvailable: true }, function(lock) { return lock ? PLUGINS.mail.backgroundSync() : undefined; }
 							);
 						else
 							await PLUGINS.mail.backgroundSync();
 					}
 				});
 				listener = totalmailreception.listen({
-					ready: () => enabled && !document.hidden && navigator.onLine,
-					sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-					wake: () => scheduler.wake().catch(() => {}),
+					ready: function() { return enabled && !document.hidden && navigator.onLine; },
+					sleep: function(ms) { return new Promise(function(resolve) { return setTimeout(resolve, ms); }); },
+					wake: function() { return scheduler.wake().catch(function() {}); },
 					async poll(since) {
 
 						var answer = await totalmailrequest.get('/changes/?since=' + since);

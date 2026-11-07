@@ -9,18 +9,20 @@ PLUGIN('devices', function(exports) {
 
 			var mailbox = PLUGINS.mail,
 				busy = false;
-			var set = (path, value) => exports.set(path, value);
-			var when = (iso) => (iso ? new Date(iso).toLocaleString(document.documentElement.lang, { dateStyle: 'medium', timeStyle: 'short' }) : '');
+			var set = function(path, value) { return exports.set(path, value); };
+			var when = function(iso) { return iso ? new Date(iso).toLocaleString(document.documentElement.lang, { dateStyle: 'medium', timeStyle: 'short' }) : ''; };
 			function render(data) {
 				set(
 					'items',
-					data.devices.map((d) => ({
-						id: d.id,
-						name: d.name,
-						current: d.current,
-						detail: [d.platform, d.app].filter(Boolean).join(' · '),
-						lastUsed: TRANSLATE('@(Last used {0})').format(when(d.last)) + (d.address ? ' · ' + d.address : '')
-					}))
+					data.devices.map(function(d) {
+						return {
+							id: d.id,
+							name: d.name,
+							current: d.current,
+							detail: [d.platform, d.app].filter(Boolean).join(' · '),
+							lastUsed: TRANSLATE('@(Last used {0})').format(when(d.last)) + (d.address ? ' · ' + d.address : '')
+						};
+					})
 				);
 			}
 			async function call(schema, payload) {
@@ -47,7 +49,7 @@ PLUGIN('devices', function(exports) {
 					mailbox.notify(e.message);
 				}
 			};
-			exports.revoke = async (element) => {
+			exports.revoke = async function(element) {
 				var data = await call('device_revoke', { id: element[0].dataset.id });
 				if (data)
 					render(data);

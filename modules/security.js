@@ -22,21 +22,21 @@ exports.install = function() {
 		require('../lib/identities').open({ directory, table: Tables, legacy: { file: Total.Path.join(directory, 'users.json') } }),
 		require('../lib/sessions').open({ table: Tables, legacy: { file: Total.Path.join(directory, 'sessions.json') } }),
 		require('../lib/devices').open({ table: Tables })
-	]).then(([accounts, signedin, apps]) => {
+	]).then(function([accounts, signedin, apps]) {
 
 		Object.assign(identities, accounts);
 		Object.assign(sessions, signedin);
 		Object.assign(devices, apps);
 		PAUSESERVER('security', false);
 	});
-	exports.ready.catch((error) => Total.error(error, 'TotalMail security'));
+	exports.ready.catch(function(error) { return Total.error(error, 'TotalMail security'); });
 };
 
 // A restart (a new upload of the files, a reboot) must not sign everybody out.
-ON('exit', () => sessions.flush && sessions.flush());
-var digest = (value) => Total.Crypto.createHash('sha256').update(value).digest('hex');
+ON('exit', function() { return sessions.flush && sessions.flush(); });
+var digest = function(value) { return Total.Crypto.createHash('sha256').update(value).digest('hex'); };
 
-exports.version = (() => {
+exports.version = (function() {
 	try {
 		return JSON.parse(Total.Fs.readFileSync(PATH.root('package.json'), 'utf8')).version;
 	} catch {
@@ -114,14 +114,14 @@ exports.device = function(ctrl) {
 	var user = record && identities.get(record.userId);
 	if (!user)
 		return null;
-	devices.touch(record.id, clientip(ctrl)).catch(() => {});
+	devices.touch(record.id, clientip(ctrl)).catch(function() {});
 	return { ...user, deviceId: record.id };
 };
 
 exports.revoke = function(userid) {
 	sessions.revoke(userid);
 	// The apps of the person sign out with their sessions.
-	devices.revokeUser(userid).catch((error) => Total.error(error, 'TotalMail devices'));
+	devices.revokeUser(userid).catch(function(error) { return Total.error(error, 'TotalMail devices'); });
 };
 
 exports.start = function($, user) {
@@ -154,7 +154,7 @@ exports.logout = function($) {
 	});
 };
 
-exports.address = ($) => clientip($);
+exports.address = function($) { return clientip($); };
 
 var clientip = function($) {
 	var ctrl = $.controller || $;
@@ -192,7 +192,7 @@ exports.loginSucceeded = function($, email) {
 };
 
 // Once a minute, on the framework's own timer.
-ON('service', () => {
+ON('service', function() {
 
 	var now = Date.now();
 	sessions.sweep();

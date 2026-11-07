@@ -19,11 +19,11 @@ async function ask(text) {
 	if (!process.stdin.isTTY)
 		throw Error('Run this in a terminal, or set TOTALMAIL_NEW_PASSWORD.');
 	var rl = Total.require('readline').createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-	rl._writeToOutput = (value) => (value.includes(text) ? process.stdout.write(value) : process.stdout.write(''));
-	return new Promise((resolve) => rl.question(text, (answer) => (rl.close(), process.stdout.write('\n'), resolve(answer))));
+	rl._writeToOutput = function(value) { return value.includes(text) ? process.stdout.write(value) : process.stdout.write(''); };
+	return new Promise(function(resolve) { return rl.question(text, function(answer) { return rl.close(), process.stdout.write('\n'), resolve(answer); }); });
 }
 
-exports.main = async function(argv, out = (line) => console.log(line)) {
+exports.main = async function(argv, out = function(line) { return console.log(line); }) {
 
 	var args = [...argv],
 		index = args.indexOf('--database'),
@@ -40,18 +40,19 @@ exports.main = async function(argv, out = (line) => console.log(line)) {
 	var store = await Store.open({ directory, table, legacy: { file: Total.Path.join(directory, 'users.json') } }),
 		users = store.list();
 	// A password reset or a removed code should end the sessions that were opened before: they are forgotten here.
-	var signout = () => table('sessions_sessions').remove().where('id', '!=', '').promise();
+	var signout = function() { return table('sessions_sessions').remove().where('id', '!=', '').promise(); };
 	if (command === 'list') {
 		for (var u of users)
 			out([u.email, u.role, u.disabled ? 'disabled' : '', u.totp ? 'two-step' : ''].filter(Boolean).join('  '));
 		return;
 	}
 	var user = users.find(
-		(u) =>
-			u.email ===
-			String(email || '')
-				.trim()
-				.toLowerCase()
+		function(u) {
+			return u.email ===
+				String(email || '')
+					.trim()
+					.toLowerCase();
+		}
 	);
 	if (!['reset-password', 'remove-two-step'].includes(command))
 		throw Error('Commands: list, reset-password <email>, remove-two-step <email>');
@@ -72,8 +73,8 @@ exports.main = async function(argv, out = (line) => console.log(line)) {
 if (require.main === module)
 	// The database keeps the process alive, so it ends when the command is done.
 	exports.main(process.argv.slice(2)).then(
-		() => process.exit(0),
-		(error) => {
+		function() { return process.exit(0); },
+		function(error) {
 			console.error(error.message.replace(/^@\(|\)$/g, ''));
 			process.exit(1);
 		}

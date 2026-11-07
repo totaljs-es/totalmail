@@ -9,7 +9,7 @@ PLUGIN('rules', function(exports) {
 				state = mailbox.store,
 				model = {},
 				busy = false;
-			var blank = () => ({ id: '', name: '', field: 'from', op: 'contains', value: '', action: 'archive', path: '' });
+			var blank = function() { return { id: '', name: '', field: 'from', op: 'contains', value: '', action: 'archive', path: '' }; };
 			model.fieldOptions = [
 				{ id: 'from', name: TRANSLATE('@(From)') },
 				{ id: 'to', name: TRANSLATE('@(To or Cc)') },
@@ -33,14 +33,14 @@ PLUGIN('rules', function(exports) {
 			model.error = '';
 			model.test = '';
 			model.heading = TRANSLATE('@(New rule)');
-			var account = () => state.accounts.find((a) => a.id === GET('rules.accountId'));
+			var account = function() { return state.accounts.find(function(a) { return a.id === GET('rules.accountId'); }); };
 			function error(text) {
 				exports.set('error', text || '');
 			}
 			function describe(r) {
-				var field = model.fieldOptions.find((f) => f.id === r.field)?.name,
-					op = model.opOptions.find((o) => o.id === r.op)?.name,
-					action = model.actionOptions.find((o) => o.id === r.action)?.name;
+				var field = model.fieldOptions.find(function(f) { return f.id === r.field; })?.name,
+					op = model.opOptions.find(function(o) { return o.id === r.op; })?.name,
+					action = model.actionOptions.find(function(o) { return o.id === r.action; })?.name;
 				return field + ' ' + op + ' “' + r.value + '” → ' + action + (r.path ? ' (' + r.path + ')' : '');
 			}
 			function render() {
@@ -50,32 +50,36 @@ PLUGIN('rules', function(exports) {
 					log = a?.ruleLog || [];
 				SET(
 					'rules.items',
-					rules.map((r) => ({
-						id: r.id,
-						name: r.name,
-						summary: describe(r),
-						offLabel: r.enabled === false ? TRANSLATE('@(Off)') : '',
-						toggleLabel: TRANSLATE(r.enabled === false ? '@(Turn on)' : '@(Turn off)')
-					}))
+					rules.map(function(r) {
+						return {
+							id: r.id,
+							name: r.name,
+							summary: describe(r),
+							offLabel: r.enabled === false ? TRANSLATE('@(Off)') : '',
+							toggleLabel: TRANSLATE(r.enabled === false ? '@(Turn on)' : '@(Turn off)')
+						};
+					})
 				);
 				SET(
 					'rules.log',
-					log.slice(0, 10).map((l) => ({
-						rule: l.rule,
-						action: l.action,
-						failed: l.ok === false ? TRANSLATE('@(Failed)') : '',
-						subject: l.subject || '',
-						when: new Date(l.at).toLocaleString(document.documentElement.lang)
-					}))
+					log.slice(0, 10).map(function(l) {
+						return {
+							rule: l.rule,
+							action: l.action,
+							failed: l.ok === false ? TRANSLATE('@(Failed)') : '',
+							subject: l.subject || '',
+							when: new Date(l.at).toLocaleString(document.documentElement.lang)
+						};
+					})
 				);
 				SET(
 					'rules.folderOptions',
-					(a?.mailboxes || []).filter((f) => f.path.toUpperCase() !== 'INBOX').map((f) => ({ id: f.path, name: f.name }))
+					(a?.mailboxes || []).filter(function(f) { return f.path.toUpperCase() !== 'INBOX'; }).map(function(f) { return { id: f.path, name: f.name }; })
 				);
 			}
 			function merge(result) {
 
-				var a = state.accounts.find((x) => x.id === result.accountId);
+				var a = state.accounts.find(function(x) { return x.id === result.accountId; });
 				if (a) {
 					a.rules = result.rules;
 					a.ruleLog = result.ruleLog;
@@ -106,16 +110,16 @@ PLUGIN('rules', function(exports) {
 			}
 			function open() {
 
-				if (!state.accounts.some((a) => a.configured)) {
+				if (!state.accounts.some(function(a) { return a.configured; })) {
 					mailbox.notify(TRANSLATE('@(Add your first mail account to get started.)'));
 					return;
 				}
-				SET('rules.accountId', state.account || state.accounts.find((a) => a.configured).id);
+				SET('rules.accountId', state.account || state.accounts.find(function(a) { return a.configured; }).id);
 				render();
 				clear();
 				SET('mail.window', 'rules');
 			}
-			var form = () => {
+			var form = function() {
 
 				var payload = { accountId: GET('rules.accountId') };
 				for (var field of ['name', 'field', 'op', 'value', 'action', 'path'])
@@ -126,12 +130,12 @@ PLUGIN('rules', function(exports) {
 			exports.set('', model);
 			exports.open = open;
 			exports.clear = clear;
-			exports.save = async () => {
+			exports.save = async function() {
 
 				var payload = form();
 				if (payload.action !== 'move')
 					payload.path = '';
-				var enabled = (account()?.rules || []).find((r) => r.id === payload.id)?.enabled;
+				var enabled = (account()?.rules || []).find(function(r) { return r.id === payload.id; })?.enabled;
 				var result = await call('rule_save', { ...payload, enabled: enabled !== false });
 				if (result) {
 					merge(result);
@@ -139,7 +143,7 @@ PLUGIN('rules', function(exports) {
 					mailbox.notify(TRANSLATE('@(Rule saved.)'));
 				}
 			};
-			exports.test = async () => {
+			exports.test = async function() {
 
 				var payload = form();
 				var result = await call('rule_test', {
@@ -157,9 +161,9 @@ PLUGIN('rules', function(exports) {
 						: TRANSLATE('@(No message in the inbox matches this today.)')
 				);
 			};
-			exports.edit = (element) => {
+			exports.edit = function(element) {
 
-				var r = (account()?.rules || []).find((x) => x.id === element[0].dataset.id);
+				var r = (account()?.rules || []).find(function(x) { return x.id === element[0].dataset.id; });
 				if (!r)
 					return;
 				SET('rules.form', {
@@ -173,9 +177,9 @@ PLUGIN('rules', function(exports) {
 				});
 				exports.set('heading', TRANSLATE('@(Edit rule)'));
 			};
-			exports.toggle = async (element) => {
+			exports.toggle = async function(element) {
 
-				var r = (account()?.rules || []).find((x) => x.id === element[0].dataset.id);
+				var r = (account()?.rules || []).find(function(x) { return x.id === element[0].dataset.id; });
 				if (!r)
 					return;
 				var result = await call('rule_save', {
@@ -187,14 +191,14 @@ PLUGIN('rules', function(exports) {
 				if (result)
 					merge(result);
 			};
-			exports.remove = async (element) => {
+			exports.remove = async function(element) {
 				var result = await call('rule_delete', { accountId: GET('rules.accountId'), id: element[0].dataset.id });
 				if (result) {
 					merge(result);
 					clear();
 				}
 			};
-			WATCH('rules.accountId', () => {
+			WATCH('rules.accountId', function() {
 				if (mailbox.model.window === 'rules') {
 					render();
 					clear();

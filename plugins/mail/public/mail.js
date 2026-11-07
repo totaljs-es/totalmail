@@ -133,7 +133,7 @@ PLUGIN('mail', function(exports) {
 	}
 	// The conversation of a message as shown to the reader: nothing from the trash unless the message is there too.
 	function conversationin(threads, m) {
-		return threads.members(m.id).filter((x) => x.folder !== 'trash' || x.folder === m.folder);
+		return threads.members(m.id).filter(function(x) { return x.folder !== 'trash' || x.folder === m.folder; });
 	}
 	function conversation(m) {
 		return conversationin(totalmailthreads(state.messages), m);
@@ -142,7 +142,7 @@ PLUGIN('mail', function(exports) {
 	function entries(items) {
 
 		if (!isgrouping() || state.folder === 'drafts')
-			return items.map((m) => ({ m, members: [m], all: [m] }));
+			return items.map(function(m) { return { m, members: [m], all: [m] }; });
 		var threads = totalmailthreads(state.messages),
 			seen = new Map(),
 			list = [];
@@ -169,7 +169,7 @@ PLUGIN('mail', function(exports) {
 			return [m];
 		return totalmailthreads(state.messages)
 			.members(m.id)
-			.filter((x) => x.remote && x.accountId === m.accountId && x.folder === m.folder);
+			.filter(function(x) { return x.remote && x.accountId === m.accountId && x.folder === m.folder; });
 	}
 	var draft = null,
 		drafttimer,
@@ -180,18 +180,19 @@ PLUGIN('mail', function(exports) {
 	function esc(value) {
 		return String(value == null ? '' : value).replace(
 			/[&<>"']/g,
-			(c) =>
-				({
+			function(c) {
+				return ({
 					'&': '&amp;',
 					'<': '&lt;',
 					'>': '&gt;',
 					'"': '&quot;',
 					"'": '&#39;'
-				})[c]
+				})[c];
+			}
 		);
 	}
 	function account(id) {
-		return state.accounts.find((item) => item.id === id);
+		return state.accounts.find(function(item) { return item.id === id; });
 	}
 	function toast(text) {
 		SETTER('notify/info', esc(text));
@@ -205,17 +206,18 @@ PLUGIN('mail', function(exports) {
 			parsed = totalmailquery.parse(query);
 		var source = state.folder === 'drafts' ? state.drafts : state.messages;
 		var matches = source.filter(
-			(item) =>
-				item.status !== 'sent' &&
-				(!state.account || item.accountId === state.account) &&
-				(state.folder === 'drafts' || (state.folder === 'starred' ? item.starred : item.folder === state.folder)) &&
-				(filter !== 'unread' || item.unread) &&
-				(parsed.empty || totalmailquery.matches(parsed, item) || (searchhits?.query === query && searchhits.ids.has(item.id)))
+			function(item) {
+				return item.status !== 'sent' &&
+					(!state.account || item.accountId === state.account) &&
+					(state.folder === 'drafts' || (state.folder === 'starred' ? item.starred : item.folder === state.folder)) &&
+					(filter !== 'unread' || item.unread) &&
+					(parsed.empty || totalmailquery.matches(parsed, item) || (searchhits?.query === query && searchhits.ids.has(item.id)));
+			}
 		);
 		// Newest first across accounts and loaded pages; drafts keep their saved order.
 		return state.folder === 'drafts'
 			? matches
-			: matches.sort((a, b) => (b.date ? new Date(b.date).getTime() || 0 : 0) - (a.date ? new Date(a.date).getTime() || 0 : 0));
+			: matches.sort(function(a, b) { return (b.date ? new Date(b.date).getTime() || 0 : 0) - (a.date ? new Date(a.date).getTime() || 0 : 0); });
 	}
 	// Folders in the current view that still have server messages that are not loaded.
 	function olderpairs() {
@@ -223,8 +225,8 @@ PLUGIN('mail', function(exports) {
 		if (['starred', 'drafts', 'sent-local'].includes(state.folder))
 			return [];
 		var pairs = [];
-		for (var a of state.accounts.filter((a) => a.configured && (!state.account || a.id === state.account))) {
-			var path = state.folder === 'inbox' ? 'INBOX' : a.mailboxes?.find((f) => f.id === state.folder)?.path;
+		for (var a of state.accounts.filter(function(a) { return a.configured && (!state.account || a.id === state.account); })) {
+			var path = state.folder === 'inbox' ? 'INBOX' : a.mailboxes?.find(function(f) { return f.id === state.folder; })?.path;
 			if (path && a.remaining?.[path] > 0)
 				pairs.push({ accountId: a.id, path, remaining: a.remaining[path] });
 		}
@@ -234,7 +236,7 @@ PLUGIN('mail', function(exports) {
 		var pairs = olderpairs();
 		ui({
 			olderShown: !!pairs.length,
-			olderCount: TRANSLATE('@({0} not loaded yet)').format(pairs.reduce((sum, p) => sum + p.remaining, 0))
+			olderCount: TRANSLATE('@({0} not loaded yet)').format(pairs.reduce(function(sum, p) { return sum + p.remaining; }, 0))
 		});
 	}
 	// Server folders in the current view that a text search can run on.
@@ -244,9 +246,9 @@ PLUGIN('mail', function(exports) {
 			return [];
 		var pairs = [];
 		for (var a of state.accounts.filter(
-			(a) => a.configured && ['verified', 'synced'].includes(a.status) && (!state.account || a.id === state.account)
+			function(a) { return a.configured && ['verified', 'synced'].includes(a.status) && (!state.account || a.id === state.account); }
 		)) {
-			var path = state.folder === 'inbox' ? 'INBOX' : a.mailboxes?.find((f) => f.id === state.folder)?.path;
+			var path = state.folder === 'inbox' ? 'INBOX' : a.mailboxes?.find(function(f) { return f.id === state.folder; })?.path;
 			if (path)
 				pairs.push({ accountId: a.id, path });
 		}
@@ -322,7 +324,7 @@ PLUGIN('mail', function(exports) {
 			return;
 		}
 		var list = targets(m);
-		await perform(async () => {
+		await perform(async function() {
 			try {
 				for (var t of list)
 					await api('message_erase', { id: t.id });
@@ -338,10 +340,11 @@ PLUGIN('mail', function(exports) {
 		if (state.folder !== 'trash')
 			return [];
 		return state.accounts.filter(
-			(a) =>
-				a.configured &&
-				(!state.account || a.id === state.account) &&
-				state.messages.some((m) => m.remote && m.accountId === a.id && m.folder === 'trash')
+			function(a) {
+				return a.configured &&
+					(!state.account || a.id === state.account) &&
+					state.messages.some(function(m) { return m.remote && m.accountId === a.id && m.folder === 'trash'; });
+			}
 		);
 	}
 	function renderemptytrash() {
@@ -362,7 +365,7 @@ PLUGIN('mail', function(exports) {
 			setTimeout(renderemptytrash, 5100);
 			return;
 		}
-		await perform(async () => {
+		await perform(async function() {
 			try {
 				for (var a of list)
 					await api('trash_empty', { accountId: a.id });
@@ -399,18 +402,18 @@ PLUGIN('mail', function(exports) {
 	}
 	function rendernavigation() {
 
-		var scoped = state.messages.filter((item) => !state.account || item.accountId === state.account);
+		var scoped = state.messages.filter(function(item) { return !state.account || item.accountId === state.account; });
 		var folders = [
-			['inbox', 'inbox', TRANSLATE('@(Inbox)'), scoped.filter((m) => m.folder === 'inbox' && m.unread).length],
-			['starred', 'star', TRANSLATE('@(Starred)'), scoped.filter((m) => m.starred).length],
+			['inbox', 'inbox', TRANSLATE('@(Inbox)'), scoped.filter(function(m) { return m.folder === 'inbox' && m.unread; }).length],
+			['starred', 'star', TRANSLATE('@(Starred)'), scoped.filter(function(m) { return m.starred; }).length],
 			[
 				'drafts',
 				'file-alt',
 				TRANSLATE('@(Drafts)'),
-				state.drafts.filter((m) => m.status !== 'sent' && (!state.account || m.accountId === state.account)).length
+				state.drafts.filter(function(m) { return m.status !== 'sent' && (!state.account || m.accountId === state.account); }).length
 			],
-			['archive', 'archive', TRANSLATE('@(Archive)'), scoped.filter((m) => m.folder === 'archive').length],
-			['trash', 'trash', TRANSLATE('@(Trash)'), scoped.filter((m) => m.folder === 'trash').length]
+			['archive', 'archive', TRANSLATE('@(Archive)'), scoped.filter(function(m) { return m.folder === 'archive'; }).length],
+			['trash', 'trash', TRANSLATE('@(Trash)'), scoped.filter(function(m) { return m.folder === 'trash'; }).length]
 		];
 		folders.push(['sent-local', 'envelope', TRANSLATE('@(Sent from TotalMail)'), 0]);
 		if (state.account) {
@@ -421,24 +424,28 @@ PLUGIN('mail', function(exports) {
 		}
 		SET(
 			'mail.folders',
-			folders.map(([id, icon, label, count]) => ({
-				id,
-				icon,
-				label,
-				count,
-				active: state.folder === id
-			}))
+			folders.map(function([id, icon, label, count]) {
+				return {
+					id,
+					icon,
+					label,
+					count,
+					active: state.folder === id
+				};
+			})
 		);
 		SET(
 			'mail.accounts',
-			state.accounts.map((a) => ({
-				...a,
-				active: state.account === a.id,
-				unreadCount: state.messages.filter((m) => m.accountId === a.id && m.folder === 'inbox' && m.unread && !m.welcome).length,
-				syncFailed: !!syncfailures[a.id],
-				// The reason the server gave, so the warning explains itself on hover.
-				syncMessage: TRANSLATE('@(Automatic sync failed. Use Sync to retry.)') + (syncerrors[a.id] ? ' ' + syncerrors[a.id] : '')
-			}))
+			state.accounts.map(function(a) {
+				return {
+					...a,
+					active: state.account === a.id,
+					unreadCount: state.messages.filter(function(m) { return m.accountId === a.id && m.folder === 'inbox' && m.unread && !m.welcome; }).length,
+					syncFailed: !!syncfailures[a.id],
+					// The reason the server gave, so the warning explains itself on hover.
+					syncMessage: TRANSLATE('@(Automatic sync failed. Use Sync to retry.)') + (syncerrors[a.id] ? ' ' + syncerrors[a.id] : '')
+				};
+			})
 		);
 		var names = {
 			inbox: TRANSLATE('@(Inbox)'),
@@ -452,7 +459,7 @@ PLUGIN('mail', function(exports) {
 				names[state.folder] ||
 				(state.folder === 'sent-local'
 					? TRANSLATE('@(Sent from TotalMail)')
-					: (account(state.account)?.mailboxes || []).find((f) => f.id === state.folder)?.name || TRANSLATE('@(Mail)')),
+					: (account(state.account)?.mailboxes || []).find(function(f) { return f.id === state.folder; })?.name || TRANSLATE('@(Mail)')),
 			accountScope: state.account ? account(state.account).name : TRANSLATE('@(All accounts)')
 		});
 	}
@@ -477,7 +484,7 @@ PLUGIN('mail', function(exports) {
 						: '@({0} messages)'
 			).format(lines.length),
 			totalCount: matching.length,
-			unreadCount: matching.filter((m) => m.unread).length,
+			unreadCount: matching.filter(function(m) { return m.unread; }).length,
 			filter: state.filter,
 			unreadOff: state.folder === 'drafts',
 			folderSubtitle:
@@ -492,7 +499,7 @@ PLUGIN('mail', function(exports) {
 			shown = stretch;
 		}
 		// What is open is always drawn, however far down it is.
-		var open = lines.findIndex((line) => line.members.some((x) => x.id === state.selected));
+		var open = lines.findIndex(function(line) { return line.members.some(function(x) { return x.id === state.selected; }); });
 		if (open >= shown)
 			shown = open + 50;
 		ui({
@@ -503,14 +510,14 @@ PLUGIN('mail', function(exports) {
 			'mail.rows',
 			lines
 				.slice(0, shown)
-				.map(({ m, members, all }) => {
+				.map(function({ m, members, all }) {
 					var a = account(m.accountId);
 					return {
 						...m,
 						count: all.length,
 						threaded: all.length > 1,
-						unread: members.some((x) => x.unread),
-						selected: members.some((x) => x.id === state.selected),
+						unread: members.some(function(x) { return x.unread; }),
+						selected: members.some(function(x) { return x.id === state.selected; }),
 						checked: checked.has(m.id),
 						displaySender: m.sender || m.to || TRANSLATE('@(No recipient)'),
 						displayTime: m.date
@@ -522,7 +529,7 @@ PLUGIN('mail', function(exports) {
 						color: a.color
 					};
 				})
-				.map((row) => {
+				.map(function(row) {
 					// What a screen reader says for the line: the state first, then who, what, when and which account.
 					row.speak = [
 						row.unread ? TRANSLATE('@(Unread)') : '',
@@ -592,14 +599,15 @@ PLUGIN('mail', function(exports) {
 	}
 	function renderreader() {
 
-		var m = state.messages.find((item) => item.id === state.selected);
+		var m = state.messages.find(function(item) { return item.id === state.selected; });
 		// The buttons of the toolbar: switched off when there is nothing to do with them, labelled for what they do now.
-		var off = (command) =>
-			!m ||
-			(m.outgoing && command !== 'print') ||
-			(command !== 'print' && networkbusy) ||
-			(['move', 'source'].includes(command) && !m.remote) ||
-			(command === 'trash' && m.folder === 'trash' && !m.remote);
+		var off = function(command) {
+			return !m ||
+				(m.outgoing && command !== 'print') ||
+				(command !== 'print' && networkbusy) ||
+				(['move', 'source'].includes(command) && !m.remote) ||
+				(command === 'trash' && m.folder === 'trash' && !m.remote);
+		};
 		ui({
 			t: {
 				archive: {
@@ -632,14 +640,16 @@ PLUGIN('mail', function(exports) {
 			...m,
 			thread:
 				isgrouping() && chain.length > 1
-					? chain.map((x) => ({
-						id: x.id,
-						current: x.id === m.id,
-						unread: !!x.unread,
-						who: x.outgoing ? TRANSLATE('@(You)') : x.sender || x.email,
-						when: x.date ? new Date(x.date).toLocaleDateString(document.documentElement.lang) : '',
-						snippet: (x.body || '').replace(/\s+/g, ' ').slice(0, 90)
-					}))
+					? chain.map(function(x) {
+						return {
+							id: x.id,
+							current: x.id === m.id,
+							unread: !!x.unread,
+							who: x.outgoing ? TRANSLATE('@(You)') : x.sender || x.email,
+							when: x.date ? new Date(x.date).toLocaleDateString(document.documentElement.lang) : '',
+							snippet: (x.body || '').replace(/\s+/g, ' ').slice(0, 90)
+						};
+					})
 					: [],
 			unsubscribe: m.unsubscribe || null,
 			invite: m.invite ? invitecard(m.invite) : null,
@@ -652,15 +662,17 @@ PLUGIN('mail', function(exports) {
 			accountName: a.name,
 			accountEmail: m.outgoing ? m.to : a.email,
 			messageKind: m.welcome ? TRANSLATE('@(Message)') : '',
-			files: (m.attachments || []).map((f) => ({
-				name: f.name,
-				size: filesize(f.size),
-				href: '/attachment/' + encodeURIComponent(m.id) + '/' + f.index + '/'
-			})),
+			files: (m.attachments || []).map(function(f) {
+				return {
+					name: f.name,
+					size: filesize(f.size),
+					href: '/attachment/' + encodeURIComponent(m.id) + '/' + f.index + '/'
+				};
+			}),
 			body: m.remote && !m.bodyLoaded ? TRANSLATE('@(Loading message securely…)') : m.body,
 			initials: m.sender
 				.split(' ')
-				.map((s) => s[0])
+				.map(function(s) { return s[0]; })
 				.slice(0, 2)
 				.join('')
 		});
@@ -668,18 +680,18 @@ PLUGIN('mail', function(exports) {
 	async function selectmessage(id) {
 
 		if (state.folder === 'drafts') {
-			await opencomposer(state.drafts.find((d) => d.id === id));
+			await opencomposer(state.drafts.find(function(d) { return d.id === id; }));
 			return;
 		}
 		state.selected = id;
 		ui({ hasReader: true });
 		renderlist();
 		renderreader();
-		var m = state.messages.find((m) => m.id === id);
+		var m = state.messages.find(function(m) { return m.id === id; });
 		if (m?.remote && (!m.bodyLoaded || m.hasHtml === undefined || (m.attachmentCount && !m.attachments))) {
 			reading = reading
-				.catch(() => {})
-				.then(async () => {
+				.catch(function() {})
+				.then(async function() {
 					if (state.selected !== id)
 						return;
 					try {
@@ -702,8 +714,8 @@ PLUGIN('mail', function(exports) {
 		}
 		if (m && m.unread && state.selected === id && (!m.remote || m.bodyLoaded))
 			try {
-				var operation = async () => api(m.remote ? 'message_seen' : 'message_change', { id, operation: 'read' });
-				reading = reading.catch(() => {}).then(operation);
+				var operation = async function() { return api(m.remote ? 'message_seen' : 'message_change', { id, operation: 'read' }); };
+				reading = reading.catch(function() {}).then(operation);
 				var saved = await reading;
 				m.unread = saved.unread;
 				renderlist();
@@ -716,7 +728,7 @@ PLUGIN('mail', function(exports) {
 
 		if (searchhits && searchhits.query !== (mail.search || '').trim().toLocaleLowerCase())
 			searchhits = null;
-		if (state.selected && !visible().some((item) => item.id === state.selected)) {
+		if (state.selected && !visible().some(function(item) { return item.id === state.selected; })) {
 			state.selected = '';
 			renderreader();
 			ui({ hasReader: false });
@@ -747,14 +759,14 @@ PLUGIN('mail', function(exports) {
 		pendingsaves++;
 		draftstatus(TRANSLATE('@(Saving…)'));
 		saving = saving
-			.catch(() => {})
-			.then(async () => {
+			.catch(function() {})
+			.then(async function() {
 				try {
 					if (!data.id)
 						data.id = current.id;
 					var saved = await api('draft_save', data);
 					Object.assign(current, saved);
-					var i = state.drafts.findIndex((d) => d.id === saved.id);
+					var i = state.drafts.findIndex(function(d) { return d.id === saved.id; });
 					if (i < 0)
 						state.drafts.unshift(saved);
 					else
@@ -779,15 +791,15 @@ PLUGIN('mail', function(exports) {
 		dirty = true;
 		draftstatus(TRANSLATE('@(Unsaved changes…)'));
 		clearTimeout(drafttimer);
-		drafttimer = setTimeout(() => savedraft().catch((e) => toast(e.message)), 650);
+		drafttimer = setTimeout(function() { return savedraft().catch(function(e) { return toast(e.message); }); }, 650);
 	}
 	function draftfiles(source) {
-		return (source?.attachments || []).map((f) => ({ id: f.id, name: f.name, size: filesize(f.size) }));
+		return (source?.attachments || []).map(function(f) { return { id: f.id, name: f.name, size: filesize(f.size) }; });
 	}
 	function draftchanged(saved) {
 
 		Object.assign(draft, saved);
-		var i = state.drafts.findIndex((d) => d.id === saved.id);
+		var i = state.drafts.findIndex(function(d) { return d.id === saved.id; });
 		if (i < 0)
 			state.drafts.unshift(saved);
 		else
@@ -863,14 +875,15 @@ PLUGIN('mail', function(exports) {
 		clearTimeout(undotimer);
 		ui({ undoText: TRANSLATE('@(Putting it back…)'), undoBusy: true });
 		try {
-			await perform(async () => {
+			await perform(async function() {
 				try {
 					for (var item of items) {
 						var found = state.messages.find(
-							(x) =>
-								x.accountId === item.accountid &&
-								x.folder === item.folder &&
-								(item.messageid ? x.messageId === item.messageid : x.id === item.id)
+							function(x) {
+								return x.accountId === item.accountid &&
+									x.folder === item.folder &&
+									(item.messageid ? x.messageId === item.messageid : x.id === item.id);
+							}
 						);
 						if (found)
 							await api('message_change', { id: found.id, operation: 'restore', enabled: false });
@@ -886,7 +899,7 @@ PLUGIN('mail', function(exports) {
 			hideundo();
 		}
 	}
-	exports.undo = () => undomove().catch((e) => toast(e.message));
+	exports.undo = function() { return undomove().catch(function(e) { return toast(e.message); }); };
 	function undoentry(t, folder) {
 		return { id: t.id, accountid: t.accountId, messageid: t.messageId || '', folder };
 	}
@@ -895,7 +908,7 @@ PLUGIN('mail', function(exports) {
 	var checked = new Set(),
 		anchor = '';
 	function lineids() {
-		return entries(visible()).map((line) => line.m.id);
+		return entries(visible()).map(function(line) { return line.m.id; });
 	}
 	function renderbulk() {
 
@@ -905,7 +918,7 @@ PLUGIN('mail', function(exports) {
 				checked.delete(id);
 		ui({
 			bulkShown: checked.size > 0,
-			bulkCount: TRANSLATE('@({count} selected)').replace('{count}', () => checked.size),
+			bulkCount: TRANSLATE('@({count} selected)').replace('{count}', function() { return checked.size; }),
 			bulkAll: ids.length > 0 && checked.size === ids.length,
 			bulkSome: checked.size > 0 && checked.size < ids.length,
 			// Drafts can only be thrown away; the other actions belong to received mail.
@@ -948,7 +961,7 @@ PLUGIN('mail', function(exports) {
 		for (var id of ids)
 			try {
 				await api('draft_delete', { id });
-				state.drafts = state.drafts.filter((d) => d.id !== id);
+				state.drafts = state.drafts.filter(function(d) { return d.id !== id; });
 				checked.delete(id);
 				done++;
 			} catch {
@@ -957,19 +970,19 @@ PLUGIN('mail', function(exports) {
 		renderlist();
 		toast(
 			TRANSLATE(left ? '@({done} done, {left} could not be changed.)' : '@({done} done.)')
-				.replace('{done}', () => done)
-				.replace('{left}', () => left)
+				.replace('{done}', function() { return done; })
+				.replace('{left}', function() { return left; })
 		);
 	}
 	async function bulk(op) {
 
 		if (op === 'clear')
 			return clearchecked();
-		var lines = entries(visible()).filter((line) => checked.has(line.m.id));
+		var lines = entries(visible()).filter(function(line) { return checked.has(line.m.id); });
 		if (!lines.length)
 			return;
 		if (state.folder === 'drafts')
-			return op === 'trash' ? discarddrafts(lines.map((line) => line.m.id)) : undefined;
+			return op === 'trash' ? discarddrafts(lines.map(function(line) { return line.m.id; })) : undefined;
 		var list = [],
 			seen = new Set();
 		for (var line of lines)
@@ -983,11 +996,11 @@ PLUGIN('mail', function(exports) {
 			toast(TRANSLATE('@(Press again to delete permanently.)'));
 			return;
 		}
-		var star = op === 'star' ? !list.every((t) => t.starred) : false,
+		var star = op === 'star' ? !list.every(function(t) { return t.starred; }) : false,
 			done = 0,
 			left = 0,
 			moved = [];
-		await perform(async () => {
+		await perform(async function() {
 			try {
 				for (var t of list) {
 					var operation = op === 'archive' ? (['archive', 'trash'].includes(t.folder) ? 'restore' : 'archive') : op;
@@ -998,7 +1011,7 @@ PLUGIN('mail', function(exports) {
 						!erasing &&
 						t.remote &&
 						['archive', 'trash'].includes(operation) &&
-						!account(t.accountId).mailboxes?.some((f) => f.specialUse === (operation === 'archive' ? '\\Archive' : '\\Trash'))
+						!account(t.accountId).mailboxes?.some(function(f) { return f.specialUse === (operation === 'archive' ? '\\Archive' : '\\Trash'); })
 					) {
 						left++;
 						continue;
@@ -1025,8 +1038,8 @@ PLUGIN('mail', function(exports) {
 			}
 		});
 		var text = TRANSLATE(left ? '@({done} done, {left} could not be changed.)' : '@({done} done.)')
-			.replace('{done}', () => done)
-			.replace('{left}', () => left);
+			.replace('{done}', function() { return done; })
+			.replace('{left}', function() { return left; });
 		// What came out of the inbox can be put back.
 		if (!offerundo(moved, text))
 			toast(text);
@@ -1037,10 +1050,10 @@ PLUGIN('mail', function(exports) {
 	}
 	exports.showmore = showmore;
 	// The list asks for more when its end comes near (the scrollend component).
-	exports.scrolled = () => GET('mail.ui').moreShown && showmore();
+	exports.scrolled = function() { return GET('mail.ui').moreShown && showmore(); };
 	// The checkbox of a line (Shift for a range), the one that selects all, and the buttons of the bar.
-	exports.check = (element, event) => togglecheck(element[0].dataset.row, !!event?.shiftKey, true);
-	exports.bulkall = (element) => {
+	exports.check = function(element, event) { return togglecheck(element[0].dataset.row, !!event?.shiftKey, true); };
+	exports.bulkall = function(element) {
 		if (element[0].checked)
 			for (var id of lineids())
 				checked.add(id);
@@ -1048,9 +1061,9 @@ PLUGIN('mail', function(exports) {
 			checked.clear();
 		renderlist();
 	};
-	exports.bulk = (element) => bulk(element[0].dataset.bulk).catch((e) => toast(e.message));
+	exports.bulk = function(element) { return bulk(element[0].dataset.bulk).catch(function(e) { return toast(e.message); }); };
 	// The select-all box is a tri-state: it has no attribute for 'some', only a property, so the binding calls this.
-	exports.bulkstate = (value, path, element) => {
+	exports.bulkstate = function(value, path, element) {
 		var box = element.find('input')[0];
 		if (box) {
 			box.checked = !!value?.bulkAll;
@@ -1063,7 +1076,7 @@ PLUGIN('mail', function(exports) {
 		var lines = entries(visible());
 		if (!lines.length)
 			return;
-		var i = lines.findIndex((line) => line.members.some((x) => x.id === state.selected));
+		var i = lines.findIndex(function(line) { return line.members.some(function(x) { return x.id === state.selected; }); });
 		var next = lines[Math.min(lines.length - 1, Math.max(0, i < 0 ? 0 : i + delta))];
 		await selectmessage(next.m.id);
 		SETTER('page/reveal', '.message-row.selected');
@@ -1086,7 +1099,7 @@ PLUGIN('mail', function(exports) {
 			if (!clearchecked())
 				return false;
 		} else if (key === 'x') {
-			var line = entries(visible()).find((l) => l.members.some((x) => x.id === state.selected));
+			var line = entries(visible()).find(function(l) { return l.members.some(function(x) { return x.id === state.selected; }); });
 			if (line)
 				togglecheck(line.m.id, false);
 		} else if (bulkable[key] && checked.size)
@@ -1105,7 +1118,7 @@ PLUGIN('mail', function(exports) {
 		if (file.name && !/^image\.(png|jpe?g|gif|webp)$/i.test(file.name))
 			return file;
 		var now = new Date(),
-			pad = (n) => String(n).padStart(2, '0'),
+			pad = function(n) { return String(n).padStart(2, '0'); },
 			extension = (file.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
 		var name =
 			'image-' +
@@ -1121,7 +1134,7 @@ PLUGIN('mail', function(exports) {
 		return new File([file], name, { type: file.type });
 	}
 	// Files dropped on the window (the dropfiles component): on the composer they are attached, on the mailbox they start a new message.
-	exports.dropped = async (files) => {
+	exports.dropped = async function(files) {
 
 		var list = files.map(stamp);
 		if (!list.length || (mail.window && mail.window !== 'composer'))
@@ -1135,7 +1148,7 @@ PLUGIN('mail', function(exports) {
 		}
 	};
 	// Files pasted into the message (the mailbody component).
-	exports.pasted = (files) => attachfiles(files.map(stamp)).catch((e) => toast(e.message));
+	exports.pasted = function(files) { return attachfiles(files.map(stamp)).catch(function(e) { return toast(e.message); }); };
 	// Address suggestions while typing in To, Cc and Bcc, from the mail already loaded. Nothing leaves the browser.
 	var contactcache = { size: -1, list: [] };
 	// The addresses of the mail already loaded and of the accounts: the list the suggestions draw from (mail.contacts).
@@ -1147,7 +1160,7 @@ PLUGIN('mail', function(exports) {
 			size: state.messages.length,
 			list: totalmailcontacts(
 				state.messages,
-				state.accounts.flatMap((a) => [a.email, ...(a.aliases || [])])
+				state.accounts.flatMap(function(a) { return [a.email, ...(a.aliases || [])]; })
 			)
 		};
 		SET('mail.contacts', contactcache.list);
@@ -1156,15 +1169,15 @@ PLUGIN('mail', function(exports) {
 	// The input component of a path, to give it the focus.
 	function focusfield(path) {
 		FIND('input', true)
-			.find((c) => c.path?.path === path)
+			.find(function(c) { return c.path?.path === path; })
 			?.autofocus();
 	}
 	// The window measures itself when it opens, before the assistant's box or a row of the form has appeared: it measures again,
 	// and a window that is still taller than the screen moves up until its buttons are in view.
 	function fitwindow(delay = 60) {
-		var fit = () => {
+		var fit = function() {
 			SETTER('modal', 'resize');
-			setTimeout(() => {
+			setTimeout(function() {
 
 				var element = document.querySelector('.ui-modal.composer');
 				if (!element || GET('mail.window') !== 'composer')
@@ -1199,7 +1212,7 @@ PLUGIN('mail', function(exports) {
 			list = a ? [a.email, ...(a.aliases || [])] : [];
 		SET(
 			'mail.fromOptions',
-			list.map((address) => ({ id: address, name: address }))
+			list.map(function(address) { return { id: address, name: address }; })
 		);
 		ui({ aliasRow: list.length >= 2 });
 		SET('mail.compose.from', list.includes(chosen) ? chosen : list[0] || '');
@@ -1208,24 +1221,25 @@ PLUGIN('mail', function(exports) {
 	function replyfrom(message) {
 
 		var a = account(message.accountId),
-			wanted = [...(message.toRecipients || []), ...(message.ccRecipients || [])].map((x) => String(x).toLowerCase());
+			wanted = [...(message.toRecipients || []), ...(message.ccRecipients || [])].map(function(x) { return String(x).toLowerCase(); });
 		if (!a || wanted.includes(a.email.toLowerCase()))
 			return '';
-		return (a.aliases || []).find((x) => wanted.includes(x)) || '';
+		return (a.aliases || []).find(function(x) { return wanted.includes(x); }) || '';
 	}
 	// The labels of the quoted header, in the person's language.
 	function quotetext() {
 		return {
-			wrote: (date, who) =>
-				TRANSLATE('@(On {date}, {sender} wrote:)')
-					.replace('{date}', () => date)
-					.replace('{sender}', () => who),
+			wrote: function(date, who) {
+				return TRANSLATE('@(On {date}, {sender} wrote:)')
+					.replace('{date}', function() { return date; })
+					.replace('{sender}', function() { return who; });
+			},
 			forwarded: TRANSLATE('@(Forwarded message)'),
 			from: TRANSLATE('@(From)'),
 			date: TRANSLATE('@(Date)'),
 			subject: TRANSLATE('@(Subject)'),
 			to: TRANSLATE('@(To)'),
-			format: (value) => (value ? new Date(value).toLocaleString(document.documentElement.lang) : '')
+			format: function(value) { return value ? new Date(value).toLocaleString(document.documentElement.lang) : ''; }
 		};
 	}
 	// A forward carries the original's attachments: the server copies them into the saved draft.
@@ -1278,7 +1292,7 @@ PLUGIN('mail', function(exports) {
 				used = new Set([mine?.email.toLowerCase(), ...(mine?.aliases || [])]);
 			function recipients(values) {
 				return values
-					.filter((value) => {
+					.filter(function(value) {
 
 						if (!value || used.has(value.toLowerCase()))
 							return false;
@@ -1319,7 +1333,7 @@ PLUGIN('mail', function(exports) {
 		fitwindow(250);
 		// A reply starts in the message, a new message in the recipient field.
 		if (!existing)
-			setTimeout(() => (reply && !forward ? SETTER('mailbody/focus', 0) : focusfield('mail.compose.to')), 150);
+			setTimeout(function() { return reply && !forward ? SETTER('mailbody/focus', 0) : focusfield('mail.compose.to'); }, 150);
 		if (forward && !existing)
 			forwardfiles(reply.id);
 	}
@@ -1345,11 +1359,11 @@ PLUGIN('mail', function(exports) {
 		}
 		clearTimeout(drafttimer);
 		dirty = false;
-		await saving.catch(() => {});
+		await saving.catch(function() {});
 		var id = draft.id;
-		if (id && state.drafts.some((d) => d.id === id)) {
+		if (id && state.drafts.some(function(d) { return d.id === id; })) {
 			await api('draft_delete', { id });
-			state.drafts = state.drafts.filter((d) => d.id !== id);
+			state.drafts = state.drafts.filter(function(d) { return d.id !== id; });
 		}
 		SET('mail.window', '');
 		draft = null;
@@ -1360,7 +1374,7 @@ PLUGIN('mail', function(exports) {
 
 		if (state.loading)
 			return;
-		var m = state.messages.find((m) => m.id === state.selected);
+		var m = state.messages.find(function(m) { return m.id === state.selected; });
 		if (name === 'compose') {
 			if (!state.accounts.length) {
 				await PLUGINS.accounts.open();
@@ -1370,7 +1384,7 @@ PLUGIN('mail', function(exports) {
 		} else if (name === 'show-cc' || name === 'show-bcc')
 			revealextra(name === 'show-cc' ? 'cc' : 'bcc', true);
 		else if (name === 'attach')
-			SETTER('filepicker/open', { multiple: true, callback: (files) => attachfiles(files).catch((e) => toast(e.message)) });
+			SETTER('filepicker/open', { multiple: true, callback: function(files) { return attachfiles(files).catch(function(e) { return toast(e.message); }); } });
 		else if (name === 'older')
 			await oldermail();
 		else if (name === 'server-search')
@@ -1460,7 +1474,7 @@ PLUGIN('mail', function(exports) {
 			ui({ hasReader: false });
 		else if (name === 'next') {
 			var lines = entries(visible());
-			var i = lines.findIndex((line) => line.members.some((item) => item.id === state.selected));
+			var i = lines.findIndex(function(line) { return line.members.some(function(item) { return item.id === state.selected; }); });
 			if (lines.length)
 				await selectmessage(lines[(i + 1) % lines.length].m.id);
 		} else if (name === 'move' && m?.remote)
@@ -1481,14 +1495,14 @@ PLUGIN('mail', function(exports) {
 			if (
 				m.remote &&
 				['archive', 'trash'].includes(operation) &&
-				!account(m.accountId).mailboxes?.some((f) => f.specialUse === (operation === 'archive' ? '\\Archive' : '\\Trash'))
+				!account(m.accountId).mailboxes?.some(function(f) { return f.specialUse === (operation === 'archive' ? '\\Archive' : '\\Trash'); })
 			) {
 				PLUGINS.folders.move(m.id);
 				return;
 			}
 			var list = name === 'star' ? [m] : targets(m),
 				origin = m.folder;
-			await perform(async () => {
+			await perform(async function() {
 				try {
 					for (var t of list)
 						await api('message_change', { id: t.id, operation, enabled: !t.starred });
@@ -1506,7 +1520,7 @@ PLUGIN('mail', function(exports) {
 						origin === 'inbox' &&
 						operation !== 'restore' &&
 						offerundo(
-							list.map((t) => undoentry(t, destination)),
+							list.map(function(t) { return undoentry(t, destination); }),
 							TRANSLATE(operation === 'archive' ? '@(Archived.)' : '@(Moved to the trash.)')
 						)
 					)
@@ -1533,7 +1547,7 @@ PLUGIN('mail', function(exports) {
 				renderlist();
 				renderreader();
 				ui({ hasReader: false });
-				var f = account(state.account)?.mailboxes?.find((f) => f.id === state.folder);
+				var f = account(state.account)?.mailboxes?.find(function(f) { return f.id === state.folder; });
 				if (f)
 					await syncmail(state.account, f.path);
 			} else if (el.dataset.account) {
@@ -1561,7 +1575,7 @@ PLUGIN('mail', function(exports) {
 	}
 	// The account the open message was last signed for, so changing it twice still compares with what is on screen.
 	var signedfor = null;
-	WATCH('mail.compose.accountId', (next) => {
+	WATCH('mail.compose.accountId', function(next) {
 
 		var body = GET('mail.compose.body'),
 			previous = signedfor || draft?.accountId;
@@ -1575,7 +1589,7 @@ PLUGIN('mail', function(exports) {
 		refreshsendbutton();
 	});
 	// Whether leaving the page would lose something (the beforeleave component asks).
-	exports.pending = () => dirty || pendingsaves > 0;
+	exports.pending = function() { return dirty || pendingsaves > 0; };
 	// Every key of the page (the keys component): shortcuts while no window is open, Escape while one is.
 	exports.keys = function(event) {
 
@@ -1614,7 +1628,7 @@ PLUGIN('mail', function(exports) {
 		},
 		async function() {
 
-			WATCH('mail.language', async (language) => {
+			WATCH('mail.language', async function(language) {
 				if (!language || language === document.documentElement.lang)
 					return;
 				try {
@@ -1646,7 +1660,7 @@ PLUGIN('mail', function(exports) {
 					userEmail: state.user.email,
 					userInitials: state.user.name
 						.split(/\s+/)
-						.map((x) => x[0])
+						.map(function(x) { return x[0]; })
 						.slice(0, 2)
 						.join('')
 						.toUpperCase(),
@@ -1668,7 +1682,7 @@ PLUGIN('mail', function(exports) {
 				} catch {
 					SET('mail.theme', 'auto');
 				}
-				WATCH('mail.theme', (value) => {
+				WATCH('mail.theme', function(value) {
 
 					if (!value)
 						return;
@@ -1719,10 +1733,10 @@ PLUGIN('mail', function(exports) {
 	}
 	function updatesyncstatus() {
 		ui({
-			listStatus: state.accounts.some((a) => a.status === 'synced')
+			listStatus: state.accounts.some(function(a) { return a.status === 'synced'; })
 				? ''
 				: TRANSLATE(
-					state.accounts.some((a) => a.configured)
+					state.accounts.some(function(a) { return a.configured; })
 						? '@(Save credentials, then verify and sync)'
 						: '@(Add your first mail account to get started.)'
 				)
@@ -1756,17 +1770,17 @@ PLUGIN('mail', function(exports) {
 		SET('mail.notifyOn', true);
 	}
 	function unreadinbox() {
-		return new Set(state.messages.filter((m) => m.folder === 'inbox' && m.unread && !m.welcome).map((m) => m.id));
+		return new Set(state.messages.filter(function(m) { return m.folder === 'inbox' && m.unread && !m.welcome; }).map(function(m) { return m.id; }));
 	}
 	// Mail that arrived since the previous load is announced when the window is not in front of the person.
 	// A screen reader hears new mail in a polite status line, with or without system notifications.
 	function say(text) {
 		ui({ announce: '' });
-		setTimeout(() => ui({ announce: text }), 50);
+		setTimeout(function() { return ui({ announce: text }); }, 50);
 	}
 	function announce(before) {
 
-		var fresh = state.messages.filter((m) => m.folder === 'inbox' && m.unread && !m.welcome && !before.has(m.id));
+		var fresh = state.messages.filter(function(m) { return m.folder === 'inbox' && m.unread && !m.welcome && !before.has(m.id); });
 		if (!fresh.length)
 			return;
 		var first = fresh[0],
@@ -1777,7 +1791,7 @@ PLUGIN('mail', function(exports) {
 		say((fresh.length === 1 ? TRANSLATE('@(New message)') + ': ' : '') + text);
 		if (!notificationsenabled() || (!document.hidden && document.hasFocus()))
 			return;
-		SETTER('nativenotifications/show', fresh.length === 1 ? TRANSLATE('@(New message)') : TRANSLATE('@(New mail)'), text, () => {
+		SETTER('nativenotifications/show', fresh.length === 1 ? TRANSLATE('@(New message)') : TRANSLATE('@(New mail)'), text, function() {
 			if (fresh.length === 1)
 				selectmessage(first.id);
 		});
@@ -1789,7 +1803,7 @@ PLUGIN('mail', function(exports) {
 		Object.assign(state, await api('bootstrap'));
 		announce(before);
 		PLUGINS.accounts.refresh();
-		if (!state.messages.some((m) => m.id === selected))
+		if (!state.messages.some(function(m) { return m.id === selected; }))
 			state.selected = '';
 		renderlist();
 		renderreader();
@@ -1822,7 +1836,7 @@ PLUGIN('mail', function(exports) {
 		}
 	}
 	function currentpath() {
-		return account(state.account)?.mailboxes?.find((f) => f.id === state.folder)?.path || '';
+		return account(state.account)?.mailboxes?.find(function(f) { return f.id === state.folder; })?.path || '';
 	}
 	async function perform(fn) {
 
@@ -1844,8 +1858,8 @@ PLUGIN('mail', function(exports) {
 			toast(TRANSLATE('@(Mail synchronization is already running.)'));
 			return;
 		}
-		var accounts = id ? [account(id)] : state.account ? [account(state.account)] : state.accounts.filter((a) => a.configured);
-		if (!accounts.length || accounts.some((a) => !a?.configured)) {
+		var accounts = id ? [account(id)] : state.account ? [account(state.account)] : state.accounts.filter(function(a) { return a.configured; });
+		if (!accounts.length || accounts.some(function(a) { return !a?.configured; })) {
 			toast(TRANSLATE('@(Save the account before connecting.)'));
 			return;
 		}
@@ -1854,7 +1868,7 @@ PLUGIN('mail', function(exports) {
 		try {
 			await reading;
 			for (var a of accounts) {
-				var folderpath = path || a.mailboxes?.find((f) => f.id === state.folder)?.path || 'INBOX';
+				var folderpath = path || a.mailboxes?.find(function(f) { return f.id === state.folder; })?.path || 'INBOX';
 				await api('account_sync', { accountId: a.id, path: folderpath });
 				delete syncfailures[a.id];
 				delete retryafter[a.id];
@@ -1927,7 +1941,7 @@ PLUGIN('mail', function(exports) {
 		} catch (e) {
 			ui({ sendError: e.message });
 			await reloadmail();
-			var saved = state.drafts.find((d) => d.id === draft?.id);
+			var saved = state.drafts.find(function(d) { return d.id === draft?.id; });
 			if (saved)
 				Object.assign(draft, saved);
 			refreshsendbutton();
@@ -1937,14 +1951,15 @@ PLUGIN('mail', function(exports) {
 			ui({ editSendOff: false, confirmOff: ['unknown', 'sending', 'sent'].includes(draft?.status) });
 		}
 	}
-	exports.backgroundReady = () =>
-		!state.loading &&
-		!!state.user &&
-		!networkbusy &&
-		!sendbusy &&
-		!mail.window &&
-		!PLUGINS.accounts?.busy &&
-		state.accounts.some((a) => a.configured && ['verified', 'synced'].includes(a.status));
+	exports.backgroundReady = function() {
+		return !state.loading &&
+			!!state.user &&
+			!networkbusy &&
+			!sendbusy &&
+			!mail.window &&
+			!PLUGINS.accounts?.busy &&
+			state.accounts.some(function(a) { return a.configured && ['verified', 'synced'].includes(a.status); });
+	};
 	exports.backgroundSync = async function() {
 
 		if (!exports.backgroundReady())
@@ -1952,7 +1967,7 @@ PLUGIN('mail', function(exports) {
 		busy(true);
 		try {
 			await reading;
-			for (var a of state.accounts.filter((a) => a.configured && ['verified', 'synced'].includes(a.status))) {
+			for (var a of state.accounts.filter(function(a) { return a.configured && ['verified', 'synced'].includes(a.status); })) {
 				if (retryafter[a.id] > Date.now())
 					continue;
 				try {
@@ -2014,7 +2029,7 @@ PLUGIN('mail', function(exports) {
 	exports.reload = reloadmail;
 	exports.store = state;
 	exports.api = api;
-	exports.upload = (url, form) => totalmailrequest.upload(url, form);
+	exports.upload = function(url, form) { return totalmailrequest.upload(url, form); };
 	exports.notify = toast;
 	// What the assistant writes goes into the composer only when the person chooses it.
 	exports.say = say;
@@ -2024,7 +2039,7 @@ PLUGIN('mail', function(exports) {
 	};
 	exports.replywith = async function(id, text) {
 
-		var m = state.messages.find((x) => x.id === id);
+		var m = state.messages.find(function(x) { return x.id === id; });
 		if (!m)
 			return;
 		await opencomposer(null, m);

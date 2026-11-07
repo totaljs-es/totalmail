@@ -5,7 +5,7 @@ function overview($) {
 		hidden = MODS.instance.hidden(),
 		defaultid = catalogue.defaultId();
 	var oauth = {};
-	for (var provider of catalogue.all().filter((p) => p.auth === 'oauth2')) {
+	for (var provider of catalogue.all().filter(function(p) { return p.auth === 'oauth2'; })) {
 		var own = MODS.instance.view().oauth[provider.id] || {};
 		oauth[provider.id] = {
 			name: provider.name,
@@ -20,25 +20,27 @@ function overview($) {
 	return {
 		oauth,
 		defaultProvider: defaultid,
-		types: catalogue.all().map((p) => ({
-			id: p.id,
-			name: p.name,
-			custom: !!p.custom,
-			auth: p.auth,
-			hidden: p.id !== 'other' && hidden.includes(p.id),
-			locked: p.id === 'other',
-			isDefault: p.id === defaultid,
-			summary: p.summary,
-			note: p.note,
-			domains: p.domains.join(', '),
-			steps: p.steps.map((s) => (s.url ? s.text + ' | ' + s.url : s.text)).join('\n'),
-			imapHost: p.imap?.host || '',
-			imapPort: p.imap?.port || 993,
-			imapSecurity: p.imap?.security || 'tls',
-			smtpHost: p.smtp?.host || '',
-			smtpPort: p.smtp?.port || 465,
-			smtpSecurity: p.smtp?.security || 'tls'
-		}))
+		types: catalogue.all().map(function(p) {
+			return {
+				id: p.id,
+				name: p.name,
+				custom: !!p.custom,
+				auth: p.auth,
+				hidden: p.id !== 'other' && hidden.includes(p.id),
+				locked: p.id === 'other',
+				isDefault: p.id === defaultid,
+				summary: p.summary,
+				note: p.note,
+				domains: p.domains.join(', '),
+				steps: p.steps.map(function(s) { return s.url ? s.text + ' | ' + s.url : s.text; }).join('\n'),
+				imapHost: p.imap?.host || '',
+				imapPort: p.imap?.port || 993,
+				imapSecurity: p.imap?.security || 'tls',
+				smtpHost: p.smtp?.host || '',
+				smtpPort: p.smtp?.port || 465,
+				smtpSecurity: p.smtp?.security || 'tls'
+			};
+		})
 	};
 }
 
@@ -58,10 +60,10 @@ function slug(name) {
 function steps(text) {
 	return String(text || '')
 		.split('\n')
-		.map((line) => line.trim())
+		.map(function(line) { return line.trim(); })
 		.filter(Boolean)
 		.slice(0, 8)
-		.map((line) => {
+		.map(function(line) {
 
 			var [first, ...rest] = line.split('|');
 			var link = rest.join('|').trim();
@@ -73,7 +75,7 @@ NEWACTION('Instance|get', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -instance_get --> Instance|get',
-	action: ($) => FUNC.run($, () => overview($))
+	action: function($) { return FUNC.run($, function() { return overview($); }); }
 });
 
 NEWACTION('Instance|oauth', {
@@ -81,10 +83,10 @@ NEWACTION('Instance|oauth', {
 	permissions: 'admin',
 	route: '+API /api/ +instance_oauth --> Instance|oauth',
 	input: '*provider:String(30), clientId:String(120), clientSecret:String(500), clearSecret:Boolean, tenant:String(40)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
-			if (!MODS.providers.all().some((p) => p.id === model.provider && p.auth === 'oauth2'))
+			if (!MODS.providers.all().some(function(p) { return p.id === model.provider && p.auth === 'oauth2'; }))
 				throw Error('@(Invalid operation.)');
 			await MODS.instance.saveOAuth(model.provider, {
 				clientId: (model.clientId || '').trim(),
@@ -93,7 +95,8 @@ NEWACTION('Instance|oauth', {
 				tenant: (model.tenant || '').trim()
 			});
 			return overview($);
-		})
+		});
+	}
 });
 
 NEWACTION('Instance|type', {
@@ -101,8 +104,8 @@ NEWACTION('Instance|type', {
 	permissions: 'admin',
 	route: '+API /api/ +instance_type --> Instance|type',
 	input: 'id:String(30), *name:String(80), summary:String(200), note:String(300), domains:String(1000), *imapHost:String(253), *imapPort:Number, *imapSecurity:{tls|starttls}, *smtpHost:String(253), *smtpPort:Number, *smtpSecurity:{tls|starttls}, auth:{password|app-password}, steps:String(2000)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			var catalogue = MODS.providers,
 				existing = model.id ? catalogue.get(model.id) : null;
@@ -140,7 +143,8 @@ NEWACTION('Instance|type', {
 			}
 			await MODS.instance.saveProvider(raw);
 			return overview($);
-		})
+		});
+	}
 });
 
 NEWACTION('Instance|type_delete', {
@@ -148,14 +152,15 @@ NEWACTION('Instance|type_delete', {
 	permissions: 'admin',
 	route: '+API /api/ +instance_type_delete --> Instance|type_delete',
 	input: '*id:String(30)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			if (!MODS.providers.get(model.id)?.custom)
 				throw Error('@(Account type not found.)');
 			await MODS.instance.deleteProvider(model.id);
 			return overview($);
-		})
+		});
+	}
 });
 
 NEWACTION('Instance|prefs', {
@@ -163,19 +168,20 @@ NEWACTION('Instance|prefs', {
 	permissions: 'admin',
 	route: '+API /api/ +instance_prefs --> Instance|prefs',
 	input: 'hidden:String(1000), defaultProvider:String(30)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
-			var known = MODS.providers.all().map((p) => p.id);
+			var known = MODS.providers.all().map(function(p) { return p.id; });
 			var hidden = String(model.hidden || '')
 				.split(/[\s,;]+/)
 				.filter(Boolean);
-			if (hidden.some((id) => id === 'other' || !known.includes(id)))
+			if (hidden.some(function(id) { return id === 'other' || !known.includes(id); }))
 				throw Error('@(Account type not found.)');
 			var chosen = model.defaultProvider || '';
 			if (chosen && (!known.includes(chosen) || hidden.includes(chosen)))
 				throw Error('@(Account type not found.)');
 			await MODS.instance.savePrefs({ hidden, defaultProvider: chosen });
 			return overview($);
-		})
+		});
+	}
 });

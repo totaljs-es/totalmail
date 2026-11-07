@@ -76,17 +76,19 @@ PLUGIN('providers', function(exports) {
 				exports.set('googleSecret', !!g.secretSet);
 				SET(
 					'providers.items',
-					data.types.map((t) => ({
-						id: t.id,
-						name: TRANSLATE(t.name),
-						custom: t.custom,
-						canHide: !t.locked,
-						canDefault: !t.isDefault && !t.hidden,
-						toggleLabel: TRANSLATE(t.hidden ? '@(Show)' : '@(Hide)'),
-						defaultLabel: t.isDefault ? TRANSLATE('@(Default)') : '',
-						hiddenLabel: t.hidden ? TRANSLATE('@(Hidden)') : '',
-						customLabel: t.custom ? TRANSLATE('@(Added here)') : ''
-					}))
+					data.types.map(function(t) {
+						return {
+							id: t.id,
+							name: TRANSLATE(t.name),
+							custom: t.custom,
+							canHide: !t.locked,
+							canDefault: !t.isDefault && !t.hidden,
+							toggleLabel: TRANSLATE(t.hidden ? '@(Show)' : '@(Hide)'),
+							defaultLabel: t.isDefault ? TRANSLATE('@(Default)') : '',
+							hiddenLabel: t.hidden ? TRANSLATE('@(Hidden)') : '',
+							customLabel: t.custom ? TRANSLATE('@(Added here)') : ''
+						};
+					})
 				);
 			}
 			async function call(schema, payload) {
@@ -124,47 +126,49 @@ PLUGIN('providers', function(exports) {
 			}
 			function hiddenids(except, add) {
 
-				var ids = data.types.filter((t) => t.hidden && t.id !== except).map((t) => t.id);
+				var ids = data.types.filter(function(t) { return t.hidden && t.id !== except; }).map(function(t) { return t.id; });
 				if (add)
 					ids.push(add);
 				return ids.join(',');
 			}
 			exports.set('', model);
 			exports.open = open;
-			exports.saveoauth = () =>
-				call('instance_oauth', {
+			exports.saveoauth = function() {
+				return call('instance_oauth', {
 					provider: 'microsoft',
 					clientId: GET('providers.ms.clientId').trim(),
 					tenant: GET('providers.ms.tenant').trim(),
 					clientSecret: GET('providers.ms.clientSecret')
 				});
-			exports.clearsecret = () =>
-				call('instance_oauth', {
+			};
+			exports.clearsecret = function() {
+				return call('instance_oauth', {
 					provider: 'microsoft',
 					clientId: GET('providers.ms.clientId').trim(),
 					tenant: GET('providers.ms.tenant').trim(),
 					clearSecret: true
 				});
-			exports.savegoogle = () =>
-				call('instance_oauth', {
+			};
+			exports.savegoogle = function() {
+				return call('instance_oauth', {
 					provider: 'google',
 					clientId: GET('providers.google.clientId').trim(),
 					clientSecret: GET('providers.google.clientSecret')
 				});
-			exports.cleargoogle = () =>
-				call('instance_oauth', { provider: 'google', clientId: GET('providers.google.clientId').trim(), clearSecret: true });
-			exports.toggle = (element) => {
+			};
+			exports.cleargoogle = function() { return call('instance_oauth', { provider: 'google', clientId: GET('providers.google.clientId').trim(), clearSecret: true }); };
+			exports.toggle = function(element) {
 				var id = element[0].dataset.id,
-					type = data.types.find((t) => t.id === id);
+					type = data.types.find(function(t) { return t.id === id; });
 				return call('instance_prefs', {
 					hidden: hiddenids(type.hidden ? id : '', type.hidden ? '' : id),
 					defaultProvider: type.isDefault ? '' : data.defaultProvider === 'other' ? '' : data.defaultProvider
 				});
 			};
-			exports.makedefault = (element) => call('instance_prefs', { hidden: hiddenids(), defaultProvider: element[0].dataset.id });
-			exports.edit = (element) => {
+			exports.makedefault = function(element) { return call('instance_prefs', { hidden: hiddenids(), defaultProvider: element[0].dataset.id }); };
+			exports.edit = function(element) {
 
-				var type = data.types.find((t) => t.id === element[0].dataset.id);
+				var type = data.types.find(function(t) { return t.id === element[0].dataset.id; });
 				if (!type)
 					return;
 				SET('providers.type', {
@@ -184,17 +188,17 @@ PLUGIN('providers', function(exports) {
 				});
 				exports.set('heading', TRANSLATE('@(Edit account type)'));
 			};
-			exports.newtype = () => {
+			exports.newtype = function() {
 
 				SET('providers.type', blank());
 				exports.set('heading', TRANSLATE('@(Add an account type)'));
 				error('');
 			};
-			exports.remove = async (element) => {
+			exports.remove = async function(element) {
 				if (await call('instance_type_delete', { id: element[0].dataset.id }))
 					exports.newtype();
 			};
-			exports.savetype = async () => {
+			exports.savetype = async function() {
 
 				var payload = {};
 				// `id` has no input: it belongs to the type being edited.
@@ -208,7 +212,7 @@ PLUGIN('providers', function(exports) {
 				}
 			};
 			// The return address of a provider (data-field is msReturn or googleReturn).
-			exports.copy = async (element) => {
+			exports.copy = async function(element) {
 				try {
 					await navigator.clipboard.writeText(exports.get(element?.[0]?.dataset.field || 'msReturn') || '');
 					mailbox.notify(TRANSLATE('@(Link copied.)'));

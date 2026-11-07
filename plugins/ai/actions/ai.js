@@ -8,7 +8,7 @@ NEWACTION('Assistant|get', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -assistant_get --> Assistant|get',
-	action: ($) => FUNC.run($, overview)
+	action: function($) { return FUNC.run($, overview); }
 });
 
 NEWACTION('Assistant|save', {
@@ -16,13 +16,13 @@ NEWACTION('Assistant|save', {
 	permissions: 'admin',
 	route: '+API /api/ +assistant_save --> Assistant|save',
 	input: 'enabled:Boolean, provider:{openai|anthropic}, endpoint:String(300), model:String(120), key:String(500), clearKey:Boolean, maxChars:Number',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			var provider = model.provider || 'openai',
 				endpoint = (model.endpoint || '').trim(),
 				name = (model.model || '').trim();
-			// Claude has one address; leaving it empty means the official one.
+				// Claude has one address; leaving it empty means the official one.
 			if (!endpoint && provider === 'anthropic')
 				endpoint = MODS.ai.defaults.anthropic;
 			if (endpoint)
@@ -46,7 +46,8 @@ NEWACTION('Assistant|save', {
 				maxChars: limit
 			});
 			return overview();
-		})
+		});
+	}
 });
 
 // The knowledge base: collections of documents the assistant may read. Administrators only.
@@ -54,7 +55,7 @@ NEWACTION('Assistant|knowledge', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -assistant_knowledge --> Assistant|knowledge',
-	action: ($) => FUNC.run($, () => ({ ...MODS.knowledge.view(), accept: Extract.supported }))
+	action: function($) { return FUNC.run($, function() { return { ...MODS.knowledge.view(), accept: Extract.supported }; }); }
 });
 
 NEWACTION('Assistant|collection', {
@@ -62,8 +63,8 @@ NEWACTION('Assistant|collection', {
 	permissions: 'admin',
 	route: '+API /api/ +assistant_collection --> Assistant|collection',
 	input: 'id:String(40), *name:String(80), description:String(200), localonly:Boolean',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 			await MODS.knowledge.saveCollection({
 				id: model.id || '',
 				name: model.name,
@@ -71,7 +72,8 @@ NEWACTION('Assistant|collection', {
 				localonly: model.localonly === true
 			});
 			return MODS.knowledge.view();
-		})
+		});
+	}
 });
 
 NEWACTION('Assistant|collection_delete', {
@@ -79,11 +81,12 @@ NEWACTION('Assistant|collection_delete', {
 	permissions: 'admin',
 	route: '+API /api/ +assistant_collection_delete --> Assistant|collection_delete',
 	input: '*id:String(40)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 			await MODS.knowledge.removeCollection(model.id);
 			return MODS.knowledge.view();
-		})
+		});
+	}
 });
 
 NEWACTION('Assistant|document_delete', {
@@ -91,11 +94,12 @@ NEWACTION('Assistant|document_delete', {
 	permissions: 'admin',
 	route: '+API /api/ +assistant_document_delete --> Assistant|document_delete',
 	input: '*id:String(40)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 			await MODS.knowledge.removeDocument(model.id);
 			return MODS.knowledge.view();
-		})
+		});
+	}
 });
 
 // A short question to the model with the values on screen, before they are saved.
@@ -104,8 +108,8 @@ NEWACTION('Assistant|test', {
 	permissions: 'admin',
 	route: '+API /api/ +assistant_test --> Assistant|test',
 	input: 'provider:{openai|anthropic}, endpoint:String(300), *model:String(120), key:String(500)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			var provider = model.provider || 'openai',
 				saved = MODS.instance.ai();
@@ -122,12 +126,13 @@ NEWACTION('Assistant|test', {
 				// The administrator sees the server's own reason: it is what tells a wrong model from a wrong key.
 				var wrapped = Error(
 					TRANSLATE($.language, err.message) +
-						(err.detail ? ' (' + String(err.detail).replace(/\s+/g, ' ').slice(0, 200) + ')' : '')
+							(err.detail ? ' (' + String(err.detail).replace(/\s+/g, ' ').slice(0, 200) + ')' : '')
 				);
 				wrapped.plain = true;
 				throw wrapped;
 			}
-		})
+		});
+	}
 });
 
 // The tasks every signed-in person can run. The conversation comes from the person's own mailbox, never from the request.
@@ -135,10 +140,10 @@ NEWACTION('Assistant|run', {
 	user: true,
 	route: '+API /api/ +assistant_run --> Assistant|run',
 	input: '*task:{summarize|translate|reply|tone|proofread|compose}, id:String(80), accountId:String(80), instruction:String(500), style:{clearer|shorter|formal|friendly}, lang:{en|es|sk|cs|de|fr|it|pt|pl}, text:String(20000), knowledge:Boolean',
-	action: ($, m) => {
+	action: function($, m) {
 		FUNC.run(
 			$,
-			async () => {
+			async function() {
 
 				var settings = MODS.instance.ai();
 				if (!MODS.ai.status(settings).configured)
@@ -154,7 +159,7 @@ NEWACTION('Assistant|run', {
 					text: m.text || ''
 				};
 				// The model reads what a person reads: never the plain part of a message that also has HTML, never what a reader cannot see.
-				var visible = (message) => {
+				var visible = function(message) {
 
 					var read = MODS.ai.readable(store.message(message.id));
 					hidden = hidden || read.hidden;
@@ -167,21 +172,21 @@ NEWACTION('Assistant|run', {
 					input.instruction = asked.text;
 					if (!input.instruction.trim())
 						throw Error('@(Write something first.)');
-					owner = data.accounts.find((a) => a.id === m.accountId);
+					owner = data.accounts.find(function(a) { return a.id === m.accountId; });
 				} else if (['tone', 'proofread'].includes(m.task) || (m.task === 'translate' && !m.id)) {
 					var own = MODS.ai.unhide(input.text);
 					input.text = own.text;
 					hidden = hidden || own.hidden;
 					if (!input.text.trim())
 						throw Error('@(Write something first.)');
-					owner = data.accounts.find((a) => a.id === m.accountId);
+					owner = data.accounts.find(function(a) { return a.id === m.accountId; });
 				} else {
-					message = data.messages.find((x) => x.id === m.id);
+					message = data.messages.find(function(x) { return x.id === m.id; });
 					if (!message || message.welcome)
 						throw Error('@(Message not found.)');
 					if (message.remote && !message.bodyLoaded)
 						throw Error('@(Open the message first so it can be read.)');
-					owner = data.accounts.find((a) => a.id === message.accountId);
+					owner = data.accounts.find(function(a) { return a.id === message.accountId; });
 					// A translation is of the message that is open; a summary or a reply, of its conversation.
 					input.context =
 						m.task === 'translate'
@@ -207,13 +212,13 @@ NEWACTION('Assistant|run', {
 									: '@(Nothing in the knowledge base matches this message.)'
 							);
 						input.sources = MODS.knowledge.block(found.results, MODS.ai.wrap);
-						sources = found.results.map((p) => ({ document: p.document, section: p.section, collection: p.collection }));
+						sources = found.results.map(function(p) { return { document: p.document, section: p.section, collection: p.collection }; });
 					}
 					var vetted = MODS.ai.vet(
 						MODS.ai.tidy(m.task, await MODS.ai.complete(settings, MODS.ai.build(m.task, input))),
 						[input.context, input.text, input.instruction, input.sources].join('\n')
 					);
-					MODS.instance.countAi(m.task).catch(() => {});
+					MODS.instance.countAi(m.task).catch(function() {});
 					var warnings = [];
 					if (hidden)
 						warnings.push('hidden');

@@ -2,32 +2,36 @@
 // all show the model of this plugin: the views bind to ai.card, ai.composer, ai.library and the rest; nothing is drawn by hand.
 // The card under a message and the box of the composer sit in the mail window, which is compiled before this plugin starts:
 // their models exist from the moment the script is read.
-var aicard = () => ({
-	shown: false,
-	where: '',
-	knowledge: false,
-	busy: false,
-	working: '',
-	resultShown: false,
-	text: '',
-	warnHidden: false,
-	warnLinks: false,
-	sourcesShown: false,
-	sources: [],
-	canReply: false
-});
+var aicard = function() {
+	return {
+		shown: false,
+		where: '',
+		knowledge: false,
+		busy: false,
+		working: '',
+		resultShown: false,
+		text: '',
+		warnHidden: false,
+		warnLinks: false,
+		sourcesShown: false,
+		sources: [],
+		canReply: false
+	};
+};
 
-var aicomposer = () => ({
-	shown: false,
-	where: '',
-	busy: false,
-	working: '',
-	resultShown: false,
-	text: '',
-	warnHidden: false,
-	warnLinks: false,
-	replaced: false
-});
+var aicomposer = function() {
+	return {
+		shown: false,
+		where: '',
+		busy: false,
+		working: '',
+		resultShown: false,
+		text: '',
+		warnHidden: false,
+		warnLinks: false,
+		replaced: false
+	};
+};
 
 SET('ai.card', aicard());
 SET('ai.composer', aicomposer());
@@ -62,7 +66,7 @@ PLUGIN('ai', function(exports) {
 		{ id: 'anthropic', name: 'Claude (Anthropic)' }
 	];
 	model.form = { provider: 'openai', endpoint: '', model: '', key: '', maxChars: 12000, cname: '' };
-	model.languages = Object.keys(languagenames).map((id) => ({ id, name: languagenames[id] }));
+	model.languages = Object.keys(languagenames).map(function(id) { return { id, name: languagenames[id] }; });
 	model.lang = remembered();
 	model.instruction = '';
 	// What a new message should say, in the person's own words.
@@ -94,9 +98,9 @@ PLUGIN('ai', function(exports) {
 				working = false,
 				library = { collections: [], accept: '' },
 				before = '';
-			var set = (path, value) => exports.set(path, value);
+			var set = function(path, value) { return exports.set(path, value); };
 			// The box of the composer grows and shrinks: the window measures itself again, or it ends up off the screen.
-			var patch = (path, values) => {
+			var patch = function(path, values) {
 				set(path, Object.assign({}, exports.get(path), values));
 				if (path === 'composer')
 					mailbox.fitwindow();
@@ -124,10 +128,10 @@ PLUGIN('ai', function(exports) {
 				set(
 					'usage',
 					TRANSLATE('@(Used {count} times so far: {summarize} summaries, {reply} replies, {tone} tone adjustments.)')
-						.replace('{count}', () => u.total)
-						.replace('{summarize}', () => u.tasks.summarize || 0)
-						.replace('{reply}', () => u.tasks.reply || 0)
-						.replace('{tone}', () => u.tasks.tone || 0)
+						.replace('{count}', function() { return u.total; })
+						.replace('{summarize}', function() { return u.tasks.summarize || 0; })
+						.replace('{reply}', function() { return u.tasks.reply || 0; })
+						.replace('{tone}', function() { return u.tasks.tone || 0; })
 				);
 			}
 			function fields() {
@@ -182,18 +186,18 @@ PLUGIN('ai', function(exports) {
 				return next;
 			}
 			exports.open = open;
-			exports.toggle = () => set('enabled', !exports.get('enabled'));
-			exports.preset = (element) => {
+			exports.toggle = function() { return set('enabled', !exports.get('enabled')); };
+			exports.preset = function(element) {
 
 				SET('ai.form.provider', element[0].dataset.provider);
 				SET('ai.form.endpoint', element[0].dataset.endpoint);
 				status('');
 			};
-			exports.save = async () => {
+			exports.save = async function() {
 				if (await save())
 					mailbox.notify(TRANSLATE('@(Assistant settings saved.)'));
 			};
-			exports.clearkey = async () => {
+			exports.clearkey = async function() {
 				if (await save({ clearKey: true }))
 					mailbox.notify(TRANSLATE('@(Saved key removed.)'));
 			};
@@ -214,17 +218,21 @@ PLUGIN('ai', function(exports) {
 			function drawlibrary() {
 				set(
 					'library',
-					library.collections.map((c) => ({
-						id: c.id,
-						name: c.name,
-						localonly: c.localonly,
-						localLabel: TRANSLATE(c.localonly ? '@(Allow outside models)' : '@(Keep local only)'),
-						documents: c.documents.map((d) => ({
-							id: d.id,
-							title: d.title,
-							label: d.title + ' · ' + TRANSLATE('@(Passages: {count})').replace('{count}', () => d.chunks)
-						}))
-					}))
+					library.collections.map(function(c) {
+						return {
+							id: c.id,
+							name: c.name,
+							localonly: c.localonly,
+							localLabel: TRANSLATE(c.localonly ? '@(Allow outside models)' : '@(Keep local only)'),
+							documents: c.documents.map(function(d) {
+								return {
+									id: d.id,
+									title: d.title,
+									label: d.title + ' · ' + TRANSLATE('@(Passages: {count})').replace('{count}', function() { return d.chunks; })
+								};
+							})
+						};
+					})
 				);
 			}
 			async function upload(collectionid, chosen) {
@@ -259,7 +267,7 @@ PLUGIN('ai', function(exports) {
 					library = { collections: result.collections, accept: library.accept };
 					drawlibrary();
 					if (result.added.length)
-						lines.push(TRANSLATE('@(Documents added: {count}.)').replace('{count}', () => result.added.length));
+						lines.push(TRANSLATE('@(Documents added: {count}.)').replace('{count}', function() { return result.added.length; }));
 					for (var failed of result.failed)
 						lines.push(failed.name + ': ' + failed.error);
 					fail(lines.join(' '));
@@ -268,17 +276,17 @@ PLUGIN('ai', function(exports) {
 					fail(e.message);
 				}
 			}
-			var collection = (element) => library.collections.find((c) => c.id === element[0].dataset.id);
-			exports.adddocs = (element) => {
+			var collection = function(element) { return library.collections.find(function(c) { return c.id === element[0].dataset.id; }); };
+			exports.adddocs = function(element) {
 				var id = element[0].dataset.id;
-				SETTER('filepicker/open', { accept: library.accept, multiple: true, callback: (files) => upload(id, files) });
+				SETTER('filepicker/open', { accept: library.accept, multiple: true, callback: function(files) { return upload(id, files); } });
 			};
-			exports.removedoc = (element) => change('assistant_document_delete', { id: element[0].dataset.id });
-			exports.togglecollection = (element) => {
+			exports.removedoc = function(element) { return change('assistant_document_delete', { id: element[0].dataset.id }); };
+			exports.togglecollection = function(element) {
 				var c = collection(element);
 				c && change('assistant_collection', { id: c.id, name: c.name, description: c.description, localonly: !c.localonly });
 			};
-			exports.removecollection = (element) => {
+			exports.removecollection = function(element) {
 
 				var c = collection(element);
 				if (!c)
@@ -287,8 +295,8 @@ PLUGIN('ai', function(exports) {
 					return;
 				change('assistant_collection_delete', { id: c.id });
 			};
-			exports.togglelocal = () => set('localonly', !exports.get('localonly'));
-			exports.addcollection = async () => {
+			exports.togglelocal = function() { return set('localonly', !exports.get('localonly')); };
+			exports.addcollection = async function() {
 
 				var name = GET('ai.form.cname').trim();
 				if (!name) {
@@ -300,7 +308,7 @@ PLUGIN('ai', function(exports) {
 					fail('');
 				}
 			};
-			exports.test = async () => {
+			exports.test = async function() {
 
 				var f = fields();
 				status(TRANSLATE('@(Testing…)'));
@@ -311,14 +319,15 @@ PLUGIN('ai', function(exports) {
 				}
 				status(
 					TRANSLATE('@(The model answered in {seconds} s. It runs {where}.)')
-						.replace('{seconds}', () => (result.ms / 1000).toFixed(1))
+						.replace('{seconds}', function() { return (result.ms / 1000).toFixed(1); })
 						.replace(
 							'{where}',
-							() =>
-								TRANSLATE(result.scope === 'network' ? '@(inside your own network)' : '@(outside your own network)') +
-								' (' +
-								result.host +
-								')'
+							function() {
+								return TRANSLATE(result.scope === 'network' ? '@(inside your own network)' : '@(outside your own network)') +
+									' (' +
+									result.host +
+									')';
+							}
 						)
 				);
 			};
@@ -336,13 +345,13 @@ PLUGIN('ai', function(exports) {
 						: inside
 							? '@(The text of this conversation is sent to {host}, inside your own network.)'
 							: '@(The text of this conversation is sent to {host}, outside your own network.)'
-				).replace('{host}', () => state.ai.host);
+				).replace('{host}', function() { return state.ai.host; });
 			}
 			function current() {
-				return state.messages.find((m) => m.id === state.selected);
+				return state.messages.find(function(m) { return m.id === state.selected; });
 			}
 			function accountoff(accountid) {
-				return mailbox.store.accounts.find((a) => a.id === accountid)?.assistant === false;
+				return mailbox.store.accounts.find(function(a) { return a.id === accountid; })?.assistant === false;
 			}
 			async function run(payload) {
 
@@ -360,16 +369,18 @@ PLUGIN('ai', function(exports) {
 				}
 			}
 			// The language picked for a translation is remembered.
-			WATCH('ai.lang', (value) => {
+			WATCH('ai.lang', function(value) {
 				try {
 					localStorage.setItem('totalmail-translate', value);
 				} catch {}
 			});
 			// What the person is told besides the suggestion: the message hides text, or the model tried to add a link.
-			var flags = (answer) => ({
-				warnHidden: !!answer.warnings?.includes('hidden'),
-				warnLinks: !!answer.warnings?.includes('links')
-			});
+			var flags = function(answer) {
+				return {
+					warnHidden: !!answer.warnings?.includes('hidden'),
+					warnLinks: !!answer.warnings?.includes('links')
+				};
+			};
 			// ---- The card: its state follows the message that is open
 			var cardkey = '';
 			function showresult(key) {
@@ -393,7 +404,7 @@ PLUGIN('ai', function(exports) {
 					resultShown: true,
 					text: found.text,
 					...flags(found),
-					sources: (found.sources || []).map((s) => [s.document, s.section].filter(Boolean).join(' — ')),
+					sources: (found.sources || []).map(function(s) { return [s.document, s.section].filter(Boolean).join(' — '); }),
 					sourcesShown: !!found.sources?.length,
 					canReply: key.replace(/k$/, '') === 'reply'
 				});
@@ -406,10 +417,10 @@ PLUGIN('ai', function(exports) {
 					return;
 				}
 				patch('card', { shown: true, where: where(), knowledge: state.ai.knowledge === true, working: '' });
-				showresult(['replyk', 'reply', 'translate', 'summarize'].find((k) => results.has(m.id + ':' + k)) || null);
+				showresult(['replyk', 'reply', 'translate', 'summarize'].find(function(k) { return results.has(m.id + ':' + k); }) || null);
 			}
 			// task is summarize, translate, reply or replyk (a reply from the knowledge base)
-			exports.go = async (element) => {
+			exports.go = async function(element) {
 
 				var m = current(),
 					task = element[0].dataset.task,
@@ -418,7 +429,7 @@ PLUGIN('ai', function(exports) {
 					return;
 				task = task.replace(/k$/, '');
 				var key = task + (withknowledge ? 'k' : '');
-				var fresh = state.messages.find((x) => x.id === m.id) || m;
+				var fresh = state.messages.find(function(x) { return x.id === m.id; }) || m;
 				if (fresh.remote && !fresh.bodyLoaded) {
 					mailbox.notify(TRANSLATE('@(Open the message first so it can be read.)'));
 					return;
@@ -438,17 +449,17 @@ PLUGIN('ai', function(exports) {
 				}
 				showresult(key);
 			};
-			exports.use = () => {
+			exports.use = function() {
 				var m = current();
 				m && mailbox.replywith(m.id, exports.get('card.text'));
 			};
-			exports.copy = async () => {
+			exports.copy = async function() {
 				try {
 					await navigator.clipboard.writeText(exports.get('card.text'));
 					mailbox.notify(TRANSLATE('@(Copied.)'));
 				} catch {}
 			};
-			exports.dismiss = () => {
+			exports.dismiss = function() {
 
 				var m = current();
 				m && results.delete(m.id + ':' + cardkey);
@@ -479,7 +490,7 @@ PLUGIN('ai', function(exports) {
 				patch('composer', { shown: true, where: where(true) });
 			}
 			// task is tone, proofread, translate or compose; a tone also carries data-style, a compose is written from ai.idea
-			exports.write = async (element) => {
+			exports.write = async function(element) {
 
 				var task = element[0].dataset.task,
 					extra = {},
@@ -506,30 +517,30 @@ PLUGIN('ai', function(exports) {
 				mailbox.say(TRANSLATE('@(The assistant has a suggestion.)'));
 				patch('composer', { resultShown: true, text: answer.text, ...flags(answer), replaced: false });
 			};
-			exports.replace = () => {
+			exports.replace = function() {
 
 				before = GET('mail.compose.body') || '';
 				var again = mine(before);
 				mailbox.writebody(exports.get('composer.text') + (again.tail ? '\n\n' + again.tail : ''));
 				patch('composer', { replaced: true, resultShown: false });
 			};
-			exports.restore = () => {
+			exports.restore = function() {
 				mailbox.writebody(before);
 				patch('composer', { replaced: false });
 			};
-			exports.cdismiss = () => patch('composer', { resultShown: false, replaced: false });
+			exports.cdismiss = function() { return patch('composer', { resultShown: false, replaced: false }); };
 			function refresh() {
 				drawcard();
 				drawcomposer();
 			}
 			exports.refresh = refresh;
 			// The card follows the message that is open (the reader is set again at every selection).
-			WATCH('mail.reader', () => setTimeout(drawcard, 0));
-			WATCH('mail.window', (next) => {
+			WATCH('mail.reader', function() { return setTimeout(drawcard, 0); });
+			WATCH('mail.window', function(next) {
 				if (next === 'composer')
 					setTimeout(drawcomposer, 0);
 			});
-			WATCH('mail.compose.accountId', () => setTimeout(drawcomposer, 0));
+			WATCH('mail.compose.accountId', function() { return setTimeout(drawcomposer, 0); });
 			refresh();
 		}
 	);

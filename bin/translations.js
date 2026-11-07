@@ -43,10 +43,11 @@ exports.texts = function() {
 	return [...found].sort();
 };
 
-exports.languages = () =>
-	Fs.readdirSync(Path.join(root, 'resources'))
-		.filter((name) => name.endsWith('.resource'))
-		.map((name) => name.replace('.resource', ''));
+exports.languages = function() {
+	return Fs.readdirSync(Path.join(root, 'resources'))
+		.filter(function(name) { return name.endsWith('.resource'); })
+		.map(function(name) { return name.replace('.resource', ''); });
+};
 
 function keys(language) {
 
@@ -66,7 +67,7 @@ exports.missing = function() {
 		result = {};
 	for (var language of exports.languages()) {
 		var have = keys(language);
-		result[language] = texts.filter((text) => !have.has(exports.key(text)));
+		result[language] = texts.filter(function(text) { return !have.has(exports.key(text)); });
 	}
 	return result;
 };

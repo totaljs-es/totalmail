@@ -24,7 +24,7 @@ PLUGIN('access', function(exports) {
 		exports.set('error', '');
 		try {
 			// The model follows the keyboard a millisecond later: let the last key be in it (Enter can come right after it).
-			await new Promise((resolve) => setTimeout(resolve, 20));
+			await new Promise(function(resolve) { return setTimeout(resolve, 20); });
 			// Autofill extensions can update the field without emitting the events that update the component model.
 			var codeInput = token ? document.querySelector('.access-form input[name="_auth_code"]') : null;
 			var data = token ? { token, code: codeInput ? codeInput.value : GET('access.code') } : { email: GET('access.email'), password: GET('access.password') };
@@ -47,7 +47,7 @@ PLUGIN('access', function(exports) {
 			accessbusy = false;
 		}
 	}
-	WATCH('access.language', (language) => {
+	WATCH('access.language', function(language) {
 
 		if (!language || language === document.documentElement.lang)
 			return;
@@ -56,5 +56,5 @@ PLUGIN('access', function(exports) {
 		location.assign(url.href);
 	});
 	exports.submit = accesssubmit;
-	exports.restart = () => location.reload();
+	exports.restart = function() { return location.reload(); };
 });

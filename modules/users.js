@@ -11,15 +11,15 @@ var stores = new Map(),
 
 var REG_ID = /^[a-f0-9]{32}$/;
 
-var valid = (id) => REG_ID.test(id || '');
+var valid = function(id) { return REG_ID.test(id || ''); };
 
 exports.install = function() {
 
 	PAUSESERVER('users', true);
 	var loading = MODS.security.ready
-		.then(() =>
-			Promise.all(
-				MODS.security.identities.list().map(async (user) => {
+		.then(function() {
+			return Promise.all(
+				MODS.security.identities.list().map(async function(user) {
 					var mailbox = await Mailbox.open({
 						table: Tables,
 						id: user.id,
@@ -27,15 +27,16 @@ exports.install = function() {
 					});
 					stores.set(user.id, mailbox);
 				})
-			)
+			);
+		}
 		)
-		.then(() => PAUSESERVER('users', false));
-	loading.catch((error) => Total.error(error, 'TotalMail mailboxes'));
+		.then(function() { return PAUSESERVER('users', false); });
+	loading.catch(function(error) { return Total.error(error, 'TotalMail mailboxes'); });
 	// Changed and removed messages are wiped from the files every six hours (the service runs every minute).
-	ON('service', (minutes) => {
+	ON('service', function(minutes) {
 		if (minutes % 360 === 0)
 			for (var store of stores.values())
-				store.clean().catch((error) => Total.error(error, 'TotalMail mailbox clean'));
+				store.clean().catch(function(error) { return Total.error(error, 'TotalMail mailbox clean'); });
 	});
 };
 
@@ -54,13 +55,13 @@ exports.forUser = function(user) {
 	if (Total.Fs.existsSync(file))
 		try {
 			Object.assign(state, JSON.parse(Total.Fs.readFileSync(file, 'utf8')));
-			imported = mirror.save(state).then(() => Total.Fs.renameSync(file, file + '.migrated'));
-			imported.catch((error) => Total.error(error, 'TotalMail mailbox import'));
+			imported = mirror.save(state).then(function() { return Total.Fs.renameSync(file, file + '.migrated'); });
+			imported.catch(function(error) { return Total.error(error, 'TotalMail mailbox import'); });
 		} catch {}
 	// Nothing is written until the import has finished.
 	store = Mailbox.create({
 		state,
-		mirror: { save: (next) => imported.then(() => mirror.save(next)), clean: () => imported.then(() => mirror.clean()) }
+		mirror: { save: function(next) { return imported.then(function() { return mirror.save(next); }); }, clean: function() { return imported.then(function() { return mirror.clean(); }); } }
 	});
 	stores.set(user.id, store);
 	return store;

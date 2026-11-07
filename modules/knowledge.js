@@ -6,11 +6,11 @@ var Lib = require('../lib/knowledge'),
 exports.install = function() {
 	PAUSESERVER('knowledge', true);
 	Lib.open({ table: Tables, legacy: { file: PATH.root('database/knowledge.json') } })
-		.then((store) => {
+		.then(function(store) {
 			Object.assign(exports, store);
 			PAUSESERVER('knowledge', false);
 		})
-		.catch((error) => Total.error(error, 'TotalMail knowledge base'));
+		.catch(function(error) { return Total.error(error, 'TotalMail knowledge base'); });
 };
 
 exports.limits = Lib.limits;

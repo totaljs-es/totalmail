@@ -7,8 +7,8 @@ NEWACTION('Accounts|discover', {
 	user: true,
 	route: '+API /api/ +account_discover --> Accounts|discover',
 	input: '*email:Email',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			if (running.has($.user.id))
 				throw Error('@(Discovery is already running.)');
@@ -18,15 +18,16 @@ NEWACTION('Accounts|discover', {
 			} finally {
 				running.delete($.user.id);
 			}
-		})
+		});
+	}
 });
 
 NEWACTION('Accounts|save', {
 	user: true,
 	route: '+API /api/ +account_save --> Accounts|save',
 	input: 'id:String(80), *name:String(80), *email:Email, *imapHost:String(253), *imapPort:Number, *imapSecurity:{tls|starttls}, *imapUsername:String(254), *smtpHost:String(253), *smtpPort:Number, *smtpSecurity:{tls|starttls}, *smtpUsername:String(254), authType:{password|oauth2}, password:String(500), signature:String(1000), aliases:String(1500), assistant:Boolean',
-	action: ($, model) =>
-		FUNC.run($, () => {
+	action: function($, model) {
+		return FUNC.run($, function() {
 
 			for (var port of [model.imapPort, model.smtpPort])
 				if (!Number.isInteger(port) || port < 1 || port > 65535)
@@ -38,7 +39,7 @@ NEWACTION('Accounts|save', {
 				initials: model.name
 					.trim()
 					.split(/\s+/)
-					.map((x) => x[0])
+					.map(function(x) { return x[0]; })
 					.slice(0, 2)
 					.join('')
 					.toUpperCase(),
@@ -59,14 +60,14 @@ NEWACTION('Accounts|save', {
 					username: model.smtpUsername
 				}
 			};
-			// Left out when the request does not mention it, so an update from elsewhere keeps the saved signature.
-			// (the schema fills a missing text with '', so the request itself tells whether it was sent)
+				// Left out when the request does not mention it, so an update from elsewhere keeps the saved signature.
+				// (the schema fills a missing text with '', so the request itself tells whether it was sent)
 			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'signature'))
 				account.signature = String(model.signature)
 					.replace(/\r\n?/g, '\n')
 					.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '')
 					.trim();
-			// Same for the aliases: only a request that mentions them changes them.
+				// Same for the aliases: only a request that mentions them changes them.
 			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'aliases')) {
 				var parsed = Aliases.parse(model.aliases, account.email);
 				if (parsed.error)
@@ -76,7 +77,7 @@ NEWACTION('Accounts|save', {
 			// Same for the assistant switch.
 			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'assistant'))
 				account.assistant = model.assistant === true;
-			// A generated ID is new; only explicit IDs can update a user's existing account.
+				// A generated ID is new; only explicit IDs can update a user's existing account.
 			var store = MODS.users.forUser($.user);
 			if (!model.id)
 				account.newId = UID();
@@ -85,7 +86,8 @@ NEWACTION('Accounts|save', {
 			else if (model.password)
 				account.secret = MODS.security.identities.encrypt(model.password);
 			return store.saveAccount(account);
-		})
+		});
+	}
 });
 
 // A person removes one of their own accounts: it leaves TotalMail with its cached mail and drafts. The mailbox on the mail
@@ -94,22 +96,23 @@ NEWACTION('Accounts|delete', {
 	user: true,
 	route: '+API /api/ +account_delete --> Accounts|delete',
 	input: '*id:String(80)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			var removed = await MODS.users.forUser($.user).deleteAccount(model.id);
 			for (var file of removed.files)
 				await MODS.users.files($.user).remove($.user.id, file);
 			return { id: removed.id };
-		})
+		});
+	}
 });
 
 NEWACTION('Accounts|providers', {
 	user: true,
 	route: '+API /api/ -account_providers --> Accounts|providers',
-	action: ($) => {
+	action: function($) {
 		// OAuth providers are usable only when this server has an application registered for them.
-		var list = MODS.providers.list().map((p) => {
+		var list = MODS.providers.list().map(function(p) {
 
 			if (p.auth !== 'oauth2')
 				return p;
@@ -131,15 +134,15 @@ NEWACTION('Accounts|detect', {
 	user: true,
 	route: '+API /api/ +account_detect --> Accounts|detect',
 	input: '*email:Email',
-	action: ($, model) => FUNC.run($, async () => ({ provider: await MODS.providers.detect(model.email) }))
+	action: function($, model) { return FUNC.run($, async function() { return { provider: await MODS.providers.detect(model.email) }; }); }
 });
 
 NEWACTION('Accounts|adminlink', {
 	user: true,
 	route: '+API /api/ +account_oauth_admin --> Accounts|adminlink',
 	input: '*provider:String(30), *email:Email',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			var provider = MODS.providers.get(model.provider);
 			if (!provider || provider.auth !== 'oauth2')
@@ -151,15 +154,16 @@ NEWACTION('Accounts|adminlink', {
 					MODS.oauth.redirectUri($.controller || $, provider.id)
 				)
 			};
-		})
+		});
+	}
 });
 
 NEWACTION('Accounts|oauth', {
 	user: true,
 	route: '+API /api/ +account_oauth_start --> Accounts|oauth',
 	input: '*provider:String(30), *email:Email, name:String(80), accountId:String(80)',
-	action: ($, model) =>
-		FUNC.run($, async () => {
+	action: function($, model) {
+		return FUNC.run($, async function() {
 
 			var provider = MODS.providers.get(model.provider);
 			if (!provider || provider.auth !== 'oauth2')
@@ -179,5 +183,6 @@ NEWACTION('Accounts|oauth', {
 					redirectUri: MODS.oauth.redirectUri($.controller || $, provider.id)
 				})
 			};
-		})
+		});
+	}
 });

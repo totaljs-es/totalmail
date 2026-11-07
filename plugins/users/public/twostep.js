@@ -13,18 +13,20 @@ PLUGIN('twostep', function(exports) {
 				busy = false,
 				codes = [];
 			// Every step starts from a clean model; the window has nothing in it when it is closed.
-			var blank = (step) => ({
-				password: '',
-				code: '',
-				step: step,
-				error: '',
-				secret: '',
-				qr: '',
-				recovery: '',
-				left: '',
-				totp: !!state.user.totp,
-				focuscodes: 0
-			});
+			var blank = function(step) {
+				return {
+					password: '',
+					code: '',
+					step: step,
+					error: '',
+					secret: '',
+					qr: '',
+					recovery: '',
+					left: '',
+					totp: !!state.user.totp,
+					focuscodes: 0
+				};
+			};
 			exports.set('', blank('off'));
 			function show(step) {
 				exports.set('', blank(step));
@@ -73,9 +75,9 @@ PLUGIN('twostep', function(exports) {
 					return;
 				show('setup');
 				exports.set('secret', result.secret.replace(/(.{4})/g, '$1 ').trim());
-				SETTER('qrcode/create', { text: result.uri, width: 168, height: 168, callback: (src) => exports.set('qr', src) });
+				SETTER('qrcode/create', { text: result.uri, width: 168, height: 168, callback: function(src) { return exports.set('qr', src); } });
 			};
-			exports.cancel = () => show('off');
+			exports.cancel = function() { return show('off'); };
 			exports.enable = async function() {
 
 				var result = await call('user_totp_enable', { code: GET('twostep.code') });

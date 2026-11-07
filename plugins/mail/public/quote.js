@@ -13,15 +13,15 @@ function totalmailquote(kind, message, signature, text) {
 			.replace(/\r\n?/g, '\n')
 			.slice(0, chars)
 			.split('\n')
-			.map((line) => line.replace(/\s+$/, ''));
+			.map(function(line) { return line.replace(/\s+$/, ''); });
 		// Runs of blank lines collapse to one; blank lines at both ends go.
-		lines = lines.filter((line, i) => line || (i > 0 && lines[i - 1]));
+		lines = lines.filter(function(line, i) { return line || (i > 0 && lines[i - 1]); });
 		while (lines.length && !lines[lines.length - 1])
 			lines.pop();
 		while (lines.length && !lines[0])
 			lines.shift();
 		var cut = lines.length > maxlines;
-		lines = lines.slice(0, maxlines).map((line) => (line ? '> ' + line : '>'));
+		lines = lines.slice(0, maxlines).map(function(line) { return line ? '> ' + line : '>'; });
 		if (cut)
 			lines.push('> …');
 		return lines.join('\n');

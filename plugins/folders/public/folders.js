@@ -5,7 +5,7 @@ PLUGIN('folders', function(exports) {
 		busy = false;
 	exports.set('', { form: {}, error: '', busy: false });
 	WAIT(
-		() => !!PLUGINS.mail?.store,
+		function() { return !!PLUGINS.mail?.store; },
 		function() {
 			mailbox = PLUGINS.mail;
 		}
@@ -15,13 +15,13 @@ PLUGIN('folders', function(exports) {
 		exports.set('error', text || '');
 	}
 	function parents(id) {
-		var a = mailbox.store.accounts.find((a) => a.id === id);
+		var a = mailbox.store.accounts.find(function(a) { return a.id === id; });
 		SET(
 			'folders.parents',
-			[{ id: '', name: TRANSLATE('@(Top level)') }].concat((a?.mailboxes || []).map((f) => ({ id: f.path, name: f.path })))
+			[{ id: '', name: TRANSLATE('@(Top level)') }].concat((a?.mailboxes || []).map(function(f) { return { id: f.path, name: f.path }; }))
 		);
 	}
-	WATCH('folders.form.accountId', (id) => {
+	WATCH('folders.form.accountId', function(id) {
 		if (mailbox) {
 			parents(id);
 			SET('folders.form.parent', '');
@@ -35,7 +35,7 @@ PLUGIN('folders', function(exports) {
 
 		if (!mailbox)
 			return;
-		var accounts = mailbox.store.accounts.filter((a) => a.configured);
+		var accounts = mailbox.store.accounts.filter(function(a) { return a.configured; });
 		if (!accounts.length) {
 			mailbox.notify(TRANSLATE('@(Save the account before connecting.)'));
 			return;
@@ -43,10 +43,10 @@ PLUGIN('folders', function(exports) {
 		messageid = '';
 		SET(
 			'folders.accounts',
-			accounts.map((a) => ({ id: a.id, name: a.name + ' · ' + a.email }))
+			accounts.map(function(a) { return { id: a.id, name: a.name + ' · ' + a.email }; })
 		);
 		SET('folders.form', {
-			accountId: accounts.some((a) => a.id === mailbox.store.account) ? mailbox.store.account : accounts[0].id,
+			accountId: accounts.some(function(a) { return a.id === mailbox.store.account; }) ? mailbox.store.account : accounts[0].id,
 			name: '',
 			parent: ''
 		});
@@ -57,11 +57,11 @@ PLUGIN('folders', function(exports) {
 	}
 	function move(id) {
 
-		var m = mailbox.store.messages.find((m) => m.id === id);
+		var m = mailbox.store.messages.find(function(m) { return m.id === id; });
 		if (!m?.remote)
 			return;
-		var a = mailbox.store.accounts.find((a) => a.id === m.accountId);
-		var options = (a.mailboxes || []).filter((f) => f.path !== m.mailboxPath).map((f) => ({ id: f.path, name: f.path }));
+		var a = mailbox.store.accounts.find(function(a) { return a.id === m.accountId; });
+		var options = (a.mailboxes || []).filter(function(f) { return f.path !== m.mailboxPath; }).map(function(f) { return { id: f.path, name: f.path }; });
 		messageid = id;
 		SET('folders.destinations', options);
 		SET('folders.form', { path: options[0]?.id || '' });
@@ -77,7 +77,7 @@ PLUGIN('folders', function(exports) {
 		exports.set('busy', true);
 		error();
 		try {
-			await mailbox.operation(async () => {
+			await mailbox.operation(async function() {
 
 				if (messageid)
 					await mailbox.api('message_move', { id: messageid, path: GET('folders.form.path') });

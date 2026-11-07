@@ -7,22 +7,24 @@ exports.install = function() {
 	// Nothing is served until the settings are loaded.
 	PAUSESERVER('instance', true);
 	// The key that protects the secrets belongs to the accounts, which MODS.security opens.
-	ON('ready', () =>
-		MODS.security.ready
-			.then(() =>
-				Lib.open({
+	ON('ready', function() {
+		return MODS.security.ready
+			.then(function() {
+				return Lib.open({
 					table: Tables,
 					crypto: {
-						encrypt: (value) => MODS.security.identities.encrypt(value),
-						decrypt: (value) => MODS.security.identities.decrypt(value)
+						encrypt: function(value) { return MODS.security.identities.encrypt(value); },
+						decrypt: function(value) { return MODS.security.identities.decrypt(value); }
 					},
 					legacy: { file: PATH.root('database/instance.json') }
-				})
+				});
+			}
 			)
-			.then((store) => {
+			.then(function(store) {
 				Object.assign(exports, store);
 				PAUSESERVER('instance', false);
 			})
-			.catch((error) => Total.error(error, 'TotalMail instance settings'))
+			.catch(function(error) { return Total.error(error, 'TotalMail instance settings'); });
+	}
 	);
 };

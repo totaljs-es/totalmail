@@ -21,7 +21,7 @@ var totalmailrequest = (function() {
 	function reasons(value) {
 		return Array.isArray(value)
 			? value
-				.map((item) => item.error || item.name)
+				.map(function(item) { return item.error || item.name; })
 				.filter(Boolean)
 				.join(', ')
 			: '';
@@ -30,7 +30,7 @@ var totalmailrequest = (function() {
 		// A schema of the API (POST /api/ with { schema, data }): the answer, or an Error with a message for the person.
 		api: async function(schema, data) {
 
-			var answer = await call((done) => TAPI(schema, data || {}, done));
+			var answer = await call(function(done) { return TAPI(schema, data || {}, done); });
 			if (!answer.status)
 				throw new Error(TRANSLATE('@(Cannot reach TotalMail. Check your connection and try again.)'));
 			if (answer.status === 401)
@@ -44,7 +44,7 @@ var totalmailrequest = (function() {
 		// Files (a FormData): the answer in the same way.
 		upload: async function(url, form, progress) {
 
-			var answer = await call((done) => UPLOAD('POST ' + url, form, done, progress));
+			var answer = await call(function(done) { return UPLOAD('POST ' + url, form, done, progress); });
 			if (answer.status === 401)
 				throw new Error(TRANSLATE('@(Your session has expired. Sign in again to continue.)'));
 			if (!answer.status || answer.status >= 400 || Array.isArray(answer.value) || !answer.value || typeof answer.value !== 'object')
@@ -52,6 +52,6 @@ var totalmailrequest = (function() {
 			return answer.value;
 		},
 		// A plain GET: { status, value }, the caller decides.
-		get: (url) => call((done) => AJAX('GET ' + url, done))
+		get: function(url) { return call(function(done) { return AJAX('GET ' + url, done); }); }
 	};
 })();

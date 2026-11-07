@@ -100,15 +100,17 @@ PLUGIN('users', function(exports) {
 				listing = result.users;
 				SET(
 					'users.items',
-					result.users.map((u) => ({
-						...u,
-						roleLabel: TRANSLATE(u.role === 'admin' ? '@(Administrator)' : '@(Member)'),
-						disabledLabel: u.disabled ? TRANSLATE('@(Disabled)') : '',
-						twostepLabel: u.totp ? TRANSLATE('@(Two-step verification)') : '',
-						canManage: u.id !== state.user.id
-					}))
+					result.users.map(function(u) {
+						return {
+							...u,
+							roleLabel: TRANSLATE(u.role === 'admin' ? '@(Administrator)' : '@(Member)'),
+							disabledLabel: u.disabled ? TRANSLATE('@(Disabled)') : '',
+							twostepLabel: u.totp ? TRANSLATE('@(Two-step verification)') : '',
+							canManage: u.id !== state.user.id
+						};
+					})
 				);
-				if (chosen && !listing.some((u) => u.id === chosen.id))
+				if (chosen && !listing.some(function(u) { return u.id === chosen.id; }))
 					hidemanage();
 				SET('mail.window', 'users');
 			}
@@ -121,7 +123,7 @@ PLUGIN('users', function(exports) {
 			}
 			function manage(element) {
 
-				chosen = listing.find((u) => u.id === element[0].dataset.id) || null;
+				chosen = listing.find(function(u) { return u.id === element[0].dataset.id; }) || null;
 				if (!chosen)
 					return;
 				confirming = 0;
@@ -147,7 +149,7 @@ PLUGIN('users', function(exports) {
 					userbusy = false;
 					await openusers();
 					if (chosen)
-						chosen = listing.find((u) => u.id === chosen.id) || null;
+						chosen = listing.find(function(u) { return u.id === chosen.id; }) || null;
 					managetoggle();
 					exports.set('totpReset', !!chosen?.totp);
 					mailbox.notify(done);
@@ -190,7 +192,7 @@ PLUGIN('users', function(exports) {
 				if (Date.now() > confirming) {
 					confirming = Date.now() + 5000;
 					exports.set('removeLabel', TRANSLATE('@(Press again to delete)'));
-					setTimeout(() => {
+					setTimeout(function() {
 						if (Date.now() >= confirming)
 							exports.set('removeLabel', TRANSLATE('@(Delete user)'));
 					}, 5100);
