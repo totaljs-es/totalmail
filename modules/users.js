@@ -48,10 +48,10 @@ exports.forUser = function(user) {
 	if (store)
 		return store;
 	// Nobody has written to this mailbox yet, so nothing is in the database; a file an earlier version left is imported.
-	let state = { accounts: [], messages: [], drafts: [] },
+	var state = { accounts: [], messages: [], drafts: [] },
 		file = Total.Path.join(database, 'mail-' + user.id + '.json'),
 		imported = Promise.resolve();
-	let mirror = Mirror.create(Mailbox.spec(Tables, user.id), state, false);
+	var mirror = Mirror.create(Mailbox.spec(Tables, user.id), state, false);
 	if (Total.Fs.existsSync(file))
 		try {
 			Object.assign(state, JSON.parse(Total.Fs.readFileSync(file, 'utf8')));
