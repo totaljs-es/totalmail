@@ -1274,7 +1274,9 @@ PLUGIN('mail', function(exports) {
 		if (!(draft && draft.id))
 			return;
 		try {
-			var { skippedFiles: skippedfiles, ...next } = await api('draft_forward_files', { id: draft.id, messageId: id });
+			var next = Object.assign({}, await api('draft_forward_files', { id: draft.id, messageId: id }));
+			var skippedfiles = next.skippedFiles;
+			delete next.skippedFiles;
 			draftchanged(next);
 			if (skippedfiles)
 				toast(TRANSLATE('@(Some attachments were too large or too many to forward.)'));

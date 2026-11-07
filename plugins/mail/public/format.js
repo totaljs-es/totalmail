@@ -170,7 +170,7 @@ var totalmailformat = (function() {
 			return null;
 		if (tail.length) {
 			blocks.push('<div style="margin-top:16px;color:#7b8794">' + tail.map(signaturelinks).join('<br>') + '</div>');
-			plain.push(...tail);
+			Array.prototype.push.apply(plain, tail);
 		}
 		return {
 			html: '<!doctype html><html><body><div style="' + font + '">' + blocks.join('') + '</div></body></html>',

@@ -66,8 +66,9 @@ function steps(text) {
 		.slice(0, 8)
 		.map(function(line) {
 
-			var [first, ...rest] = line.split('|');
-			var link = rest.join('|').trim();
+			var parts = line.split('|');
+			var first = parts.shift();
+			var link = parts.join('|').trim();
 			return link ? { text: first.trim(), url: link } : { text: first.trim() };
 		});
 }

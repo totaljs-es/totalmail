@@ -3,7 +3,8 @@ var Welcome = require('../../../lib/welcome');
 // A message's sanitized HTML has its own route; no Action answer carries it.
 function strip(value) {
 	if (value && typeof value === 'object' && !Array.isArray(value) && 'html' in value) {
-		var { html, ...rest } = value;
+		var rest = Object.assign({}, value);
+		delete rest.html;
 		return rest;
 	}
 	return value;
