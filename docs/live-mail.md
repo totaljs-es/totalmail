@@ -31,7 +31,15 @@ How TotalMail reads and sends, and the limits you should know about. Setup of ea
 
 ## The SMTP sender
 
-`lib/vendor/total5-mail.js` is the MIT-licensed SMTP sender of `total5@0.0.19` with corrections: no second TLS handshake on implicit TLS, certificate and hostname validation with TLS 1.2+, TLS errors reported to the caller, TotalMail's own Message-ID and the exact message bytes kept for the Sent copy, complete 76-character base64 attachment lines with RFC 2231 file names, fragmented replies assembled correctly, LOGIN or PLAIN as the server advertises (and authentication confirmed), and success reported only after the server accepts the message. Keep these changes, and the protocol tests that cover them, when upgrading Total.js.
+`lib/vendor/total5-mail.js` is the SMTP sender of `total5@0.0.19`, unchanged except for what TotalMail needs. The TLS options (`servername`, `minVersion: 'TLSv1.2'`, `rejectUnauthorized`) come from the configuration that `lib/smtp.js` gives it, not from the copy. The changes are:
+
+- a message is reported as sent only after the server accepts its data, and a rejected message, a lost connection or an authentication that was not confirmed is an error;
+- replies split into several packets are put together, and a line without a status code is ignored;
+- `LOGIN` or `PLAIN` is used as the server advertises;
+- attachments are base64 in complete lines of 76 characters, with the padding only at the end, and a file name cannot break the header (RFC 2231 for non-ASCII names);
+- `$messageid` (the Message-ID on the domain of the sender), `$html` (the HTML part next to the plain text part) and `$capture` (`$source` is the exact MIME that was sent, for the copy in the Sent folder).
+
+Keep these changes, and the protocol tests that cover them, when upgrading Total.js.
 
 ## When an account does not work
 
