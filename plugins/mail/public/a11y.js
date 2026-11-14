@@ -86,7 +86,17 @@
 		self.make = function() {
 
 			self.aclass('hidden');
-			new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
+			// Only what is added around a field matters: the redraw of the message list (the most frequent change) is skipped.
+			var selector = 'ui-component.ui-input,[data-label],[data-labelledby]';
+			new MutationObserver(function(mutations) {
+				for (var m = 0; m < mutations.length; m++)
+					for (var added = Array.from(mutations[m].addedNodes), n = 0; n < added.length; n++) {
+						var node = added[n];
+						if (node.nodeType === 1 && (node.matches(selector) || node.querySelector(selector) || node.closest(selector)))
+							return schedule();
+					}
+
+			}).observe(document.documentElement, { childList: true, subtree: true });
 			schedule();
 		};
 	});
