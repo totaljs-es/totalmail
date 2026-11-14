@@ -29,9 +29,9 @@ NEWACTION('Assistant|save', {
 				endpoint = MODS.ai.parseendpoint(endpoint).url;
 			if (model.enabled === true && (!endpoint || !name))
 				throw Error('@(Enter the server address and the model before turning the assistant on.)');
-			var saved = MODS.instance.ai(),
-				key = (model.key || '').trim();
-			if (model.enabled === true && provider === 'anthropic' && !key && (!saved.key || model.clearKey === true))
+			var key = (model.key || '').trim();
+			// The saved key counts only for the server it was saved with.
+			if (model.enabled === true && provider === 'anthropic' && !key && (!MODS.instance.keyFor(provider, endpoint) || model.clearKey === true))
 				throw Error('@(Claude needs a key.)');
 			var limit = Math.round(Number(model.maxChars) || MODS.ai.defaults.maxChars);
 			if (limit < 2000 || limit > 60000)
@@ -111,11 +111,10 @@ NEWACTION('Assistant|test', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			var provider = model.provider || 'openai',
-				saved = MODS.instance.ai();
+			var provider = model.provider || 'openai';
 			var target = MODS.ai.parseendpoint(model.endpoint || (provider === 'anthropic' ? MODS.ai.defaults.anthropic : ''));
 			var started = Date.now(),
-				settings = { provider, endpoint: target.url, model: model.model.trim(), key: (model.key || '').trim() || saved.key };
+				settings = { provider, endpoint: target.url, model: model.model.trim(), key: (model.key || '').trim() || MODS.instance.keyFor(provider, target.url) };
 			try {
 				var text = await MODS.ai.complete(settings, [{ role: 'user', content: 'Reply with the single word: ready' }], {
 					maxTokens: 64,
@@ -139,7 +138,7 @@ NEWACTION('Assistant|test', {
 NEWACTION('Assistant|run', {
 	user: true,
 	route: '+API /api/ +assistant_run --> Assistant|run',
-	input: '*task:{summarize|translate|reply|tone|proofread|compose}, id:String(80), accountId:String(80), instruction:String(500), style:{clearer|shorter|formal|friendly}, lang:{en|es|sk|cs|de|fr|it|pt|pl}, text:String(20000), knowledge:Boolean',
+	input: '*task:{summarize|translate|reply|tone|proofread|compose}, id:String(80), accountId:String(80), instruction:String(500), style:{clearer|shorter|formal|friendly}, lang:{en|es|sk|cs|de|fr|it|pt|pl|el}, text:String(20000), knowledge:Boolean',
 	action: function($, m) {
 		FUNC.run(
 			$,

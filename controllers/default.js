@@ -133,7 +133,7 @@ exports.install = function() {
 			.then(function(draft) { return $.json(draft); })
 			.catch(function(err) {
 				if (saved)
-					files.remove($.user.id, saved);
+					files.remove($.user.id, saved).catch(ERROR('TotalMail files'));
 				$.invalid((err.message && err.message.startsWith('@(')) ? err.message : '@(The operation could not be completed.)');
 			});
 	});

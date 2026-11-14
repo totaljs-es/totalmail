@@ -70,10 +70,11 @@ NEWACTION('Users|totp', {
 
 // Two-step verification of the signed-in person. Every step asks for the password again: an open window is not proof of who is at it.
 async function mine($, password) {
-	if (!MODS.security.allowLogin($, 'totp-' + $.user.id))
+	if (!MODS.security.allowAttempt('totp-' + $.user.id))
 		throw Error('@(Too many attempts. Try again in 15 minutes.)');
 	if (!(await MODS.security.identities.verify($.user.id, password)))
 		throw Error('@(Your current password is incorrect.)');
+	MODS.security.attemptSucceeded('totp-' + $.user.id);
 }
 
 async function second($, password, code) {
@@ -106,7 +107,7 @@ NEWACTION('Users|totpenable', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			if (!MODS.security.allowLogin($, 'totp-' + $.user.id))
+			if (!MODS.security.allowAttempt('totp-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
 			var secret = MODS.security.pending.takeSetup($.user.id);
 			if (!secret)
@@ -187,9 +188,13 @@ NEWACTION('Users|profile', {
 				throw Error('@(Choose an available language.)');
 			if ((model.newPassword || '') !== (model.confirmPassword || ''))
 				throw Error('@(The new passwords do not match.)');
-			if (!MODS.security.allowLogin($, 'profile-' + $.user.id))
+			// Only a change that needs the password is a guess at it; a colour or a language is not.
+			var guessing = !!(model.currentPassword || model.newPassword);
+			if (guessing && !MODS.security.allowAttempt('profile-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
 			var result = await MODS.security.identities.updateProfile($.user.id, model);
+			if (guessing)
+				MODS.security.attemptSucceeded('profile-' + $.user.id);
 			if (result.credentialsChanged) {
 				MODS.security.revoke($.user.id);
 				MODS.security.start($, result.user);
@@ -201,10 +206,11 @@ NEWACTION('Users|profile', {
 
 // Managing other people needs an administrator who proves it is them: their own password is asked every time.
 async function confirmed($, model) {
-	if (!MODS.security.allowLogin($, 'admin-' + $.user.id))
+	if (!MODS.security.allowAttempt('admin-' + $.user.id))
 		throw Error('@(Too many attempts. Try again in 15 minutes.)');
 	if (!(await MODS.security.identities.verify($.user.id, model.adminPassword)))
 		throw Error('@(Your current password is incorrect.)');
+	MODS.security.attemptSucceeded('admin-' + $.user.id);
 }
 
 function others($, id) {

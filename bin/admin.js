@@ -41,7 +41,12 @@ exports.main = async function(argv, out = function(line) { return console.log(li
 	var store = await Store.open({ directory, table, legacy: { file: Total.Path.join(directory, 'users.json') } }),
 		users = store.list();
 	// A password reset or a removed code should end the sessions that were opened before: they are forgotten here.
-	var signout = function() { return table('sessions_sessions').remove().where('id', '!=', '').promise(); };
+	var signout = function() {
+		return Promise.all([
+			table('sessions_sessions').remove().where('id', '!=', '').promise(),
+			table('devices_devices').remove().where('id', '!=', '').promise()
+		]);
+	};
 	if (command === 'list') {
 		for (var arr = Array.from(users), i = 0; i < arr.length; i++) {
 			var u = arr[i];

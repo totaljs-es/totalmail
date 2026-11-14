@@ -14,6 +14,9 @@ exports.useInstance = Lib.useInstance;
 // was started from the account type list, a new account is added. Returns what the page tells the person: ok or mismatch.
 exports.complete = async function(provider, grant) {
 
+	// The person may have been disabled or removed while they signed in at the provider.
+	if (!MODS.security.identities.get(grant.userId))
+		throw Error('invalid_state');
 	var store = MODS.users.forUser({ id: grant.userId }),
 		servers = MODS.providers.serversFor(provider, grant.email);
 	if (grant.accountId) {

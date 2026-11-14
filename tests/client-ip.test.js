@@ -12,3 +12,8 @@ test('without the header the socket address is used, and trust can be switched o
 	Assert.equal(clientip({ 'x-forwarded-for': '203.0.113.9' }, '198.51.100.7', false), '198.51.100.7');
 	Assert.equal(clientip({}, undefined), 'unknown');
 });
+test('the header is ignored when the connection does not come from a proxy of ours', () => {
+	Assert.equal(clientip({ 'x-forwarded-for': '1.2.3.4' }, '198.51.100.7'), '198.51.100.7');
+	Assert.equal(clientip({ 'x-forwarded-for': '203.0.113.9' }, '::ffff:127.0.0.1'), '203.0.113.9');
+	Assert.equal(clientip({ 'x-forwarded-for': '203.0.113.9' }, '::1'), '203.0.113.9');
+});

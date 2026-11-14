@@ -303,6 +303,12 @@ test('the key is stored encrypted, never shown and only how often the tasks ran 
 	);
 	await store.saveAi({ enabled: true, endpoint: 'http://localhost:11434/v1', model: 'qwen2', maxChars: 8000 });
 	assert.equal(store.ai().key, 'sk-very-secret', 'a blank key keeps the saved one');
+	assert.equal(store.keyFor('openai', 'http://localhost:11434/v1/chat'), 'sk-very-secret', 'the same server, even with another path');
+	assert.equal(store.keyFor('openai', 'https://attacker.example/v1'), '', 'another server never gets the saved key');
+	assert.equal(store.keyFor('anthropic', 'http://localhost:11434/v1'), '', 'nor another protocol');
+	await store.saveAi({ enabled: true, endpoint: 'https://attacker.example/v1', model: 'qwen2', maxChars: 8000 });
+	assert.equal(store.ai().key, '', 'a new server address drops the saved key instead of sending it there');
+	await store.saveAi({ enabled: true, endpoint: 'http://localhost:11434/v1', model: 'qwen2', key: 'sk-very-secret', maxChars: 8000 });
 	await store.saveAi({ enabled: true, endpoint: 'http://localhost:11434/v1', model: 'qwen2', clearKey: true, maxChars: 8000 });
 	assert.equal(store.ai().key, '');
 	assert.equal(store.aiView().keySet, false);

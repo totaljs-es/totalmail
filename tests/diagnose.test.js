@@ -317,3 +317,38 @@ test('the domain is checked for MX, SPF and DMARC without failing the account', 
 	Assert.match(titles(open.checks.filter((c) => c.status === 'warn')), /lets any server send/);
 	Assert.match(titles(open.checks), /only monitors/);
 });
+test('a server that stalls the STARTTLS handshake does not hang the diagnosis', async (t) => {
+	var server = Net.createServer((socket) => {
+		socket.on('error', () => {});
+		socket.write('220 localhost ESMTP\r\n');
+		socket.on('data', (chunk) => {
+			if (/^EHLO/i.test(String(chunk)))
+				socket.write('250-localhost\r\n250 STARTTLS\r\n');
+			else if (/^STARTTLS/i.test(String(chunk)))
+				socket.write('220 Go ahead\r\n');
+		});
+	});
+	await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+	t.after(() => server.close());
+	var started = Date.now();
+	var report = await tool({ timeout: 400 }).run(
+		account({ smtp: { host: 'smtp.example.test', port: server.address().port, security: 'starttls', username: 'u' } }),
+		'secret'
+	);
+	Assert.ok(Date.now() - started < 5000, 'it ends');
+	Assert.ok(find(report, 'outgoing', 'fail').length > 0);
+});
+test('a server that never ends a line is cut off instead of filling the memory', async (t) => {
+	var server = Net.createServer((socket) => {
+		socket.on('error', () => {});
+		var timer = setInterval(() => socket.write('x'.repeat(20000)), 5);
+		socket.on('close', () => clearInterval(timer));
+	});
+	await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+	t.after(() => server.close());
+	var report = await tool({ timeout: 3000 }).run(
+		account({ smtp: { host: 'smtp.example.test', port: server.address().port, security: 'starttls', username: 'u' } }),
+		'secret'
+	);
+	Assert.ok(find(report, 'outgoing', 'fail').length > 0);
+});

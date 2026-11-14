@@ -23,10 +23,11 @@ NEWACTION('Devices|create', {
 
 			if ($.user.deviceId)
 				throw Error('@(Sign in with your password to add a device.)');
-			if (!MODS.security.allowLogin($, 'device-' + $.user.id))
+			if (!MODS.security.allowAttempt('device-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
 			if (!(await MODS.security.identities.verify($.user.id, model.password)))
 				throw Error('@(Your current password is incorrect.)');
+			MODS.security.attemptSucceeded('device-' + $.user.id);
 			var made = await MODS.security.devices.create($.user.id, {
 				name: model.name,
 				platform: model.platform,

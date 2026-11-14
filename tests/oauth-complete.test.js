@@ -2,9 +2,10 @@ require('total5');
 var { test } = require('node:test');
 var assert = require('node:assert/strict');
 var Oauth = require('../modules/oauth');
-function fixture(existing) {
+function fixture(existing, active) {
 	let saved = [],
 		remembered = [];
+	MODS.security = { identities: { get: (id) => (active === false ? null : { id }) } };
 	MODS.users = {
 		forUser: (user) => ({
 			user,
@@ -53,4 +54,9 @@ test('a sign-in with another address than the account is refused and saves nothi
 	assert.equal(await Oauth.complete({ id: 'google' }, { ...grant, accountId: 'a1' }), 'mismatch');
 	assert.equal(f.saved.length, 0);
 	assert.equal(f.remembered.length, 0);
+});
+test('a sign-in of a person who was disabled or removed meanwhile saves nothing', async () => {
+	let f = fixture(undefined, false);
+	await assert.rejects(Oauth.complete({ id: 'google' }, grant), /invalid_state/);
+	assert.equal(f.saved.length, 0);
 });

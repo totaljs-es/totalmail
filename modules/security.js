@@ -159,7 +159,7 @@ exports.address = function($) { return clientip($); };
 
 var clientip = function($) {
 	var ctrl = $.controller || $;
-	return require('../lib/clientip')(ctrl.headers, (ctrl.req && (ctrl.req.connection && ctrl.req.connection.remoteAddress)), String(CONF.trust_proxy) !== 'false');
+	return require('../lib/clientip')(ctrl.headers, (ctrl.req && ctrl.req.socket && ctrl.req.socket.remoteAddress), String(CONF.trust_proxy) !== 'false');
 };
 
 exports.allowLogin = function($, email) {
@@ -183,6 +183,26 @@ exports.allowLogin = function($, email) {
 			return false;
 	}
 	return true;
+};
+
+// The tries of a person who is already signed in and has to prove their password again (a new device, two-step, an
+// administrator's action). They count per person, not per address: a whole office behind one address must not lock itself
+// out of signing in because somebody changed their profile, and a stolen session still cannot guess the password for long.
+exports.allowAttempt = function(key, limit) {
+
+	var entry = attempts.get('user|' + key);
+	if (!entry || entry.until < Date.now()) {
+		entry = {
+			count: 0,
+			until: Date.now() + 15 * 60000
+		};
+		attempts.set('user|' + key, entry);
+	}
+	return ++entry.count <= (limit || 15);
+};
+
+exports.attemptSucceeded = function(key) {
+	attempts.delete('user|' + key);
 };
 
 exports.loginSucceeded = function($, email) {

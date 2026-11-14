@@ -48,7 +48,7 @@ NEWACTION('Accounts|save', {
 				color: '#4285F4',
 				configured: true,
 				status: 'pending',
-				authType: model.authType || 'password',
+				authType: model.authType || '',
 				imap: {
 					host: Discovery.host(model.imapHost),
 					port: model.imapPort,
@@ -81,6 +81,12 @@ NEWACTION('Accounts|save', {
 				account.assistant = model.assistant === true;
 				// A generated ID is new; only explicit IDs can update a user's existing account.
 			var store = MODS.users.forUser($.user);
+			// A request that leaves the type out keeps the one the account has (an app may send only what it changes).
+			if (!account.authType) {
+				var current = null;
+				try { current = model.id ? store.account(model.id) : null; } catch (e) { current = null; }
+				account.authType = (current && current.authType) || 'password';
+			}
 			if (!model.id)
 				account.newId = UID();
 			if (account.authType === 'oauth2')
