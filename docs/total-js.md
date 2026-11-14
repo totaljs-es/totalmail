@@ -19,7 +19,7 @@ TotalMail is a Total.js 5 application written the way the framework suggests. If
 | `definitions/` | `AUTH()`, `LOCALIZE()`, the request middleware, `FUNC.run`, the UI components | Definitions |
 | `plugins/<id>/*.js` | The server logic of that part, beside `index.js` (IMAP and SMTP in `mail`, people and sessions in `users`, the assistant in `ai`...), exported by `index.js` and read as `PLUGINS.mail.live`, `PLUGINS.users.security`...; plain functions, so a test can `require()` them | Plugins with `exports.install` |
 | `modules/` | What no plugin owns: the storage (`mirror.js`, `tables.js`), the settings of the installation and the languages, used as `MODS.instance`... | Modules |
-| `private/vendor/` | The corrected copy of the SMTP sender of `total5@0.0.19` (not linted) | `private/` |
+| `private/vendor/` | The corrected copy of the SMTP sender of `total5@0.0.20-5` (not linted) | `private/` |
 | `resources/*.resource` | Translations | `@(Text)` and `LOCALIZE()` |
 | `database/` | NoSQL tables, the encryption key and the attachments (never committed) | `NOSQL()` |
 
@@ -55,4 +55,4 @@ The code follows the [Total.js guidelines](https://github.com/totaljs-es/guideli
 
 ## The vendored SMTP sender
 
-`private/vendor/total5-mail.js` is a copy of the SMTP sender of `total5@0.0.19` with corrections; the reason and the list are in [live-mail.md](live-mail.md#the-smtp-sender).
+`private/vendor/total5-mail.js` is a copy of the SMTP sender of `total5@0.0.20-5` with corrections; the reason and the list are in [live-mail.md](live-mail.md#the-smtp-sender).

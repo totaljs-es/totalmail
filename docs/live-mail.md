@@ -31,7 +31,7 @@ How TotalMail reads and sends, and the limits you should know about. Setup of ea
 
 ## The SMTP sender
 
-`private/vendor/total5-mail.js` is the SMTP sender of `total5@0.0.19`, unchanged except for what TotalMail needs. The TLS options (`servername`, `minVersion: 'TLSv1.2'`, `rejectUnauthorized`) come from the configuration that `plugins/mail/smtp.js` gives it, not from the copy. The changes are:
+`private/vendor/total5-mail.js` is the SMTP sender of `total5@0.0.20-5` (the beta that TotalMail uses), unchanged except for what TotalMail needs. The TLS options (`servername`, `minVersion: 'TLSv1.2'`, `rejectUnauthorized`) come from the configuration that `plugins/mail/smtp.js` gives it, not from the copy. The changes are:
 
 - a message is reported as sent only after the server accepts its data, and a rejected message, a lost connection or an authentication that was not confirmed is an error;
 - replies split into several packets are put together, and a line without a status code is ignored;

@@ -93,7 +93,7 @@ async function fetchconfig(url) {
 
 // One GET that connects only to `pinned` (the address that was just checked), whatever the name resolves to later: the
 // certificate is still verified against the name. No redirects, and the answer may not be longer than `limit` bytes.
-// (The RESTBuilder of total5@0.0.19 neither keeps a custom Agent nor applies maxlength, so this request is made directly.)
+// (The RESTBuilder of total5, 0.0.19 and the beta 0.0.20-5 alike, neither keeps a custom Agent nor applies maxlength, so this request is made directly.)
 // `extra` is for tests: a port and a certificate authority of their own.
 function pinnedget(target, pinned, options, extra) {
 	return new Promise(function(resolve, reject) {

@@ -25,7 +25,7 @@ function settings(provider) {
 	};
 }
 
-// The token endpoint: Total.js's own request (RESTBuilder), no redirects. It is the provider's own host (Google, Microsoft), and total5@0.0.19
+// The token endpoint: Total.js's own request (RESTBuilder), no redirects. It is the provider's own host (Google, Microsoft), and total5 (0.0.19, 0.0.20-5)
 // ignores maxlength(), so no ceiling on the size of the answer is claimed here.
 function form(host, path, params) {
 	return new Promise(function(resolve, reject) {

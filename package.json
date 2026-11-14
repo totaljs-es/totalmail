@@ -35,7 +35,7 @@
 		"imapflow": "^2.3.0",
 		"mailparser": "^3.9.37",
 		"sanitize-html": "^2.18.0",
-		"total5": "^0.0.19"
+		"total5": "^0.0.20-5"
 	},
 	"devDependencies": {
 		"eslint": "^9.0.0"

@@ -7,7 +7,7 @@ Guidance for AI coding agents that work on TotalMail. It is an application, not 
 TotalMail is a self-hosted mail client for teams and personal use: IMAP and SMTP accounts, a private mailbox for every person, an optional manual AI assistant. It is a **Total.js 5** application (`total5`, plus jComponent 20 in the browser) in plain JavaScript (CommonJS). Its data lives in the embedded NoSQL database of Total.js, in the private folder `database/`: one process, no database server, no queue, no outside service.
 
 Node.js: 22 or newer. Plain JavaScript, no TypeScript (Total.js does not support it: never add types or `.d.ts`).
-Main dependencies: `imapflow` (IMAP), `mailparser`, `sanitize-html`, `total5`. The SMTP sender is a corrected copy of the one of `total5@0.0.19` in `private/vendor/total5-mail.js`.
+Main dependencies: `imapflow` (IMAP), `mailparser`, `sanitize-html`, `total5`. The SMTP sender is a corrected copy of the one of `total5@0.0.20-5` (the beta) in `private/vendor/total5-mail.js`.
 License: MIT
 
 ## Commands
@@ -66,7 +66,7 @@ These are decisions of the project (`CONTRIBUTING.md` has them), not oversights.
 
 ## Pitfalls
 
-- **Total.js 5 from npm is `0.0.19`.** The SMTP sender is vendored and corrected in `private/vendor/` (`docs/live-mail.md` says why); ESLint ignores `private/vendor/`, `public/` and `node_modules/`.
+- **TotalMail uses the beta of Total.js 5 (`total5@0.0.20-5`, the `beta` tag on npm; `latest` is still `0.0.19`).** Install with `npm ci`, which takes the version of `package-lock.json`. The SMTP sender is vendored and corrected in `private/vendor/` (`docs/live-mail.md` says why); ESLint ignores `private/vendor/`, `public/` and `node_modules/`.
 - **The data is in memory and mirrored.** A store loads its tables at startup (nothing is served before: `PAUSESERVER()`), answers reads from memory and writes only the records that changed through `modules/mirror.js`; a failed write changes nothing. Open tables with `modules/tables.js`, never with files of your own (`docs/storage.md`).
 - **The Total.js watcher is on unless the instance is in production**, so editing a file restarts the server.
 - **Tests bootstrap `total5`** (`require('total5')`) so the framework helpers and the database are exercised too. Use a temporary folder for data and clean it up.

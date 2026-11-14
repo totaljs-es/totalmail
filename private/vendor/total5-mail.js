@@ -1,4 +1,4 @@
-// The SMTP sender of total5@0.0.19 with the changes of docs/live-mail.md (everything else is as in total5).
+// The SMTP sender of total5@0.0.20-5 with the changes of docs/live-mail.md (everything else is as in total5).
 // Total.js SMTP sender
 // The MIT License
 // Copyright 2016-2023 (c) Peter Širka <petersirka@gmail.com>
@@ -153,7 +153,7 @@ Message.prototype.attachmentfs = function(storage, id, name, contentid) {
 
 	if (name) {
 		ext = F.TUtils.getExtension(name);
-		type = F.TUtils.contentTypes[ext];
+		type = F.TUtils.contentTypes[ext] || 'application/octet-stream';
 	}
 
 	var obj = {};
@@ -323,7 +323,7 @@ Mailer.$writeattachment = function(obj) {
 	var stream;
 
 	if (attachment.storage) {
-		FILESTORAGE(attachment.storage).readbase64(attachment.filename, function(err, meta) {
+		FILESTORAGE(attachment.storage).readbuffer(attachment.filename, function(err, buffer, meta) {
 			if (err) {
 				F.error(err, 'Mail.filestorage()', attachment.filename);
 				Mailer.$writeattachment(obj);
@@ -331,11 +331,11 @@ Mailer.$writeattachment = function(obj) {
 
 				if (!attachment.name) {
 					attachment.name = meta.name;
-					attachment.type = meta.type;
+					attachment.type = meta.type || 'application/octet-stream';
 					attachment.extension = meta.ext;
 				}
 
-				writeattachemnt_stream(attachment, obj, meta.stream);
+				writeattachemnt_stream(attachment, obj, buffer);
 			}
 		});
 	} else {
@@ -480,8 +480,13 @@ Mailer.send = function(opt, messages, callback) {
 	if (opt.secure && !opt.port)
 		opt.port = 465;
 
-	if (!opt.server)  {
-		const err = new Error('No SMTP server configuration.');
+	const server = opt.server ? F.TUtils.tohost(opt.server) : '';
+
+	if (server && server !== opt.server)
+		opt = Object.assign({}, opt, { server: server });
+
+	if (!server)  {
+		const err = new Error(opt.server ? 'Invalid SMTP server hostname.' : 'No SMTP server configuration.');
 		let iscallback = false;
 
 		if (callback) {

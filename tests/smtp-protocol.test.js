@@ -233,6 +233,22 @@ test('SMTP sends attachments as intact base64, sanitizes names and returns the e
 	assert.ok(f.body.every((line) => line.length <= 998));
 });
 
+test('an attachment of a type nobody knows goes as application/octet-stream, not as undefined', async (t) => {
+	let f = await fixture(t);
+	let result = await smtp.send(
+		f.options,
+		{ email: 'sender@example.test', name: 'Sender' },
+		{ messageId: '<kind@totalmail.local>', subject: 'Kind', body: 'See attached' },
+		['to@example.test'],
+		null,
+		[],
+		[{ name: 'notes.unknownkind', content: Buffer.from('data') }]
+	);
+	assert.ok(!/Content-Type: undefined/.test(result.source));
+	let parsed = await require('mailparser').simpleParser(result.source);
+	assert.equal(parsed.attachments[0].contentType, 'application/octet-stream');
+});
+
 test('SMTP signs in with XOAUTH2 and an access token for OAuth accounts, never a password', async (t) => {
 	let f = await fixture(t, { auth: 'xoauth2' });
 	let account = {
