@@ -186,23 +186,25 @@ exports.allowLogin = function($, email) {
 };
 
 // The tries of a person who is already signed in and has to prove their password again (a new device, two-step, an
-// administrator's action). They count per person, not per address: a whole office behind one address must not lock itself
-// out of signing in because somebody changed their profile, and a stolen session still cannot guess the password for long.
-exports.allowAttempt = function(key, limit) {
+// administrator's action). They count per person and address: someone with a stolen session cannot guess the password for long,
+// nor lock the person out from another address, and a whole office behind one address does not use up the places of the sign-in
+// page because somebody changed their profile (these tries are not charged to the address itself).
+exports.allowAttempt = function($, key, limit) {
 
-	var entry = attempts.get('user|' + key);
+	var id = 'user|' + clientip($) + '|' + key;
+	var entry = attempts.get(id);
 	if (!entry || entry.until < Date.now()) {
 		entry = {
 			count: 0,
 			until: Date.now() + 15 * 60000
 		};
-		attempts.set('user|' + key, entry);
+		attempts.set(id, entry);
 	}
 	return ++entry.count <= (limit || 15);
 };
 
-exports.attemptSucceeded = function(key) {
-	attempts.delete('user|' + key);
+exports.attemptSucceeded = function($, key) {
+	attempts.delete('user|' + clientip($) + '|' + key);
 };
 
 exports.loginSucceeded = function($, email) {

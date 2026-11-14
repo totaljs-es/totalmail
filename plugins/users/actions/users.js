@@ -71,11 +71,11 @@ NEWACTION('Users|totp', {
 
 // Two-step verification of the signed-in person. Every step asks for the password again: an open window is not proof of who is at it.
 async function mine($, password) {
-	if (!PLUGINS.users.security.allowAttempt('totp-' + $.user.id))
+	if (!PLUGINS.users.security.allowAttempt($, 'totp-' + $.user.id))
 		throw Error('@(Too many attempts. Try again in 15 minutes.)');
 	if (!(await PLUGINS.users.security.identities.verify($.user.id, password)))
 		throw Error('@(Your current password is incorrect.)');
-	PLUGINS.users.security.attemptSucceeded('totp-' + $.user.id);
+	PLUGINS.users.security.attemptSucceeded($, 'totp-' + $.user.id);
 }
 
 async function second($, password, code) {
@@ -110,7 +110,7 @@ NEWACTION('Users|totpenable', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			if (!PLUGINS.users.security.allowAttempt('totp-' + $.user.id))
+			if (!PLUGINS.users.security.allowAttempt($, 'totp-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
 			var secret = PLUGINS.users.security.pending.takeSetup($.user.id);
 			if (!secret)
@@ -199,11 +199,11 @@ NEWACTION('Users|profile', {
 				throw Error('@(The new passwords do not match.)');
 			// Only a change that needs the password is a guess at it; a colour or a language is not.
 			var guessing = !!(model.currentPassword || model.newPassword);
-			if (guessing && !PLUGINS.users.security.allowAttempt('profile-' + $.user.id))
+			if (guessing && !PLUGINS.users.security.allowAttempt($, 'profile-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
 			var result = await PLUGINS.users.security.identities.updateProfile($.user.id, model);
 			if (guessing)
-				PLUGINS.users.security.attemptSucceeded('profile-' + $.user.id);
+				PLUGINS.users.security.attemptSucceeded($, 'profile-' + $.user.id);
 			if (result.credentialsChanged) {
 				PLUGINS.users.security.revoke($.user.id);
 				PLUGINS.users.security.start($, result.user);
@@ -215,11 +215,11 @@ NEWACTION('Users|profile', {
 
 // Managing other people needs an administrator who proves it is them: their own password is asked every time.
 async function confirmed($, model) {
-	if (!PLUGINS.users.security.allowAttempt('admin-' + $.user.id))
+	if (!PLUGINS.users.security.allowAttempt($, 'admin-' + $.user.id))
 		throw Error('@(Too many attempts. Try again in 15 minutes.)');
 	if (!(await PLUGINS.users.security.identities.verify($.user.id, model.adminPassword)))
 		throw Error('@(Your current password is incorrect.)');
-	PLUGINS.users.security.attemptSucceeded('admin-' + $.user.id);
+	PLUGINS.users.security.attemptSucceeded($, 'admin-' + $.user.id);
 }
 
 function others($, id) {
