@@ -1,13 +1,15 @@
 # TotalMail on its own, behind your reverse proxy.
 #
-#   (optional) edit the included config and uncomment the config mount below
-#   docker compose up -d --build
+#   Download this file, set the four values below (or put them in a .env file next to it) and run:
+#   docker compose up -d
 #
-# The container listens on 127.0.0.1:8000 only: put the proxy that gives you HTTPS in front of it (TotalMail
-# refuses to be reached any other way in practice, the session cookie is `Secure` over https). The proxy must
-# send X-Forwarded-Proto and append to X-Forwarded-For, which nginx, Caddy and Traefik do.
+# To build the image from a clone of the repository instead, replace `image` with `build: .`.
 #
-# Using the nginx-proxy / Let's Encrypt companion that Total.js Code uses? Remove `ports`, add the VIRTUAL_* and
+# The container listens on 127.0.0.1 only: put the proxy that gives you HTTPS in front of it (the session cookie is
+# `Secure`, and Microsoft sign-in needs HTTPS). The proxy must send X-Forwarded-Proto and append to X-Forwarded-For,
+# which nginx, Caddy and Traefik do.
+#
+# Using the nginx-proxy / Let's Encrypt companion that Total.js Code uses? Remove `ports`, uncomment the VIRTUAL_* and
 # LETSENCRYPT_* variables below and join its network at the bottom.
 
 name: totalmail
@@ -15,28 +17,35 @@ name: totalmail
 services:
 
   totalmail:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/totaljs-es/totalmail:latest
     container_name: totalmail
     restart: unless-stopped
     init: true
 
     ports:
-      - "127.0.0.1:8000:8000"
-
-    volumes:
-      # People, mailboxes and the encryption key. Named volume: it is created owned by the app user.
-      - totalmail-data:/app/database
-      # Only if you need installation-specific settings (public address, trust_proxy): the config is included.
-      # - ./config:/app/config:ro
+      # 1. The port of this machine your proxy points at.
+      - "127.0.0.1:${TOTALMAIL_PORT:-8000}:8000"
 
     environment:
+      # 2. true behind a reverse proxy (the normal case); false when people reach the container directly.
+      - TRUST_PROXY=${TRUST_PROXY:-true}
+      # 3. Only for a proxy with a public address: its addresses or ranges, separated by commas.
+      #    Proxies on this machine, a private network or Tailscale are trusted already.
+      - TRUST_PROXY_FROM=${TRUST_PROXY_FROM:-}
+      # 4. Only when the public address cannot be inferred from the proxy's request (Microsoft and Google sign-in
+      #    return there), e.g. https://mail.example.com
+      - OAUTH_BASE_URL=${OAUTH_BASE_URL:-}
       # nginx-proxy companion:
       # - VIRTUAL_HOST=mail.example.com
       # - VIRTUAL_PORT=8000
       # - LETSENCRYPT_HOST=mail.example.com
       # - HTTPS_METHOD=redirect
+
+    volumes:
+      # People, mailboxes and the key that protects their passwords. Back it up.
+      - totalmail-data:/app/database
+      # A config of your own instead of the variables above:
+      # - ./config:/app/config:ro
 
     # Nothing here needs more than a plain process.
     security_opt:

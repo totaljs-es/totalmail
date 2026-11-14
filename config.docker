@@ -1,0 +1,15 @@
+// TotalMail in Docker: the image uses this file as its config, and its settings come from the environment of the container
+// (see docker-compose.yaml). A variable that is not set leaves the default. Credentials never go here: they are entered in the
+// app and encrypted in database/. To use a config of your own instead, mount it over /app/config.
+
+name : TotalMail
+$ip : 0.0.0.0
+
+// true (default) behind a reverse proxy; false when the container is reached directly.
+trust_proxy (env) : TRUST_PROXY
+
+// A proxy with a public address (addresses or ranges, IPv4 or IPv6, separated by commas).
+trust_proxy_from (env) : TRUST_PROXY_FROM
+
+// Only when the public address cannot be inferred from the proxy's request, e.g. https://mail.example.com
+oauth_base_url (env) : OAUTH_BASE_URL

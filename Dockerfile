@@ -1,7 +1,7 @@
 # TotalMail as its own image: production mode, no root, nothing of yours baked in.
 #
-# Build from the project folder:   docker build -f Dockerfile -t totalmail .
-# or let docker-compose.yaml do it.
+# The published image is ghcr.io/totaljs-es/totalmail (see docker-compose.yaml). To build it yourself from the project folder:
+#   docker build -t totalmail .
 #
 # Nothing here is native: Total.js, ImapFlow, mailparser and sanitize-html are plain JavaScript, so the small Alpine
 # image is enough. Secrets and people never enter the image: `database/` is a volume; Microsoft and Google sign-in
@@ -17,7 +17,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY . .
 
-# The repository includes a public config; NODE_ENV above selects release mode. Only runtime data belongs to this user.
+# The config of the image reads its settings from the environment (TRUST_PROXY, TRUST_PROXY_FROM, OAUTH_BASE_URL);
+# NODE_ENV above selects release mode. Only runtime data belongs to this user.
+COPY config.docker config
 RUN mkdir -p database logs tmp \
 	&& chown -R node:node /app
 

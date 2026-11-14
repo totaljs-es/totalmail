@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Docker: the image is published at `ghcr.io/totaljs-es/totalmail` (amd64 and arm64) for every version tag, and `docker-compose.yaml` uses it. Its four settings are variables: `TOTALMAIL_PORT`, `TRUST_PROXY`, `TRUST_PROXY_FROM` and `OAUTH_BASE_URL`; the image's config (`config.docker`) reads them from the environment, and a config of your own can still be mounted over `/app/config`.
+
 ## 1.1.0 — 2026-11-14
 
 - Sent mail: quotes inside quotes (`> >`) become nested blockquotes, and web links and email addresses in the signature can be clicked.

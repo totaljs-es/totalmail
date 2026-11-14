@@ -13,12 +13,13 @@ On a new public address the first visitor can create the administrator, so finis
 ## Docker
 
 ```bash
-git clone https://github.com/totaljs-es/totalmail
-cd totalmail
-docker compose up -d --build
+curl -O https://raw.githubusercontent.com/totaljs-es/totalmail/main/docker-compose.yaml
+docker compose up -d
 ```
 
-The image is `node:24-alpine`, runs as the unprivileged `node` user in production mode and contains no people, keys or secrets. `database/` is the `totalmail-data` volume: back it up (see below). Sign-in with Microsoft or Google is entered by the administrator in the app and stored in that same database, so there is nothing else to configure. A working `config` is included in the image. If you need installation-specific settings (the public address, `trust_proxy`), edit the included `config` and uncomment its mount in `docker-compose.yaml`. It contains only public defaults; credentials belong to the encrypted database. The container listens on `127.0.0.1:8000`; the compose file explains how to join an nginx-proxy network instead.
+The compose file uses the published image, `ghcr.io/totaljs-es/totalmail` (amd64 and arm64, one tag per version and `latest`). The image is `node:24-alpine`, runs as the unprivileged `node` user in production mode and contains no people, keys or secrets. `database/` is the `totalmail-data` volume: back it up (see below). Sign-in with Microsoft or Google is entered by the administrator in the app and stored in that same database, so there is nothing secret to configure.
+
+The image's config (`config.docker` in the repository) takes its settings from four variables, set in the compose file or in a `.env` file next to it: `TOTALMAIL_PORT` (the port on `127.0.0.1`, 8000), `TRUST_PROXY` (`false` without a proxy), `TRUST_PROXY_FROM` (a proxy with a public address, see [Behind a reverse proxy](#behind-a-reverse-proxy)) and `OAUTH_BASE_URL` (only when the public address cannot be inferred). For anything else, mount a config of your own over `/app/config`; it contains only public settings, credentials belong to the encrypted database. The compose file explains how to join an nginx-proxy network instead. To build the image from a clone, replace `image` with `build: .` and run `docker compose up -d --build`.
 
 ## Node.js
 
@@ -42,6 +43,8 @@ Serve TotalMail over HTTPS from a proxy such as nginx, Caddy or Traefik. The pro
 1. Stop TotalMail.
 2. Replace the application files **and delete the ones that no longer exist** in the new version. Total.js loads every file in `modules/`, `plugins/`, `controllers/` and `definitions/`, so a file left over from an older version can take the place of a newer module with the same name and break the application. With git, `git pull` does this for you; when uploading a folder, remove the old folders first.
 3. Keep `database/` and `config` as they are, and start again. Sessions survive a restart.
+
+With Docker, `docker compose pull && docker compose up -d` does all three; the volume keeps `database/`.
 
 Data written by older versions (`users.json`, `mail-<id>.json`, `instance.json`, `knowledge.json`, `sessions.json`) is imported into the database the first time a newer version starts; each file is renamed to `<name>.migrated` and not deleted. Remove them yourself when you have checked that everything is there.
 

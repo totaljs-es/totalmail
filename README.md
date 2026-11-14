@@ -29,15 +29,23 @@ TotalMail should be served over HTTPS (the session cookie is `Secure`, and Micro
 
 ### Docker
 
+The image is published at `ghcr.io/totaljs-es/totalmail` (amd64 and arm64) with each version. Download [`docker-compose.yaml`](docker-compose.yaml), set its four values and start it:
+
 ```bash
-git clone https://github.com/totaljs-es/totalmail
-cd totalmail
-docker compose up -d --build
+curl -O https://raw.githubusercontent.com/totaljs-es/totalmail/main/docker-compose.yaml
+docker compose up -d
 ```
 
-It listens on `127.0.0.1:8000`; point your proxy there. People, mailboxes and the encryption key live in the `totalmail-data` volume: back it up. Open the address and create the administrator.
+| Variable | Default | What it is |
+| --- | --- | --- |
+| `TOTALMAIL_PORT` | `8000` | The port on `127.0.0.1` your proxy points at. |
+| `TRUST_PROXY` | `true` | `false` when people reach the container directly, without a proxy. |
+| `TRUST_PROXY_FROM` | empty | Only for a proxy with a public address: its addresses or ranges, separated by commas. Proxies on the same machine, a private network or Tailscale are trusted already. |
+| `OAUTH_BASE_URL` | empty | Only when the public address cannot be inferred from the proxy's request, e.g. `https://mail.example.com`. |
 
-Sign-in with Microsoft or Google is set by the administrator inside the app and kept in the database (see [docs/oauth.md](docs/oauth.md)); there are no variables to define. Everything else is explained in [docs/installation.md](docs/installation.md).
+Write them in the file, or in a `.env` file next to it (`TRUST_PROXY_FROM=203.0.113.5`). People, mailboxes and the encryption key live in the `totalmail-data` volume: back it up. Open the address and create the administrator. To build the image from a clone instead, replace `image` with `build: .` and run `docker compose up -d --build`.
+
+Sign-in with Microsoft or Google is set by the administrator inside the app and kept in the database (see [docs/oauth.md](docs/oauth.md)); there are no secrets to define. Everything else is explained in [docs/installation.md](docs/installation.md).
 
 ### Node.js
 
@@ -52,7 +60,7 @@ A working `config` is included. Edit its non-secret settings when needed; `confi
 
 ## Updating and backups
 
-Update with `git pull` and `docker compose up -d --build` (or restart the process). Sessions survive a restart. Back up the whole `database/` folder together with the key inside it (`credentials.key`): without the key the stored mail passwords cannot be read.
+Update with `docker compose pull && docker compose up -d` (from a clone: `git pull` and `docker compose up -d --build`, or restart the process). Sessions survive a restart. Back up the whole `database/` folder together with the key inside it (`credentials.key`): without the key the stored mail passwords cannot be read.
 
 ## Status
 
