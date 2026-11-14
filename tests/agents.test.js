@@ -244,6 +244,24 @@ describe('the instructions of each area of the repository', () => {
 
 });
 
+describe('the plugins', () => {
+
+	test('a plugin loads only files without state from another plugin: what has an install() is read through PLUGINS', () => {
+		var plugins = Fs.readdirSync(Path.join(root, 'plugins')).filter((name) => Fs.statSync(Path.join(root, 'plugins', name)).isDirectory());
+		for (var plugin of plugins)
+			for (var file of Fs.readdirSync(Path.join(root, 'plugins', plugin)).filter((name) => name.endsWith('.js'))) {
+				var text = read('plugins/' + plugin + '/' + file);
+				for (var match of text.matchAll(/require\('\.\.\/(\w+)\/([\w/]+)'\)/g)) {
+					if (match[1] === plugin || !plugins.includes(match[1]))
+						continue;
+					var target = read('plugins/' + match[1] + '/' + match[2] + '.js');
+					assert.ok(!/^exports\.install\b/m.test(target), 'plugins/' + plugin + '/' + file + ' loads plugins/' + match[1] + '/' + match[2] + '.js, which has an install(): read it as PLUGINS.' + match[1] + ' inside a function');
+				}
+			}
+	});
+
+});
+
 describe('the skills', () => {
 
 	test('every skill has a name that is its folder and a description that says when to use it', () => {
