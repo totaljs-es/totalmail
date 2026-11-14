@@ -106,6 +106,10 @@ describe('AGENTS.md', () => {
 		for (var plugin of read('plugins/AGENTS.md').match(/`(mail|accounts|users|providers|rules|ai|devices|reception|access)`/g))
 			assert.ok(Fs.existsSync(Path.join(root, 'plugins', plugin.replace(/`/g, ''))), plugin);
 
+		// Total.js loads a plugin only when its folder has an index.js.
+		for (var folder of Fs.readdirSync(Path.join(root, 'plugins')).filter((name) => Fs.statSync(Path.join(root, 'plugins', name)).isDirectory()))
+			assert.ok(Fs.existsSync(Path.join(root, 'plugins', folder, 'index.js')), 'plugins/' + folder + ' has no index.js');
+
 		assert.deepEqual(Fs.readdirSync(Path.join(root, 'plugins')).sort(), ['access', 'accounts', 'ai', 'AGENTS.md', 'CLAUDE.md', 'devices', 'folders', 'mail', 'providers', 'reception', 'rules', 'users'].sort());
 	});
 
