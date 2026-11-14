@@ -122,6 +122,7 @@ PLUGIN('ai', function(exports) {
 					maxChars: data.maxChars,
 					cname: ''
 				});
+				mailbox.saved('ai.form');
 				var u = data.usage || { total: 0, tasks: {} };
 				set('enabled', !!data.enabled);
 				set('keySet', !!data.keySet);

@@ -17,11 +17,15 @@ FUNC.run = function($, fn, fallback) {
 	Promise.resolve()
 		.then(fn)
 		.then(function(value) {
-			// An error of the answer itself is logged: the request has been answered, it must not be answered again.
+			// An error of the answer itself is logged. A request that got its answer is not answered again; one that did not (the
+			// value could not be written) still gets one.
 			try {
 				$.callback(value);
 			} catch (err) {
 				Total.error(err, 'TotalMail');
+				var ctrl = $.controller;
+				if (!(ctrl && (ctrl.released || ctrl.destroyed)))
+					$.invalid(fallback || '@(The operation could not be completed.)');
 			}
 		}, function(err) {
 			if ((err.message && err.message.startsWith('@(')) || err.plain)

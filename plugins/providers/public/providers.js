@@ -50,6 +50,7 @@ PLUGIN('providers', function(exports) {
 
 				var ms = data.oauth.microsoft || {};
 				SET('providers.ms', { clientId: ms.clientId, tenant: ms.tenant, clientSecret: '' });
+				mailbox.saved('providers.ms');
 				exports.set('msReturn', ms.returnUri || '');
 				var parts = [];
 				parts.push(
@@ -64,6 +65,7 @@ PLUGIN('providers', function(exports) {
 				var g = data.oauth.google || {},
 					gparts = [];
 				SET('providers.google', { clientId: g.clientId || '', clientSecret: '' });
+				mailbox.saved('providers.google');
 				exports.set('googleReturn', g.returnUri || '');
 				gparts.push(
 					g.ready
@@ -117,6 +119,7 @@ PLUGIN('providers', function(exports) {
 					data = await mailbox.api('instance_get');
 					render();
 					SET('providers.type', blank());
+					mailbox.saved('providers.type');
 					exports.set('heading', TRANSLATE('@(Add an account type)'));
 					error('');
 					SET('mail.window', 'providers');
@@ -186,11 +189,13 @@ PLUGIN('providers', function(exports) {
 					steps: type.steps,
 					note: type.note || ''
 				});
+				mailbox.saved('providers.type');
 				exports.set('heading', TRANSLATE('@(Edit account type)'));
 			};
 			exports.newtype = function() {
 
 				SET('providers.type', blank());
+				mailbox.saved('providers.type');
 				exports.set('heading', TRANSLATE('@(Add an account type)'));
 				error('');
 			};

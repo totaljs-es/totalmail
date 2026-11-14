@@ -582,15 +582,17 @@ test('the sync button of the account form syncs that account\'s inbox', async ()
 	Assert.deepEqual(h.called('account_sync').map((c) => c.data), [{ accountId: 'a2', path: 'INBOX' }]);
 });
 
-test('leaving a section with unsaved changes asks first; what the code filled in or saved does not count', async () => {
+test('leaving a section with unsaved changes asks first; what the section loaded or saved does not count', async () => {
 	var h = await start();
 	h.set('mail.window', 'profile');
-	h.set('users.profileform', { name: 'Ana Ruiz', email: 'ana@example.test' });
+	h.set('users.profileform', { name: 'Ana Ruiz', email: 'ana@example.test', currentPassword: '' });
+	h.plugin.saved('users.profileform');
 	h.plugin.closewindow();
 	Assert.equal(h.mail().window, '', 'nothing was typed: it closes without asking');
 	Assert.equal(h.asked.length, 0);
 	h.set('mail.window', 'profile');
-	h.set('users.profileform', { name: 'Ana Ruiz', email: 'ana@example.test' });
+	h.set('users.profileform', { name: 'Ana Ruiz', email: 'ana@example.test', currentPassword: '' });
+	h.plugin.saved('users.profileform');
 	h.set('users.profileform.name', 'Ana R.');
 	h.confirming = false;
 	h.plugin.closewindow();
@@ -603,12 +605,42 @@ test('leaving a section with unsaved changes asks first; what the code filled in
 	Assert.deepEqual(h.execs, ['devices/open'], 'the person chose to leave');
 });
 
+test('a form that the code rebuilds after the person typed is still unsaved (discovery of the servers)', async () => {
+	var h = await start();
+	h.set('mail.window', 'account-setup');
+	h.set('accounts.form', { id: '', name: '', email: '', imapHost: '', password: '' });
+	h.plugin.saved('accounts.form');
+	h.set('accounts.form.email', 'rosa@example.test');
+	h.set('accounts.form.password', 'secret');
+	// What discovery does: the whole form again, with the servers it found and what the person typed.
+	h.set('accounts.form', Object.assign({}, h.get('accounts.form'), { imapHost: 'imap.example.test' }));
+	h.confirming = false;
+	h.plugin.closewindow();
+	Assert.equal(h.asked.length, 1, 'nothing of it is saved');
+	Assert.equal(h.mail().window, 'account-setup');
+});
+
+test('the passwords typed in a section are forgotten when the person moves to another one', async () => {
+	var h = await start();
+	h.set('mail.window', 'profile');
+	h.set('users.profileform', { name: 'Ana', currentPassword: '', newPassword: '', confirmPassword: '' });
+	h.plugin.saved('users.profileform');
+	h.set('users.profileform.currentPassword', 'old-one');
+	h.set('accounts.form', { password: 'mail-secret' });
+	h.confirming = true;
+	h.plugin.section([{ dataset: { open: 'devices/open' }, getAttribute: () => null }]);
+	Assert.equal(h.get('users.profileform.currentPassword'), '');
+	Assert.equal(h.get('accounts.form.password'), '');
+	Assert.equal(h.get('users.profileform.name'), 'Ana', 'only the passwords');
+});
+
 test('a section that saves says so, and the section that is open is not opened again', async () => {
 	var h = await start();
 	h.set('mail.window', 'account-setup');
 	h.set('accounts.form', { id: 'a1', name: 'Work' });
+	h.plugin.saved('accounts.form');
 	h.set('accounts.form.name', 'Office');
-	h.plugin.saved('account-setup');
+	h.plugin.saved('accounts.form');
 	h.plugin.closewindow();
 	Assert.equal(h.asked.length, 0, 'saved: nothing to lose');
 	Assert.equal(h.mail().window, '');
@@ -623,6 +655,7 @@ test('signing out from the settings with unsaved changes asks first', async () =
 	var h = await start();
 	h.set('mail.window', 'users');
 	h.set('users.form', { name: '', email: '' });
+	h.plugin.saved('users.form');
 	h.set('users.form.name', 'Rosa');
 	h.confirming = false;
 	await h.click({ command: 'logout' });

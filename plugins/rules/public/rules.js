@@ -104,6 +104,7 @@ PLUGIN('rules', function(exports) {
 			function clear() {
 
 				SET('rules.form', blank());
+				mailbox.saved('rules.form');
 				exports.set('heading', TRANSLATE('@(New rule)'));
 				exports.set('test', '');
 				error('');
@@ -177,6 +178,7 @@ PLUGIN('rules', function(exports) {
 					action: r.action,
 					path: r.path || ''
 				});
+				mailbox.saved('rules.form');
 				exports.set('heading', TRANSLATE('@(Edit rule)'));
 			};
 			exports.toggle = async function(element) {

@@ -1214,9 +1214,9 @@ PLUGIN('mail', function(exports) {
 	};
 	exports.togglenotifications = notify.toggle;
 	exports.operation = perform;
-	// Closes a window of the settings, and forgets the passwords that were typed in it.
-	// The sections of the settings that have a form. What the code puts in a form (when the section opens, after a save) is its
-	// baseline; what differs from it was typed by the person and is not saved yet.
+	// The sections of the settings that have a form. Each section says when its form holds what is saved (it has just been loaded or
+	// saved: PLUGINS.mail.saved(path)); what differs from that was typed by the person and is not saved yet. A form that never said
+	// so is never in the way.
 	var forms = {
 		'account-setup': ['accounts.form'],
 		profile: ['users.profileform'],
@@ -1229,15 +1229,6 @@ PLUGIN('mail', function(exports) {
 	function baseline(path) {
 		baselines[path] = JSON.stringify(GET(path) || null);
 	}
-	// A form set as a whole is the code; a change of one of its fields is the person.
-	for (var sections = Object.keys(forms), s = 0; s < sections.length; s++)
-		for (var paths = forms[sections[s]], p = 0; p < paths.length; p++)
-			(function(path) {
-				WATCH(path, function(value, flags, changed) {
-					if (changed === path)
-						baseline(path);
-				});
-			})(paths[p]);
 	function unsaved(name) {
 		return (forms[name] || []).some(function(path) { return path in baselines && JSON.stringify(GET(path) || null) !== baselines[path]; });
 	}
@@ -1246,11 +1237,15 @@ PLUGIN('mail', function(exports) {
 		return !unsaved(mail.window) || window.confirm(TRANSLATE('@(This section has changes that are not saved. Leave without saving them?)'));
 	}
 	exports.leave = leave;
-	// A section that saves without filling its form again says that what is in the form now is saved.
-	exports.saved = function(name) {
-		for (var paths = forms[name] || [], i = 0; i < paths.length; i++)
-			baseline(paths[i]);
-	};
+	// What is in the form at `path` now is what is saved (the section has just loaded or saved it).
+	exports.saved = baseline;
+	// The passwords typed in a section are forgotten when the person leaves it, whichever way.
+	function forget() {
+		SET('accounts.form.password', '');
+		SET('users.form.password', '');
+		if (GET('users.profileform'))
+			SET('users.profileform', Object.assign({}, GET('users.profileform'), { currentPassword: '', newPassword: '', confirmPassword: '' }));
+	}
 	// Another section of the list on the left (data-open is what opens it).
 	exports.section = function(element) {
 
@@ -1258,17 +1253,18 @@ PLUGIN('mail', function(exports) {
 		// The section that is open already is not opened again (and what was typed in it stays).
 		if (element[0].getAttribute('aria-current') === 'page' || !leave())
 			return;
+		forget();
 		if (target === 'settings')
 			SET('mail.window', 'settings');
 		else
 			EXEC(target);
 	};
+	// Closes a window of the settings, and forgets the passwords that were typed in it.
 	function closewindow() {
 		if (!leave())
 			return;
 		SET('mail.window', '');
-		SET('accounts.form.password', '');
-		SET('users.form.password', '');
+		forget();
 	}
 	exports.closewindow = closewindow;
 	exports.syncaccount = function(id) { return syncmail(id); };

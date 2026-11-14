@@ -196,7 +196,14 @@ COMPONENT('modalguard', function(self, config) {
 				var el = document.querySelector('#' + name + ' [aria-current="page"]') || document.querySelector('#' + name + ' button');
 				el && el.focus();
 				// On a narrow screen the list is a row that scrolls: the section must be in view, also after the window's animation.
-				el && el.scrollIntoView && setTimeout(function() { el.scrollIntoView({ block: 'nearest', inline: 'center' }); }, 350);
+				setTimeout(function() {
+					var row = el && el.closest('.settings-nav');
+					if (!row || self.get() !== name || getComputedStyle(row).flexDirection !== 'row')
+						return;
+					var item = el.getBoundingClientRect(),
+						box = row.getBoundingClientRect();
+					row.scrollLeft += item.left + item.width / 2 - (box.left + box.width / 2);
+				}, 350);
 			});
 		} else {
 			shell.inert = false;

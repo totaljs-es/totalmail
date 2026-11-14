@@ -47,6 +47,7 @@ PLUGIN('users', function(exports) {
 					newPassword: '',
 					confirmPassword: ''
 				});
+				mailbox.saved('users.profileform');
 				exports.set('profileError', '');
 				(PLUGINS.twostep && PLUGINS.twostep.refreshlink) && PLUGINS.twostep.refreshlink();
 				SET('mail.window', 'profile');
@@ -97,6 +98,7 @@ PLUGIN('users', function(exports) {
 					email: '',
 					password: ''
 				});
+				mailbox.saved('users.form');
 				exports.set('error', '');
 				var result = await mailbox.api('user_list');
 				listing = result.users;

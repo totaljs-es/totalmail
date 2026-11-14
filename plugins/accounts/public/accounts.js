@@ -298,6 +298,7 @@ PLUGIN('accounts', function(exports) {
 							aliases: ''
 						}
 				);
+				mailbox.saved('accounts.form');
 				discoverygeneration++;
 				setassistant(a ? a.assistant !== false : true);
 				editing = a || null;
@@ -425,7 +426,7 @@ PLUGIN('accounts', function(exports) {
 					mailbox.refresh();
 					SET('accounts.form.password', '');
 					SET('accounts.form.id', account.id);
-					mailbox.saved('account-setup');
+					mailbox.saved('accounts.form');
 					// The saved account is now the one being edited.
 					editing = state.accounts.find(function(a) { return a.id === account.id; }) || null;
 					selected = guess(editing);
