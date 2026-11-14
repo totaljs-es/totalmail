@@ -62,10 +62,17 @@ test('an account that is not there is refused', async (t) => {
 	Assert.equal(store.snapshot().accounts.length, 2);
 });
 test('an account with a message being sent stays until that is known', async (t) => {
-	var data = seed();
-	data.drafts[0].status = 'sending';
-	var { store } = fixture(t, data);
+	var { store } = fixture(t, seed());
+	await store.beginSend(store.snapshot().drafts[0].id);
 	await Assert.rejects(() => store.deleteAccount('a'), /being sent/);
 	Assert.equal(store.snapshot().accounts.length, 2);
 	Assert.equal(store.snapshot().messages.length, 3);
+});
+test('a message that was being sent when the process stopped is of unknown delivery, and can be settled', async (t) => {
+	var data = seed();
+	data.drafts[0].status = 'sending';
+	var { store } = fixture(t, data);
+	Assert.equal(store.snapshot().drafts[0].status, 'unknown');
+	await store.deleteAccount('a');
+	Assert.equal(store.snapshot().accounts.length, 1, 'the account no longer stays forever because of it');
 });

@@ -32,8 +32,9 @@ test('bootstrap excludes sent drafts after restart while retaining pending draft
 	Assert.equal(store.snapshot().drafts.find((d) => d.id === 'sent').status, 'sent', 'the submission record is retained');
 	await Assert.rejects(store.beginSend('sent'), /already submitted/);
 	await Assert.rejects(store.saveDraft({ id: 'sent', accountId: 'a', body: 'Resend' }), /already submitted/);
-	await Assert.rejects(store.deleteDraft('sending'), /already submitted/);
-	await Assert.rejects(store.deleteDraft('unknown'), /already submitted/);
+	Assert.equal(store.snapshot().drafts.find((d) => d.id === 'sending').status, 'unknown', 'after a restart a message that was being sent is of unknown delivery');
+	await Assert.rejects(store.beginSend('sending'), /already submitted/, 'and it is still never sent again');
+	Assert.equal((await store.deleteDraft('unknown')).id, 'unknown', 'a draft of unknown delivery can be discarded once the person has checked Sent');
 	await store.setSentCopy('sent', { status: 'unknown' });
 	Assert.equal(store.message('sent-sent').sentCopy, 'unknown', 'copy failure does not return the message to drafts');
 	Assert.equal((await store.deleteDraft('editable')).id, 'editable', 'real drafts can still be discarded');
