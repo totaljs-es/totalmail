@@ -1,7 +1,7 @@
 var { test } = require('node:test');
 var Assert = require('node:assert/strict');
 require('total5');
-var Imap = require('../lib/imap');
+var Imap = require('../modules/imap');
 var target = { address: '127.0.0.1', servername: 'localhost' },
 	account = { id: 'a', imap: { port: 993, security: 'tls', username: 'fixture' } };
 var id = '<fixture@totalmail.local>',
@@ -55,7 +55,7 @@ test('missing, read-only and unconfirmed Sent folders never trigger automatic re
 test('without a stored Message-ID the sender builds one on the domain of the account', async () => {
 	var captured;
 	var message = { from() {}, to() {}, cc() {}, bcc() {}, attachment() {} };
-	var smtp = require('../lib/smtp').create({
+	var smtp = require('../modules/smtp').create({
 		create: () => message,
 		send: (options, sending, done) => {
 			captured = sending.$messageid;

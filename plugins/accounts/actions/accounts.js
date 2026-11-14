@@ -1,5 +1,5 @@
-var Aliases = require('../../../lib/aliases'),
-	Discovery = require('../../../lib/discovery');
+var Aliases = require('../../../modules/aliases'),
+	Discovery = require('../../../modules/discovery');
 
 var running = new Map();
 

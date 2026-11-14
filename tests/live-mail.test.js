@@ -5,8 +5,8 @@ var { test } = require('node:test'),
 	os = require('node:os');
 require('total5');
 var Db = require('./db'),
-	{ create } = require('../lib/live'),
-	imap = require('../lib/imap');
+	{ create } = require('../modules/live'),
+	imap = require('../modules/imap');
 function fixture(t) {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-live-'));
 	t.after(() => fs.rmSync(dir, { recursive: true, force: true }));

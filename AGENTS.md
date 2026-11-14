@@ -7,7 +7,7 @@ Guidance for AI coding agents that work on TotalMail. It is an application, not 
 TotalMail is a self-hosted mail client for teams and personal use: IMAP and SMTP accounts, a private mailbox for every person, an optional manual AI assistant. It is a **Total.js 5** application (`total5`, plus jComponent 20 in the browser) in plain JavaScript (CommonJS). Its data lives in the embedded NoSQL database of Total.js, in the private folder `database/`: one process, no database server, no queue, no outside service.
 
 Node.js: 22 or newer. Plain JavaScript, no TypeScript (Total.js does not support it: never add types or `.d.ts`).
-Main dependencies: `imapflow` (IMAP), `mailparser`, `sanitize-html`, `total5`. The SMTP sender is a corrected copy of the one of `total5@0.0.19` in `lib/vendor/total5-mail.js`.
+Main dependencies: `imapflow` (IMAP), `mailparser`, `sanitize-html`, `total5`. The SMTP sender is a corrected copy of the one of `total5@0.0.19` in `private/vendor/total5-mail.js`.
 License: MIT
 
 ## Commands
@@ -28,11 +28,11 @@ node bin/admin.js list                    # getting back in from the server; see
 
 ## Repository layout
 
-Each area that has its own rules (`plugins/`, `lib/`, `tests/`) has an `AGENTS.md`: read it before you change files there. The map of the code for Total.js developers is `docs/total-js.md`.
+Each area that has its own rules (`plugins/`, `modules/`, `tests/`) has an `AGENTS.md`: read it before you change files there. The map of the code for Total.js developers is `docs/total-js.md`.
 
 - `index.js` loads `total5`, reads `config` and calls `Total.run()`. `config` holds only public defaults; `config.example` lists them.
 - `plugins/<id>/` is one part of the application: `index.js` (name, icon, who sees it), `actions/` (the API, one `NEWACTION()` per operation), `views/` (the windows) and `public/` (the browser side).
-- `modules/` are the services shared by the whole application, used as `MODS.users`, `MODS.security`, `MODS.live`... `lib/` is the domain logic (IMAP, SMTP, threads, rules, search, the NoSQL mirror) as plain functions that a test can `require()` without the web server.
+- `modules/` are the services and the domain logic shared by the whole application, used as `MODS.users`, `MODS.security`, `MODS.live`... (IMAP, SMTP, threads, rules, search, the NoSQL mirror). A module exports plain functions, so a test can `require()` it without the web server; the ones that are a singleton of the application have an `install()`.
 - `controllers/default.js` has the routes that are not JSON (the page, the message frame, print, attachments, `/health/`). `definitions/` has `AUTH()`, the request check, `LOCALIZE()` and the UI components.
 - `resources/*.resource` are the translations (one file per language). `views/` has the page. `public/` has static files.
 - `bin/` has the server tools: `admin.js` and `translations.js`. `docs/` is the documentation for people who run or build on TotalMail. `tests/` has the tests and `tests/fixtures`.
@@ -42,7 +42,7 @@ Each area that has its own rules (`plugins/`, `lib/`, `tests/`) has an `AGENTS.m
 Follow the Total.js 5 conventions at https://github.com/totaljs-es/conventions. Read [the workflow](https://github.com/totaljs-es/conventions/blob/main/general/workflow.md) and the pages for the zone you change; the nearest existing file of this project is the pattern. Keep URLs, action IDs, permissions, response shapes and settings keys when you correct style.
 
 - **Style** is the [Total.js guidelines](https://github.com/totaljs-es/guidelines), and ESLint checks what a tool can check: tabs, single quotes, semicolons, no braces around a single statement, `var` (or `let` inside functions) and no `const`, no `forEach()` (a classic loop), no trailing spaces. `npm run format` fixes most of it.
-- **Use what Total.js gives** instead of Node.js modules or another package: `Total.Fs`, `Total.Path`, `Total.Crypto`, `PATH.root()`, `UID()`, `CONF`, `NOSQL()`, `NEWACTION()`, `MODS`. In `modules/`, `definitions/`, `controllers/`, `lib/` and the `actions/` of plugins ESLint rejects `require('fs')`, `require('path')`, `require('crypto')` and the other built-in modules.
+- **Use what Total.js gives** instead of Node.js modules or another package: `Total.Fs`, `Total.Path`, `Total.Crypto`, `PATH.root()`, `UID()`, `CONF`, `NOSQL()`, `NEWACTION()`, `MODS`. In `modules/`, `definitions/`, `controllers/` and the `actions/` of plugins ESLint rejects `require('fs')`, `require('path')`, `require('crypto')` and the other built-in modules.
 - **Every endpoint is an action**: `NEWACTION('Entity|operation', { user: true, route: '+API /api/ +name --> Entity|operation', input: '*field:Type', action: ... })`. Declare the input in the action: the framework validates it before your code runs. Answer through `FUNC.run($, () => ...)`: what you return goes back, a thrown error whose message starts with `@(` is shown to the person, and any other error is logged and replaced by a generic message.
 - **Every text a person sees is `@(Text)`**, in code and in views, with no parentheses inside. Add the translations with `node bin/translations.js --add`: a test fails when a text is missing in a language.
 - **The browser does not touch the DOM by hand.** Each window keeps its state in the model of a plugin and the views bind to it (`ui-bind`, `ui-component`, `data-exec`).
@@ -66,8 +66,8 @@ These are decisions of the project (`CONTRIBUTING.md` has them), not oversights.
 
 ## Pitfalls
 
-- **Total.js 5 from npm is `0.0.19`.** The SMTP sender is vendored and corrected in `lib/vendor/` (`docs/live-mail.md` says why); ESLint ignores `lib/vendor/`, `public/` and `node_modules/`.
-- **The data is in memory and mirrored.** A store loads its tables at startup (nothing is served before: `PAUSESERVER()`), answers reads from memory and writes only the records that changed through `lib/mirror.js`; a failed write changes nothing. Open tables with `lib/tables.js`, never with files of your own (`docs/storage.md`).
+- **Total.js 5 from npm is `0.0.19`.** The SMTP sender is vendored and corrected in `private/vendor/` (`docs/live-mail.md` says why); ESLint ignores `private/vendor/`, `public/` and `node_modules/`.
+- **The data is in memory and mirrored.** A store loads its tables at startup (nothing is served before: `PAUSESERVER()`), answers reads from memory and writes only the records that changed through `modules/mirror.js`; a failed write changes nothing. Open tables with `modules/tables.js`, never with files of your own (`docs/storage.md`).
 - **The Total.js watcher is on unless the instance is in production**, so editing a file restarts the server.
 - **Tests bootstrap `total5`** (`require('total5')`) so the framework helpers and the database are exercised too. Use a temporary folder for data and clean it up.
 - **Do not commit** `database/`, `logs/`, `tmp/`, `index.pid`, `index.js.json`, `index.js.map` or `.claude/settings.local.json`.

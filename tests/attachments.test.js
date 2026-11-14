@@ -2,8 +2,8 @@ require('total5');
 var { test } = require('node:test');
 var assert = require('node:assert/strict');
 var { Readable } = require('node:stream');
-var imap = require('../lib/imap');
-var live = require('../lib/live');
+var imap = require('../modules/imap');
+var live = require('../modules/live');
 var account = { id: 'a', imap: { security: 'tls', port: 993, username: 'user' } };
 var target = { address: '127.0.0.1', servername: 'localhost' };
 var source = [
@@ -98,7 +98,7 @@ test('outgoing files are private per user, addressed by random IDs and never esc
 		Path = require('node:path');
 	let root = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-files-'));
 	t.after(() => Fs.rmSync(root, { recursive: true, force: true }));
-	let files = require('../lib/files').create(root),
+	let files = require('../modules/files').create(root),
 		user = 'a'.repeat(32),
 		other = 'b'.repeat(32);
 	let id = await files.put(user, Buffer.from('secret'));
@@ -116,7 +116,7 @@ test('draft attachments enforce limits, change the revision and survive autosave
 		Path = require('node:path');
 	let dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-draft-'));
 	t.after(() => Fs.rmSync(dir, { recursive: true, force: true }));
-	let limits = require('../lib/files').limits;
+	let limits = require('../modules/files').limits;
 	let store = require('./db').store(dir, { accounts: [{ id: 'a', configured: true }], messages: [], drafts: [] });
 	let first = await store.saveDraft({ id: 'd', accountId: 'a', body: 'x' });
 	let item = (n, size = 10) => ({ id: String(n).padStart(32, '0'), name: 'f' + n, type: 'text/plain', size });

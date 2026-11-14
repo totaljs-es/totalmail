@@ -6,8 +6,8 @@ var Crypto = require('node:crypto'),
 	Os = require('node:os'),
 	Path = require('node:path');
 var Db = require('./db'),
-	Totp = require('../lib/totp'),
-	Pending = require('../lib/pending');
+	Totp = require('../modules/totp'),
+	Pending = require('../modules/pending');
 async function fixture(t) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-2fa-'));
 	t.after(() => Fs.rmSync(dir, { recursive: true, force: true }));

@@ -1,5 +1,5 @@
-var Files = require('../lib/files');
-var Html = require('../lib/html');
+var Files = require('../modules/files');
+var Html = require('../modules/html');
 
 var REG_MESSAGE = /^imap-[a-f0-9]{64}$/;
 var REG_ANYID = /^[A-Za-z0-9_-]{1,100}$/;

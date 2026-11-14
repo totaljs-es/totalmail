@@ -4,9 +4,9 @@ var Assert = require('node:assert/strict');
 var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-var Aliases = require('../lib/aliases');
-var Store = require('../lib/store'),
-	Live = require('../lib/live');
+var Aliases = require('../modules/aliases');
+var Store = require('../modules/store'),
+	Live = require('../modules/live');
 var Db = require('./db');
 test('aliases are cleaned: lower case, no repeats, never the account address, bad input refused', () => {
 	Assert.deepEqual(Aliases.parse('Ventas@Example.com, info@example.com;  ventas@example.com  soporte@example.com', 'info@example.com'), {

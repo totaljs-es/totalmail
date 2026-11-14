@@ -4,9 +4,9 @@ var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
 require('total5');
-var Imap = require('../lib/imap'),
+var Imap = require('../modules/imap'),
 	Db = require('./db'),
-	Live = require('../lib/live');
+	Live = require('../modules/live');
 var account = {
 	id: 'account',
 	configured: true,

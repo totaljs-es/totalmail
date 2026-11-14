@@ -6,7 +6,7 @@ var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path'),
 	{ execFileSync } = require('node:child_process');
-var Discovery = require('../lib/discovery');
+var Discovery = require('../modules/discovery');
 // A certificate for the name the test asks for, and the server that answers with `handler`.
 function server(t, handler) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-pinned-'));

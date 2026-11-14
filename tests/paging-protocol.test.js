@@ -7,7 +7,7 @@ var Tls = require('node:tls'),
 	Path = require('node:path');
 var { execFileSync } = require('node:child_process');
 var { ImapFlow } = require('imapflow');
-var Imap = require('../lib/imap');
+var Imap = require('../modules/imap');
 
 test('real ImapFlow pages by sequence, refreshes cached flags by UID list and sends valid commands', { timeout: 30000 }, async (t) => {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'tm-paging-'));

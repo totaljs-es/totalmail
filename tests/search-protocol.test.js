@@ -7,7 +7,7 @@ var Tls = require('node:tls'),
 	Path = require('node:path');
 var { execFileSync } = require('node:child_process');
 var { ImapFlow } = require('imapflow');
-var Imap = require('../lib/imap');
+var Imap = require('../modules/imap');
 
 // 40 messages; UIDs 101..140. Message n replies to message n-1 and lists the earlier ones in References.
 function envelope(n) {

@@ -1,7 +1,7 @@
 require('total5');
 var { test } = require('node:test');
 var Assert = require('node:assert/strict');
-var Discovery = require('../lib/discovery');
+var Discovery = require('../modules/discovery');
 
 test('a mail server name is a plain hostname with a name as its last part', () => {
 	Assert.equal(Discovery.host('imap.gmail.com'), 'imap.gmail.com');

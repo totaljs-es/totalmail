@@ -4,7 +4,7 @@ var assert = require('node:assert/strict');
 var fs = require('node:fs');
 var os = require('node:os');
 var path = require('node:path');
-var Mirror = require('../lib/mirror');
+var Mirror = require('../modules/mirror');
 function folder(t) {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-mirror-'));
 	t.after(() => fs.rmSync(dir, { recursive: true, force: true }));

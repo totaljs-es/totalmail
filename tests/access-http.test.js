@@ -10,7 +10,7 @@ var root = path.join(__dirname, '..'),
 	Db = require('./db');
 test('native Actions enforce session, administrator privileges and private mailbox ownership', { timeout: 30000 }, async (t) => {
 	let directory = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-http-'));
-	for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'lib', 'views', 'resources'])
+	for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'private', 'views', 'resources'])
 		fs.cpSync(path.join(root, name), path.join(directory, name), { recursive: true });
 	fs.writeFileSync(path.join(directory, 'config'), 'name : TotalMail\n');
 	fs.mkdirSync(path.join(directory, 'public'));

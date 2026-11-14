@@ -1,4 +1,4 @@
-var Totp = require('../../../lib/totp');
+var Totp = require('../../../modules/totp');
 
 NEWACTION('Users|setup', {
 	name: 'Create the first administrator',

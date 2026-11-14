@@ -16,4 +16,4 @@ Things to remember:
 - Every visible text is `@(Text)` with no parentheses inside, in the views and in the JavaScript of `public/`. `node bin/translations.js --add` adds the new ones to the eight language files.
 - The windows are tested for accessibility (keyboard, roles, 200 % zoom): see `docs/accessibility.md` before you change how a window works.
 - `tests/plugins-boot.test.js` loads the browser files of every plugin with fakes: a new `public/*.js` goes in its list.
-- Keep the actions thin. The logic that does not need the framework belongs in `lib/`, where a test can reach it.
+- Keep the actions thin. The logic that does not need the framework belongs in `modules/`, where a test can reach it.

@@ -7,8 +7,8 @@ var { test } = require('node:test'),
 	path = require('node:path'),
 	{ execFileSync } = require('node:child_process');
 require('total5');
-var { Mailer } = require('../lib/vendor/total5-mail'),
-	smtp = require('../lib/smtp').create(Mailer);
+var { Mailer } = require('../private/vendor/total5-mail'),
+	smtp = require('../modules/smtp').create(Mailer);
 async function fixture(t, { starttls = false, reply = '250 queued', auth = true } = {}) {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tm-smtp-'));
 	execFileSync(

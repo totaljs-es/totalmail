@@ -1,9 +1,9 @@
 // The mailbox of each person, in the database and in memory: used as MODS.users.forUser(user). Everyone who exists is loaded when
 // the module is installed; a person who is added later starts with an empty mailbox.
-var Mailbox = require('../lib/store'),
-	Mirror = require('../lib/mirror'),
-	Tables = require('../lib/tables').in(PATH.root('database')),
-	Files = require('../lib/files');
+var Mailbox = require('./store'),
+	Mirror = require('./mirror'),
+	Tables = require('./tables').in(PATH.root('database')),
+	Files = require('./files');
 
 var stores = new Map(),
 	database = PATH.root('database'),

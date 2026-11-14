@@ -1,6 +1,6 @@
 var { test } = require('node:test');
 var Assert = require('node:assert/strict');
-var Ics = require('../lib/ics');
+var Ics = require('../modules/ics');
 var wrap = (event, method = 'REQUEST') =>
 	['BEGIN:VCALENDAR', 'VERSION:2.0', 'METHOD:' + method, 'BEGIN:VEVENT', ...event, 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n');
 test('an invitation gives what, when, where and who', () => {

@@ -1,12 +1,12 @@
 var { test } = require('node:test');
 var Assert = require('node:assert/strict');
-var Imap = require('../lib/imap');
+var Imap = require('../modules/imap');
 var Fs = require('node:fs');
 var Os = require('node:os');
 var Path = require('node:path');
 require('total5');
 var Db = require('./db');
-var Live = require('../lib/live');
+var Live = require('../modules/live');
 
 function fixture(overrides = {}) {
 	var seen = false,

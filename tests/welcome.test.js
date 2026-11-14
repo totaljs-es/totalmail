@@ -5,7 +5,7 @@ var Path = require('node:path');
 var Os = require('node:os');
 require('total5');
 var Db = require('./db');
-var Welcome = require('../lib/welcome');
+var Welcome = require('../modules/welcome');
 for (var language of ['en', 'es', 'sk'])
 	Total.loadresource(language, Fs.readFileSync(Path.join(__dirname, '../resources', language + '.resource'), 'utf8'));
 test('welcome appears once per account after successful INBOX sync and survives restart', async (t) => {

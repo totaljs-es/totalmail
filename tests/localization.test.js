@@ -36,7 +36,7 @@ test('every UI marker has matching English, Spanish, Slovak, German, French, Ita
 				files.push(file);
 		}
 	}
-	for (let dir of ['views', 'plugins', 'modules', 'lib'])
+	for (let dir of ['views', 'plugins', 'modules', 'definitions', 'controllers'])
 		scan(dir);
 	let phrases = new Set(
 		files.flatMap((file) =>

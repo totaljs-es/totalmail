@@ -32,7 +32,7 @@ When verification fails because the server rejected the sign-in, the message say
 A provider is a JSON file in `plugins/accounts/providers/` (any plugin may ship its own `providers/` folder). Copy one of the existing files and edit it; no code changes. Fields:
 
 - `id` (lowercase letters, digits, dashes), `name`, `icon` (a Total Icons name such as `server`, `google`, `apple`, `microsoft`), `order`, `summary`, `note`.
-- `auth`: `password`, `app-password` or `oauth2` (OAuth providers also need an entry in `lib/oauth.js` and, for guidance while unconfigured, a `setup` list of steps). `available: false` hides the sign-in of a provider that is not ready.
+- `auth`: `password`, `app-password` or `oauth2` (OAuth providers also need an entry in `modules/oauth.js` and, for guidance while unconfigured, a `setup` list of steps). `available: false` hides the sign-in of a provider that is not ready.
 - `imap` and `smtp`: `host`, `port`, `security` (`tls` or `starttls`). `username: "email"` fills the sign-in name from the address.
 - `domains` and `mx` (suffixes such as `.google.com`) for recognition.
 - `steps`: a list of `{ "text", "url" }`; links must be `https`.

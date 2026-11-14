@@ -49,7 +49,7 @@ test(
 		});
 		let endpoint = 'http://127.0.0.1:' + model.address().port + '/v1';
 		let directory = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-ai-http-'));
-		for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'lib', 'views', 'resources'])
+		for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'private', 'views', 'resources'])
 			fs.cpSync(path.join(root, name), path.join(directory, name), { recursive: true });
 		fs.writeFileSync(path.join(directory, 'config'), 'name : TotalMail\n');
 		fs.mkdirSync(path.join(directory, 'public'));

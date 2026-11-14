@@ -1,4 +1,4 @@
-var Tables = require('../lib/tables').in(PATH.root('database'));
+var Tables = require('./tables').in(PATH.root('database'));
 var directory = PATH.root('database');
 
 // The accounts and the sessions live in the database. They are opened when the module is installed and filled into these
@@ -19,9 +19,9 @@ exports.install = function() {
 		Total.Fs.chmodSync(directory, 0o700);
 	} catch {}
 	exports.ready = Promise.all([
-		require('../lib/identities').open({ directory, table: Tables, legacy: { file: Total.Path.join(directory, 'users.json') } }),
-		require('../lib/sessions').open({ table: Tables, legacy: { file: Total.Path.join(directory, 'sessions.json') } }),
-		require('../lib/devices').open({ table: Tables })
+		require('./identities').open({ directory, table: Tables, legacy: { file: Total.Path.join(directory, 'users.json') } }),
+		require('./sessions').open({ table: Tables, legacy: { file: Total.Path.join(directory, 'sessions.json') } }),
+		require('./devices').open({ table: Tables })
 	]).then(function(entry) {
 		var accounts = entry[0], signedin = entry[1], apps = entry[2];
 
@@ -48,7 +48,7 @@ exports.version = (function() {
 exports.identities = identities;
 exports.devices = devices;
 // A password that was right but still needs its code, and setups not yet confirmed.
-exports.pending = require('../lib/pending').create();
+exports.pending = require('./pending').create();
 // jComponent compiles bindings with Function(), hence unsafe-eval. Everything else is restricted to self and the official CDN.
 var cdn = 'https://cdn.componentator.com';
 
@@ -159,7 +159,7 @@ exports.address = function($) { return clientip($); };
 
 var clientip = function($) {
 	var ctrl = $.controller || $;
-	return require('../lib/clientip')(ctrl.headers, (ctrl.req && ctrl.req.socket && ctrl.req.socket.remoteAddress), String(CONF.trust_proxy) !== 'false');
+	return require('./clientip')(ctrl.headers, (ctrl.req && ctrl.req.socket && ctrl.req.socket.remoteAddress), String(CONF.trust_proxy) !== 'false');
 };
 
 exports.allowLogin = function($, email) {

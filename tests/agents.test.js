@@ -80,7 +80,7 @@ function check(file) {
 }
 
 var SKILLS = Fs.readdirSync(Path.join(root, '.claude', 'skills'));
-var AREAS = ['plugins', 'lib', 'tests'];
+var AREAS = ['plugins', 'modules', 'tests'];
 
 describe('AGENTS.md', () => {
 
@@ -100,7 +100,7 @@ describe('AGENTS.md', () => {
 
 	test('every folder of the layout that it describes exists, and so do the plugins that it names', () => {
 
-		for (var folder of ['plugins/', 'modules/', 'lib/', 'controllers/', 'definitions/', 'resources/', 'views/', 'public/', 'bin/', 'docs/', 'tests/'])
+		for (var folder of ['plugins/', 'modules/', 'private/', 'controllers/', 'definitions/', 'resources/', 'views/', 'public/', 'bin/', 'docs/', 'tests/'])
 			assert.ok(Fs.existsSync(Path.join(root, folder)), folder);
 
 		for (var plugin of read('plugins/AGENTS.md').match(/`(mail|accounts|users|providers|rules|ai|devices|reception|access)`/g))
@@ -120,10 +120,10 @@ describe('AGENTS.md', () => {
 		for (var module of ['fs', 'path', 'crypto'])
 			assert.ok(eslint.includes("'" + module + "'"), module + ' is not restricted');
 
-		for (var ignored of ['lib/vendor/**', 'public/**', 'node_modules/**'])
+		for (var ignored of ['private/vendor/**', 'public/**', 'node_modules/**'])
 			assert.ok(eslint.includes(ignored), ignored + ' is not ignored by ESLint');
 
-		assert.ok(Fs.existsSync(Path.join(root, 'lib', 'vendor', 'total5-mail.js')));
+		assert.ok(Fs.existsSync(Path.join(root, 'private', 'vendor', 'total5-mail.js')));
 	});
 
 	test('the request header that the tests need is the one that the application checks', () => {
@@ -228,9 +228,9 @@ describe('the instructions of each area of the repository', () => {
 			assert.ok(read(file).split('\n').length <= 200, file + ' is too long');
 	});
 
-	test('the files that lib/ names exist', () => {
-		for (var name of read('lib/AGENTS.md').match(/`\w+\.js`/g))
-			assert.ok(Fs.existsSync(Path.join(root, 'lib', name.replace(/`/g, ''))) || Fs.existsSync(Path.join(root, 'lib', 'vendor', name.replace(/`/g, ''))), name + ' is not in lib/');
+	test('the files that modules/ names exist', () => {
+		for (var name of read('modules/AGENTS.md').match(/`\w+\.js`/g))
+			assert.ok(Fs.existsSync(Path.join(root, 'modules', name.replace(/`/g, ''))) || Fs.existsSync(Path.join(root, 'private', 'vendor', name.replace(/`/g, ''))), name + ' is not in modules/');
 	});
 
 });

@@ -9,7 +9,7 @@ var { test } = require('node:test'),
 var root = path.join(__dirname, '..');
 test('a person removes one of their accounts with its mail and drafts, and nothing of anyone else', { timeout: 40000 }, async (t) => {
 	let directory = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-http-'));
-	for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'lib', 'views', 'resources'])
+	for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'private', 'views', 'resources'])
 		fs.cpSync(path.join(root, name), path.join(directory, name), { recursive: true });
 	fs.copyFileSync(path.join(root, 'package.json'), path.join(directory, 'package.json'));
 	fs.writeFileSync(path.join(directory, 'config'), 'name : TotalMail\n');

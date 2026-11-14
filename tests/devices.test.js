@@ -4,7 +4,7 @@ var Assert = require('node:assert/strict');
 var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-var Devices = require('../lib/devices'),
+var Devices = require('../modules/devices'),
 	Db = require('./db');
 function folder(t) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-devices-'));
@@ -77,7 +77,7 @@ test('use is remembered (when and from where) without writing for every request'
 for (let operation of ['revoke', 'revokeUser'])
 	test(operation + ' stays revoked while an earlier activity write finishes, including after restart', async (t) => {
 		var dir = folder(t),
-			storage = await require('../lib/mirror').open(Devices.spec(Db.table(dir)), { seed: { devices: [] } }),
+			storage = await require('../modules/mirror').open(Devices.spec(Db.table(dir)), { seed: { devices: [] } }),
 			store = Devices.create(storage),
 			now = new Date('2026-10-11T10:00:00Z'),
 			made = await store.create('u1', mac, now),
@@ -111,7 +111,7 @@ for (let operation of ['revoke', 'revokeUser'])
 
 test('a failed revocation write cannot restore access and a later write persists the removal', async (t) => {
 	var dir = folder(t),
-		storage = await require('../lib/mirror').open(Devices.spec(Db.table(dir)), { seed: { devices: [] } }),
+		storage = await require('../modules/mirror').open(Devices.spec(Db.table(dir)), { seed: { devices: [] } }),
 		store = Devices.create(storage),
 		now = new Date('2026-10-11T10:00:00Z'),
 		made = await store.create('u1', mac, now),

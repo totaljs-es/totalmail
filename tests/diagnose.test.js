@@ -7,7 +7,7 @@ var Fs = require('node:fs'),
 	Path = require('node:path'),
 	Tls = require('node:tls'),
 	{ execFileSync } = require('node:child_process');
-var Diagnose = require('../lib/diagnose');
+var Diagnose = require('../modules/diagnose');
 // A certificate for localhost that lives `days` days, and a trusted copy of it for the connections that verify.
 function certificate(t, days = 30) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-diagnose-'));

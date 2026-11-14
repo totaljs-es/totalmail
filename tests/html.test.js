@@ -2,7 +2,7 @@ require('total5');
 var { test } = require('node:test');
 var Assert = require('node:assert/strict');
 var Module = require('node:module');
-var Html = require('../lib/html');
+var Html = require('../modules/html');
 var clean = (html, attachments) => Html.clean(html, attachments)?.html || '';
 
 test('scripts, handlers, frames, forms and every other active construct disappear', () => {

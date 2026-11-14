@@ -2,9 +2,9 @@ require('total5');
 var { test } = require('node:test');
 var Assert = require('node:assert/strict');
 var { Readable } = require('node:stream');
-var Imap = require('../lib/imap');
-var Live = require('../lib/live');
-var Store = require('../lib/store');
+var Imap = require('../modules/imap');
+var Live = require('../modules/live');
+var Store = require('../modules/store');
 var Db = require('./db');
 var Fs = require('node:fs'),
 	Os = require('node:os'),

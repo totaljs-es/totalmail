@@ -1,6 +1,6 @@
 // The rules of https://github.com/totaljs-es/guidelines that a tool can check or fix.
 module.exports = [
-	{ ignores: ['lib/vendor/**', 'public/**', 'node_modules/**', 'tools/**', 'docker/**'] },
+	{ ignores: ['private/vendor/**', 'public/**', 'node_modules/**', 'tools/**', 'docker/**'] },
 	{
 		files: ['**/*.js'],
 		languageOptions: { ecmaVersion: 2024, sourceType: 'commonjs', globals: {} },
@@ -26,7 +26,7 @@ module.exports = [
 		}
 	},
 	{
-		files: ['modules/**/*.js', 'definitions/**/*.js', 'controllers/**/*.js', 'plugins/**/actions/**/*.js', 'lib/**/*.js'],
+		files: ['modules/**/*.js', 'definitions/**/*.js', 'controllers/**/*.js', 'plugins/**/actions/**/*.js'],
 		rules: {
 			'no-restricted-modules': ['error', {
 				patterns: ['node:*', 'fs', 'path', 'crypto', 'http', 'https', 'dns', 'net', 'tls', 'os', 'util', 'child_process']

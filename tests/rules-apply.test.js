@@ -4,9 +4,9 @@ var Assert = require('node:assert/strict');
 var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-var Store = require('../lib/store'),
-	Live = require('../lib/live'),
-	Rules = require('../lib/rules');
+var Store = require('../modules/store'),
+	Live = require('../modules/live'),
+	Rules = require('../modules/rules');
 var Db = require('./db');
 var target = { address: '127.0.0.1', servername: 'localhost' };
 var msg = (uid, extra = {}) => ({

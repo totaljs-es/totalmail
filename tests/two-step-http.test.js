@@ -8,11 +8,11 @@ var fs = require('node:fs'),
 	os = require('node:os'),
 	net = require('node:net'),
 	{ spawn } = require('node:child_process');
-var Totp = require('../lib/totp');
+var Totp = require('../modules/totp');
 var root = path.join(__dirname, '..');
 test('two-step verification guards the sign-in end to end', { timeout: 60000 }, async (t) => {
 	let directory = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-2fa-http-'));
-	for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'lib', 'views', 'resources'])
+	for (let name of ['plugins', 'controllers', 'definitions', 'modules', 'private', 'views', 'resources'])
 		fs.cpSync(path.join(root, name), path.join(directory, name), { recursive: true });
 	fs.writeFileSync(path.join(directory, 'config'), 'name : TotalMail\n');
 	fs.mkdirSync(path.join(directory, 'public'));

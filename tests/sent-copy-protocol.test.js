@@ -7,7 +7,7 @@ var Assert = require('node:assert/strict'),
 var { execFileSync } = require('node:child_process');
 require('total5');
 var { ImapFlow } = require('imapflow'),
-	Imap = require('../lib/imap');
+	Imap = require('../modules/imap');
 test(
 	'actual ImapFlow appends the exact Seen MIME copy over TLS and finds its UID without duplicating it',
 	{ timeout: 15000 },
