@@ -1,5 +1,5 @@
 <ui-plugin path="reception">
-	<ui-bind path="reception.enabled" config="attr aria-checked button:value" class="block"
+	<ui-bind path="reception.enabled" config="attr aria-checked button:String(!!value)" class="block"
 		><button type="button" role="switch" aria-checked="true" class="switch-row exec" data-exec="reception/toggle">
 		<i class="ti ti-refresh" aria-hidden="true"></i
 		><span class="switch-text"><strong>@(Automatic reception)</strong><small>@(Checks verified inboxes when the server reports new mail, and every minute as a safety net, while this window is visible. No mail is sent.)</small></span
