@@ -10,7 +10,9 @@ production : false
 // $port : 8000
 $ip : 0.0.0.0
 
-// The normal deployment is behind an HTTPS reverse proxy. Use false when connecting directly without a proxy.
+// The normal deployment is behind an HTTPS reverse proxy. The address that it appends to X-Forwarded-For is used only when the
+// connection comes from the proxy itself (the same machine or a private network); from anywhere else the header is ignored. Use false
+// when connecting directly without a proxy.
 trust_proxy : true
 
 // Only needed when the public address cannot be inferred from the proxy's request.
