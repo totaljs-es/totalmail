@@ -233,14 +233,12 @@ ui-component[name=repeater],ui-component[name=template] { display: block}
 .account-add .ti { font-size: 14px}
 .sidebar-bottom .user { margin-top: 15px}
 .user small { overflow: hidden; text-overflow: ellipsis; max-width: 145px}
-.access-page { min-height: 100dvh; display: grid; place-items: center; background: linear-gradient(135deg,#252525,#484848); padding: 28px}
-.access-card { position: relative; background: var(--surface); border-radius: var(--radius); padding: 38px; width: 440px; max-width: 100%; box-shadow: 0 25px 100px #0003}
+.access-page { min-height: 100dvh; display: grid; place-items: center; grid-template-columns: minmax(0,1fr)}
+.access-card { position: relative; min-width: 0}
 .access-brand { display: flex; gap: 10px; align-items: center; font-size: 23px; font-weight: 650; margin-bottom: 45px}
-.access-brand .ti { background: var(--color); color: #fff; padding: 8px; border-radius: var(--radius)}
-.access-language { position: absolute; right: 32px; top: 40px; width: 136px}
 .access-card h1 { font-size: 26px; letter-spacing: -.7px; margin: 10px 0}
-.access-card>p { font-size: 13px; line-height: 1.8; color: #919191; margin-bottom: 25px}
-.access-card small { font-size: 11px; color: #919191}
+.access-card>p { font-size: 13px; line-height: 1.8; margin-bottom: 25px}
+.access-card small { font-size: 11px}
 .access-form { display: contents}
 /* A ui-bind that only wraps something (a button in a row of buttons) takes no box of its own. */
 ui-bind.contents { display: contents}
@@ -264,14 +262,10 @@ ui-bind.contents.hidden { display: none}
 .settings-modal .ui-modal-body-area { width: 100%!important}
 @media(max-width: 730px) { .ui-modal.settings-modal { width: calc(100vw - 30px)!important; max-width: calc(100vw - 30px)!important}
 .settings-grid { grid-template-columns: 1fr}
-.access-card { padding: 30px 24px}
-.access-language { right: 24px; top: 31px}
 }
 .workspace-settings { flex-shrink: 0}
 .topbar { gap: 12px}
 .empty-account-button { margin: 18px auto 0}
-.access-page { grid-template-columns: minmax(0,1fr)}
-.access-card { min-width: 0; width: min(440px,100%)}
 .send-detail { display: grid; grid-template-columns: 75px 1fr; gap: 10px; font-size: 12px; overflow-wrap: anywhere}
 .send-detail strong { color: var(--muted-ink); font-weight: 500}
 .send-body { white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; font-size: 13px; line-height: 1.8; background: var(--surface-soft); border-radius: var(--radius); padding: 18px; color: var(--muted-ink); max-height: 300px; overflow: auto}
@@ -285,8 +279,6 @@ ui-bind.contents.hidden { display: none}
 .modal-body-content { padding: 14px 28px 28px; }
 .modal-footer-content { padding: 16px 28px; height: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .compose-footer-area .modal-footer-content { display: block; height: auto; }
-.access-page { background: var(--surface-hover); }
-.access-card, .ui-modal { border-radius: var(--radius); box-shadow: 0 12px 50px #0002; }
 .brand-mark, .compose-button { box-shadow: none; }
 @media(max-width: 730px) { .modal-heading-content { padding: 18px 20px; }
 .modal-body-content { padding: 12px 20px 24px; }
@@ -333,7 +325,7 @@ ui-bind.contents.hidden { display: none}
 
 .user { width: 100%; text-align: left; }
 .user:hover { color: #FFFFFF; }
-.brand-mark, .compose-button, .primary-button, .access-brand .ti, .ui-modal .ui-modal-footer .primary-button { color: var(--accent-text, #FFFFFF); }
+.brand-mark, .compose-button, .primary-button, .ui-modal .ui-modal-footer .primary-button { color: var(--accent-text, #FFFFFF); }
 .primary-button:hover, .compose-button:hover { filter: brightness(.94); }
 .profile-modal { width: 620px; }
 .profile-modal .settings-footer { height: 76px; }
@@ -362,7 +354,6 @@ ui-bind.contents.hidden { display: none}
 .access-card .ui-input {margin:0 0 18px}
 .access-card .ui-input-label {color:#DCE8F9;font-size:12px;margin-bottom:7px}
 .access-card .ui-input-control {background:#FFFFFF12;border:1px solid #B7D5FF40;border-radius:12px;color:#FFFFFF;min-height:48px;box-shadow:inset 0 1px 0 #FFFFFF05}
-.access-card .ui-input-control:focus-within {border-color:#79D6FF;box-shadow:0 0 0 3px #4BB8FF25}
 .access-card .ui-input input,.access-card .ui-input-value {background:transparent;color:#FFFFFF;font-size:14px}
 .access-card .ui-input input::placeholder {color:#B5C8E0}
 .access-card .ui-input-icon,.access-card .ui-input-arrow,.access-card .ui-input-password {color:#D3E5FB;background:transparent;border-color:#B7D5FF30}
