@@ -32,7 +32,7 @@
 	DEF.languages = @{!model.languages};
 	// The languages for the selectors: decorative flag first, the name in its own language next to it (nothing depends on seeing the flag).
 	DEF.languageitems = DEF.languages.map(function(item) {
-		return { id: item.id, name: '<img class="flag" src="/flags/' + encodeURIComponent(item.id) + '.svg" alt="" onerror="this.remove()">' + Thelpers.encode(item.name) };
+		return { id: item.id, name: '<img class="flag" src="/flags/' + encodeURIComponent(item.id) + '.svg" alt="">' + Thelpers.encode(item.name) };
 	});
 	LOCALIZE(@{!model.localization});
 </script>

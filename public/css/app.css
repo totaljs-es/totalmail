@@ -275,7 +275,6 @@ ui-bind.contents.hidden { display: none}
 .access-card { padding: 30px 24px}
 .access-language { right: 24px; top: 31px}
 }
-.settings-hub .settings-footer { height: 20px; padding: 0; border: 0}
 .workspace-settings { flex-shrink: 0}
 .topbar { gap: 12px}
 .empty-account-button { margin: 18px auto 0}

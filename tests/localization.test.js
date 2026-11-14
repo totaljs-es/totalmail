@@ -117,3 +117,8 @@ test('new native resource languages are discovered with their own names and Engl
 		delete Total.resources.de;
 	}
 });
+
+test('every language has the flag that the selectors draw for it', () => {
+	for (let file of fs.readdirSync(path.join(root, 'resources')).filter((name) => name.endsWith('.resource')))
+		assert.ok(fs.existsSync(path.join(root, 'public/flags', file.replace('.resource', '.svg'))), file + ' has no flag in public/flags');
+});
