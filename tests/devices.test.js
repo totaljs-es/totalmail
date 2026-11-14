@@ -4,7 +4,7 @@ var Assert = require('node:assert/strict');
 var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-var Devices = require('../modules/devices'),
+var Devices = require('../plugins/users/devices'),
 	Db = require('./db');
 function folder(t) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-devices-'));

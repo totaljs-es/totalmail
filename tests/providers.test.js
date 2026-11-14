@@ -3,8 +3,8 @@ var { test } = require('node:test');
 var Assert = require('node:assert/strict');
 var Fs = require('node:fs'),
 	Path = require('node:path');
-var Providers = require('../modules/providers'),
-	Live = require('../modules/live');
+var Providers = require('../plugins/providers/catalogue'),
+	Live = require('../plugins/mail/live');
 var root = Path.join(__dirname, '../plugins');
 var shipped = Fs.readdirSync(Path.join(root, 'accounts/providers')).filter((n) => n.endsWith('.json'));
 

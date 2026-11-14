@@ -1,5 +1,5 @@
 var dns = Total.Dns.promises,
-	Discovery = require('./discovery');
+	Discovery = require('../accounts/discovery');
 
 exports.resolve = async function(host) {
 

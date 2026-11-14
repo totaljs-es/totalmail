@@ -1,4 +1,4 @@
-// OAuth sign-in to mail providers. Used as MODS.oauth.
+// OAuth sign-in to mail providers. Used as PLUGINS.providers.oauth.
 // OAuth 2.0 authorization-code flow with PKCE for mail providers that no longer accept passwords.
 // Only the refresh token is stored (encrypted, per account); access tokens live in memory until they expire.
 // What differs between providers; the rest of the flow is the same. `valid` is the shape of an application ID.
@@ -89,8 +89,8 @@ exports.create = function(dependencies = {}) {
 
 	var request = dependencies.request || form,
 		now = dependencies.now || Date.now,
-		encrypt = dependencies.encrypt || (function(value) { return MODS.security.identities.encrypt(value); }),
-		decrypt = dependencies.decrypt || (function(value) { return MODS.security.identities.decrypt(value); });
+		encrypt = dependencies.encrypt || (function(value) { return PLUGINS.users.security.identities.encrypt(value); }),
+		decrypt = dependencies.decrypt || (function(value) { return PLUGINS.users.security.identities.decrypt(value); });
 	var states = new Map(),
 		cache = new Map(),
 		refreshing = new Map();
@@ -287,7 +287,7 @@ exports.meta = function(provider) { return providers[provider] ? { name: provide
 exports.useInstance = function(value) { return instance = value; };
 exports.claims = claims;
 
-// ---- The singleton of the application (MODS.oauth)
+// ---- The singleton of the application (PLUGINS.providers.oauth)
 var Lib = exports;
 
 exports.install = function() {
@@ -300,13 +300,13 @@ exports.install = function() {
 exports.complete = async function(provider, grant) {
 
 	// The person may have been disabled or removed while they signed in at the provider.
-	if (!MODS.security.identities.get(grant.userId))
+	if (!PLUGINS.users.security.identities.get(grant.userId))
 		throw Error('invalid_state');
 	// The tokens came from the provider the sign-in was started for; the address of the callback must name that same one.
 	if (!provider || grant.provider !== provider.id)
 		throw Error('invalid_state');
-	var store = MODS.users.forUser({ id: grant.userId }),
-		servers = MODS.providers.serversFor(provider, grant.email);
+	var store = PLUGINS.mail.mailboxes.forUser({ id: grant.userId }),
+		servers = PLUGINS.providers.catalogue.serversFor(provider, grant.email);
 	if (grant.accountId) {
 		var existing = store.account(grant.accountId);
 		if (

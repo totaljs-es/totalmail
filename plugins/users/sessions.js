@@ -1,7 +1,7 @@
 // Sign-in sessions, kept across restarts in the sessions_sessions table of the database. Only the SHA-256 of each token is
 // stored, so the table cannot be used to sign in. Writes are debounced (a burst of sign-ins is one write); a session that has
 // expired is not loaded.
-var Mirror = require('./mirror');
+var Mirror = require('../../modules/mirror');
 exports.spec = function(table) { return { table, prefix: 'sessions', clean: true, lists: ['sessions'] }; };
 
 // options = { table, now, legacy: { file } }: what an earlier version kept was { hash: { userId, expires } } in a JSON file.

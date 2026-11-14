@@ -26,7 +26,7 @@ module.exports = [
 		}
 	},
 	{
-		files: ['modules/**/*.js', 'definitions/**/*.js', 'controllers/**/*.js', 'plugins/**/actions/**/*.js'],
+		files: ['modules/**/*.js', 'definitions/**/*.js', 'controllers/**/*.js', 'plugins/*/*.js', 'plugins/**/actions/**/*.js'],
 		rules: {
 			'no-restricted-modules': ['error', {
 				patterns: ['node:*', 'fs', 'path', 'crypto', 'http', 'https', 'dns', 'net', 'tls', 'os', 'util', 'child_process']

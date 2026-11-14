@@ -9,7 +9,7 @@
 // would write that copy back over this change. `--database <folder>` points at another data folder (default: ./database).
 require('total5');
 
-var Store = require('../modules/identities'),
+var Store = require('../plugins/users/identities'),
 	Tables = require('../modules/tables');
 
 async function ask(text) {

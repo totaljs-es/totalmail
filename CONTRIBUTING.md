@@ -26,7 +26,7 @@ The three must pass; CI runs them on Node 22 and 24 and builds the Docker image.
 ## How the code is organised
 
 - `plugins/<name>/` is one part of the application: `actions/` (the API, written as Total.js actions), `views/` and `public/` (the browser side), `index.js`.
-- `modules/` are Total.js modules loaded by name (`MODS.name`); they hold the services and the domain logic as plain functions, so they can also be loaded with `require()`. Tests bootstrap `total5` so framework helpers and the embedded database are exercised too.
+- The logic of each feature is a file of its plugin (`plugins/mail/imap.js`), exported by `index.js` as `PLUGINS.<id>.<name>`; `modules/` holds what no plugin owns (storage, settings, languages). Both are plain functions, so they can also be loaded with `require()`. Tests bootstrap `total5` so framework helpers and the embedded database are exercised too.
 - Data lives in the NoSQL tables of Total.js through `modules/mirror.js`: state in memory, only the records that changed are written.
 - The browser code does not touch the DOM by hand: each window keeps its state in a jComponent model and the views bind to it with `ui-bind` and components. The rules a tool can check are in `eslint.config.cjs`; the full style is the [Total.js guidelines](https://github.com/totaljs-es/guidelines).
 - Use what Total.js already gives (`Total.Fs`, `Total.Path`, `Total.Crypto`, `NOSQL`, `NEWACTION`, `MODS`) instead of an extra package.

@@ -1,6 +1,6 @@
 // Rules belong to an account of the signed-in person: the account is always resolved from their own store.
 function run($, fn) {
-	FUNC.run($, function() { return fn(MODS.users.forUser($.user)); });
+	FUNC.run($, function() { return fn(PLUGINS.mail.mailboxes.forUser($.user)); });
 }
 
 NEWACTION('Rules|save', {
@@ -12,10 +12,10 @@ NEWACTION('Rules|save', {
 		return run($, function(store) {
 
 			var account = store.account(model.accountId);
-			var rule = MODS.rules.validate(Object.assign({}, model, { id: model.id || UID() }), account);
+			var rule = PLUGINS.rules.engine.validate(Object.assign({}, model, { id: model.id || UID() }), account);
 			if (model.id && !(account.rules || []).some(function(r) { return r.id === model.id; }))
 				throw Error('@(Rule not found.)');
-			return store.saveRule(model.accountId, rule, MODS.rules.limits.rules);
+			return store.saveRule(model.accountId, rule, PLUGINS.rules.engine.limits.rules);
 		});
 	}
 });
@@ -38,8 +38,8 @@ NEWACTION('Rules|test', {
 		return run($, function(store) {
 
 			var account = store.account(model.accountId);
-			var rule = MODS.rules.validate({ name: 'test', field: model.field, op: model.op, value: model.value, action: 'read' }, account);
-			var hits = store.folderMessages(model.accountId, 'inbox').filter(function(m) { return MODS.rules.matches(rule, m); });
+			var rule = PLUGINS.rules.engine.validate({ name: 'test', field: model.field, op: model.op, value: model.value, action: 'read' }, account);
+			var hits = store.folderMessages(model.accountId, 'inbox').filter(function(m) { return PLUGINS.rules.engine.matches(rule, m); });
 			return { matching: hits.length, sample: hits.slice(0, 5).map(function(m) { return String(m.subject || '').slice(0, 80); }) };
 		});
 	}

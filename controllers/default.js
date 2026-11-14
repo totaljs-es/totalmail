@@ -18,13 +18,13 @@ exports.install = function() {
 				httpOnly: true,
 				samesite: 'Lax'
 			});
-		MODS.security.headers($);
+		PLUGINS.users.security.headers($);
 		$.response.headers['cache-control'] = 'private, no-store';
 		$.response.headers['content-language'] = $.language;
 		var user = await $.authorize();
 		$.view(user ? 'index' : 'login', Object.assign({ localization: MODS.localization.clientResources($.language),
 			languages: MODS.localization.clientLanguages(),
-			setup: !MODS.security.identities.configured() }, MODS.appearance.resolve((user && user.color))));
+			setup: !PLUGINS.users.security.identities.configured() }, MODS.appearance.resolve((user && user.color))));
 	});
 	// The sanitized HTML of a message, for the sandboxed frame of the reader. Own policy, own headers: remote images
 	// stay blocked unless the reader asked for them with ?images=1.
@@ -34,16 +34,16 @@ exports.install = function() {
 			return $.invalid(404);
 		var message;
 		try {
-			message = MODS.users.forUser($.user).message($.params.id);
+			message = PLUGINS.mail.mailboxes.forUser($.user).message($.params.id);
 		} catch {
 			return $.invalid(404);
 		}
 		if (!message.html)
 			return $.invalid(404);
 		var images = $.query.images === '1';
-		Object.assign($.response.headers, MODS.html.headers(images, $.protocol + '://' + $.headers.host));
+		Object.assign($.response.headers, PLUGINS.mail.html.headers(images, $.protocol + '://' + $.headers.host));
 		$.response.minify = false;
-		$.html(MODS.html.document(message.html, images));
+		$.html(PLUGINS.mail.html.document(message.html, images));
 	});
 	// A message laid out for paper in its own tab: the details, then the cleaned HTML or the plain text. No script runs here
 	// (same policy as the frame), so printing is the browser's own command.
@@ -53,12 +53,12 @@ exports.install = function() {
 			return $.invalid(404);
 		var message;
 		try {
-			message = MODS.users.forUser($.user).message($.params.id);
+			message = PLUGINS.mail.mailboxes.forUser($.user).message($.params.id);
 		} catch {
 			return $.invalid(404);
 		}
 		var images = $.query.images === '1';
-		Object.assign($.response.headers, MODS.html.headers(images, "'none'"));
+		Object.assign($.response.headers, PLUGINS.mail.html.headers(images, "'none'"));
 		$.response.minify = false;
 		$.view('print', {
 			subject: message.subject || TRANSLATE($.language, '@(No subject)'),
@@ -66,7 +66,7 @@ exports.install = function() {
 			to: (message.toRecipients || []).join(', ') || message.to,
 			cc: (message.ccRecipients || []).join(', ') || message.cc,
 			date: message.date ? new Date(message.date).toLocaleString($.language || 'en') : '',
-			html: message.html ? MODS.html.display(message.html, images) : '',
+			html: message.html ? PLUGINS.mail.html.display(message.html, images) : '',
 			text: message.body
 		});
 	});
@@ -75,7 +75,7 @@ exports.install = function() {
 		if (!REG_MESSAGE.test($.params.id))
 			return $.invalid(404);
 		Promise.resolve()
-			.then(function() { return MODS.live.source($.user, MODS.users.forUser($.user), $.params.id); })
+			.then(function() { return PLUGINS.mail.live.source($.user, PLUGINS.mail.mailboxes.forUser($.user), $.params.id); })
 			.then(function(file) {
 
 				$.response.headers['cache-control'] = 'private, no-store';
@@ -92,7 +92,7 @@ exports.install = function() {
 		if (!REG_MESSAGE.test($.params.id) || index < 0)
 			return $.invalid(404);
 		Promise.resolve()
-			.then(function() { return MODS.live.attachment($.user, MODS.users.forUser($.user), $.params.id, index); })
+			.then(function() { return PLUGINS.mail.live.attachment($.user, PLUGINS.mail.mailboxes.forUser($.user), $.params.id, index); })
 			.then(function(file) {
 
 				$.response.headers['cache-control'] = 'private, no-store';
@@ -106,11 +106,11 @@ exports.install = function() {
 	ROUTE('+POST /upload/{draft}/ @upload <16mb', function($) {
 
 		var file = $.files[0],
-			files = MODS.users.files($.user),
-			store = MODS.users.forUser($.user);
+			files = PLUGINS.mail.mailboxes.files($.user),
+			store = PLUGINS.mail.mailboxes.forUser($.user);
 		if (!file || $.files.length !== 1 || !file.size)
 			return $.invalid('@(Choose a file to attach.)');
-		if (file.size > MODS.files.limits.file)
+		if (file.size > PLUGINS.mail.files.limits.file)
 			return $.invalid('@(Attachments can add up to 15 MB per message.)');
 		var name =
 			String(file.filename || '')
@@ -132,7 +132,7 @@ exports.install = function() {
 						type: Total.TUtils.contentTypes[Total.TUtils.getExtension(name)] || 'application/octet-stream',
 						size: file.size
 					},
-					MODS.files.limits
+					PLUGINS.mail.files.limits
 				);
 			})
 			.then(function(draft) { return $.json(draft); })
@@ -150,13 +150,13 @@ exports.install = function() {
 			return;
 		if (!$.files.length || $.files.length > 10)
 			return $.invalid('@(Choose between one and ten files.)');
-		var result = await MODS.knowledge.importFiles(String(($.body || {}).collectionid || '').slice(0, 40), $.files, $.language);
-		$.json(Object.assign({}, result, MODS.knowledge.view()));
+		var result = await PLUGINS.ai.knowledge.importFiles(String(($.body || {}).collectionid || '').slice(0, 40), $.files, $.language);
+		$.json(Object.assign({}, result, PLUGINS.ai.knowledge.view()));
 	});
 	// Long poll: answers when an IDLE connection reports a change in one of the user's inboxes, or after about 25 seconds.
 	ROUTE('+GET /changes/ <40s', function($) {
 		var since = /^\d{1,12}$/.test($.query.since || '') ? parseInt($.query.since) : 0;
-		MODS.changes
+		PLUGINS.mail.changes
 			.wait($.user, since, function(fn) { return $.req.once('close', fn); })
 			.then(function(value) {
 				$.response.headers['cache-control'] = 'private, no-store';
@@ -169,17 +169,17 @@ exports.install = function() {
 	// and the page then returns to the app through a same-site navigation.
 	ROUTE('GET /oauth/{provider}/callback/', function($) {
 
-		var provider = MODS.providers.get($.params.provider);
+		var provider = PLUGINS.providers.catalogue.get($.params.provider);
 		if (!provider || provider.auth !== 'oauth2')
 			return $.invalid(404);
 		function done(result) {
 
-			MODS.security.headers($);
+			PLUGINS.users.security.headers($);
 			$.response.headers['cache-control'] = 'private, no-store';
 			$.response.headers['referrer-policy'] = 'no-referrer';
 			$.view('oauth', { result });
 		}
-		var service = MODS.oauth,
+		var service = PLUGINS.providers.oauth,
 			query = $.query;
 		// Return from the administrator approval link: it carries no state and no code.
 		if (query.admin_consent)
@@ -205,7 +205,7 @@ exports.install = function() {
 		$.json({
 			status: 'ok',
 			mode: 'multiuser',
-			version: MODS.security.version,
+			version: PLUGINS.users.security.version,
 			api: 1
 		});
 	});

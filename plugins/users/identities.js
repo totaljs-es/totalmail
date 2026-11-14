@@ -1,6 +1,6 @@
 // Single-process identity store. A change is published only after it is written to the database.
 var Totp = require('./totp');
-var Mirror = require('./mirror');
+var Mirror = require('../../modules/mirror');
 exports.spec = function(table) { return { table, prefix: 'users', clean: true, lists: ['users'] }; };
 
 // The store, opened on a database: options = { table, directory, legacy: { file } }. `directory` is where

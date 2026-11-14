@@ -1,11 +1,11 @@
-// The mail itself: what is read from and sent to the mail servers. Used as MODS.live.
+// The mail itself: what is read from and sent to the mail servers. Used as PLUGINS.mail.live.
 var Credential = require('./credential'),
-	Lazy = require('./lazy'),
+	Lazy = require('../../modules/lazy'),
 	Network = require('./network'),
-	Rules = require('./rules'),
+	Rules = require('../rules/engine'),
 	Diagnose = require('./diagnose'),
 	imap = require('./imap').create(),
-	smtp = require('./smtp').create(require('../private/vendor/total5-mail').Mailer);
+	smtp = require('./smtp').create(require('../../private/vendor/total5-mail').Mailer);
 
 var active = new Set();
 
@@ -14,10 +14,10 @@ exports.create = function(dependencies = {}) {
 	var engine = dependencies.imap || imap,
 		sender = dependencies.smtp || smtp,
 		resolve = dependencies.resolve || Network.resolve,
-		oauth = dependencies.oauth || Lazy(function() { return MODS.oauth; }),
-		providers = dependencies.providers || Lazy(function() { return MODS.providers; }),
-		files = dependencies.files || (function(user) { return MODS.users.files(user); }),
-		decrypt = dependencies.decrypt || (function(value) { return MODS.security.identities.decrypt(value); });
+		oauth = dependencies.oauth || Lazy(function() { return PLUGINS.providers.oauth; }),
+		providers = dependencies.providers || Lazy(function() { return PLUGINS.providers.catalogue; }),
+		files = dependencies.files || (function(user) { return PLUGINS.mail.mailboxes.files(user); }),
+		decrypt = dependencies.decrypt || (function(value) { return PLUGINS.users.security.identities.decrypt(value); });
 	// For OAuth accounts the "password" handed to IMAP and SMTP is a fresh access token.
 	var credential = Credential.create({ oauth, decrypt });
 	// A rejected sign-in usually means the provider needs another kind of credential: say which.
@@ -220,7 +220,7 @@ exports.create = function(dependencies = {}) {
 				query = String(query || '')
 					.replace(/[\x00-\x1f\x7f]+/g, ' ')
 					.trim();
-				if (query.length < 2 || query.length > 200 || require('../plugins/mail/public/query').parse(query).empty)
+				if (query.length < 2 || query.length > 200 || require('./public/query').parse(query).empty)
 					throw Error('@(Type at least two characters to search.)');
 				var tmp = await credential(store, id);
 				var account = tmp.account, password = tmp.password;
@@ -485,7 +485,7 @@ exports.create = function(dependencies = {}) {
 	};
 };
 
-// ---- The singleton of the application (MODS.live)
+// ---- The singleton of the application (PLUGINS.mail.live)
 var Lib = exports;
 
 exports.install = function() {

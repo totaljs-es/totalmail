@@ -1,4 +1,4 @@
-var Tables = require('./tables').in(PATH.root('database'));
+var Tables = require('../../modules/tables').in(PATH.root('database'));
 var directory = PATH.root('database');
 
 // The accounts and the sessions live in the database. They are opened when the module is installed and filled into these

@@ -17,7 +17,8 @@ TotalMail is a Total.js 5 application written the way the framework suggests. If
 | `plugins/<id>/public/*.js` | The browser side: `PLUGIN('id', function(exports) { ... })` | jComponent plugins |
 | `controllers/default.js` | The routes that are not JSON: the page, the message frame, print, source, attachments, upload | `exports.install` + `ROUTE()` |
 | `definitions/` | `AUTH()`, `LOCALIZE()`, the request middleware, `FUNC.run`, the UI components | Definitions |
-| `modules/` | State, services and domain logic shared by the whole app (IMAP, SMTP, threads, rules, search, storage), used as `MODS.security`, `MODS.users`, `MODS.live` ...; plain functions, so a test can `require()` them | Modules with `exports.install` |
+| `plugins/<id>/*.js` | The server logic of that part, beside `index.js` (IMAP and SMTP in `mail`, people and sessions in `users`, the assistant in `ai`...), exported by `index.js` and read as `PLUGINS.mail.live`, `PLUGINS.users.security`...; plain functions, so a test can `require()` them | Plugins with `exports.install` |
+| `modules/` | What no plugin owns: the storage (`mirror.js`, `tables.js`), the settings of the installation and the languages, used as `MODS.instance`... | Modules |
 | `private/vendor/` | The corrected copy of the SMTP sender of `total5@0.0.19` (not linted) | `private/` |
 | `resources/*.resource` | Translations | `@(Text)` and `LOCALIZE()` |
 | `database/` | NoSQL tables, the encryption key and the attachments (never committed) | `NOSQL()` |
@@ -29,7 +30,7 @@ TotalMail is a Total.js 5 application written the way the framework suggests. If
 - **Authentication.** `AUTH()` in `definitions/auth.js` returns the user of the session or of an app's device token. Administrators carry the `admin` permission.
 - **Request check.** The `request` middleware in `definitions/request.js` rejects a change that does not come from TotalMail's own page.
 - **Texts.** Every text the person sees is `@(Text)`, in code and in views. `node bin/translations.js` lists what is missing in each language and a test fails when something is not translated.
-- **Modules.** `MODS.<name>` is the way to reach another part of the app. A module is a file in `modules/` with `exports.install`; when its data must be loaded first it calls `PAUSESERVER()` so nothing is served before it is ready.
+- **Modules and plugins.** `MODS.<name>` and `PLUGINS.<id>.<name>` are the way to reach another part of the app, from inside a function. A singleton has an `install()` (called by the loader, or by the `install()` of its plugin); when its data must be loaded first it calls `PAUSESERVER()` so nothing is served before it is ready.
 - **Data.** The state of each store is in memory and every change is written to the NoSQL tables of Total.js by `modules/mirror.js` (insert, modify or remove of the records that differ). Tables are opened with `NOSQL()` through `modules/tables.js`.
 - **Framework helpers first.** Code uses `Total.Fs`, `Total.Path`, `Total.Crypto`, `PATH.root()`, `UID()`, `CONF`, `ON('service')` and `Total.error()`; ESLint rejects `require('fs')`, `require('path')`, `require('crypto')` and the other Node modules in application code.
 - **Browser.** The pages do not touch the DOM by hand. Each window keeps its state in the model of a plugin and the views bind to it with `ui-bind`, `ui-component` and `data-exec`. The components come from the Total.js CDN (`COMPONENTATOR` in `definitions/ui.js`).

@@ -7,7 +7,7 @@ var Tls = require('node:tls'),
 	Path = require('node:path');
 var { execFileSync } = require('node:child_process');
 var { ImapFlow } = require('imapflow');
-var Imap = require('../modules/imap');
+var Imap = require('../plugins/mail/imap');
 
 // A server with INBOX and Trash. Trash holds UIDs 5, 6 and 7; `uidplus` switches the capability on or off.
 function build(t, { uidplus = true } = {}) {

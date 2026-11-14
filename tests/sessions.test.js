@@ -4,7 +4,7 @@ var Assert = require('node:assert/strict');
 var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-var Sessions = require('../modules/sessions'),
+var Sessions = require('../plugins/users/sessions'),
 	Db = require('./db');
 function folder(t) {
 	var dir = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'totalmail-sessions-'));

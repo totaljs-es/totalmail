@@ -1,7 +1,7 @@
 require('total5');
 var { test } = require('node:test');
 var assert = require('node:assert/strict');
-var Security = require('../modules/security');
+var Security = require('../plugins/users/security');
 test('a signed-in person gets 15 password tries per purpose, and a success starts the count again', () => {
 	for (let i = 0; i < 15; i++)
 		assert.equal(Security.allowAttempt('t-1'), true);

@@ -4,9 +4,9 @@ var Assert = require('node:assert/strict');
 var Fs = require('node:fs'),
 	Os = require('node:os'),
 	Path = require('node:path');
-var Store = require('../modules/store'),
-	Live = require('../modules/live'),
-	Files = require('../modules/files');
+var Store = require('../plugins/mail/store'),
+	Live = require('../plugins/mail/live'),
+	Files = require('../plugins/mail/files');
 var Db = require('./db');
 var user = { id: 'b'.repeat(32) };
 function fixture(t, attachments) {

@@ -18,7 +18,7 @@ TotalMail keeps its data in the embedded **NoSQL** database of Total.js, in the 
 - **Only what changed is written.** A change is made on a copy; `mirror.save()` compares it with what the database holds and sends an `insert` for each new record, a `modify` for each changed one and a `remove` for each one that went. Only when the database has accepted all of it does the copy become the current state: a failed write changes nothing.
 - **Order.** The database does not keep the order of records, so each one carries a counter that is removed when it is read; a list comes back in the order it was created (drafts: the most recently saved first).
 - **No trace of old values.** The database appends a change and marks the old line as removed. For the people, the sessions and the installation settings the files are cleaned after every change, so a replaced password hash or a spent recovery code is gone from the file. Mailboxes are cleaned every six hours, and a deleted person's tables are deleted with `clear()`.
-- **Modules.** The services live in `/modules` (`MODS.security`, `MODS.users`, `MODS.instance`, `MODS.knowledge`); the logic that does not need the framework is exported as plain functions, which is why it can be tested on its own.
+- **Plugins and modules.** The stores live beside the plugin that owns them (`PLUGINS.users.security`, `PLUGINS.mail.mailboxes`, `PLUGINS.ai.knowledge`) or, when no plugin owns them, in `/modules` (`MODS.instance`); the logic that does not need the framework is exported as plain functions, which is why it can be tested on its own.
 
 ## Moving from the JSON files
 

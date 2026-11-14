@@ -11,7 +11,7 @@ function strip(value) {
 function run($, fn) {
 	FUNC.run(
 		$,
-		function() { return Promise.resolve(fn(MODS.users.forUser($.user))).then(strip); },
+		function() { return Promise.resolve(fn(PLUGINS.mail.mailboxes.forUser($.user))).then(strip); },
 		'@(Mail connection failed. Check the server, TLS settings and app password.)'
 	);
 }
@@ -21,7 +21,7 @@ NEWACTION('Accounts|verify', {
 	user: true,
 	route: '+API /api/ +account_verify --> Accounts|verify',
 	input: '*accountId:String(80)',
-	action: function($, m) { return run($, function(store) { return MODS.live.verify($.user, store, m.accountId); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.verify($.user, store, m.accountId); }); }
 });
 
 // Support for an account that does not work: the checks, written in the person's language.
@@ -32,7 +32,7 @@ NEWACTION('Accounts|diagnose', {
 	input: '*accountId:String(80)',
 	action: function($, m) {
 		return run($, async function(store) {
-			var report = await MODS.live.diagnose($.user, store, m.accountId),
+			var report = await PLUGINS.mail.live.diagnose($.user, store, m.accountId),
 				say = function(text, args) { return TRANSLATE($.language, text).replace(/\{(\d)\}/g, function(found, index) { return args[index] === undefined ? found : args[index]; }); };
 			return {
 				failed: report.failed,
@@ -55,7 +55,7 @@ NEWACTION('Drafts|forwardfiles', {
 	user: true,
 	route: '+API /api/ +draft_forward_files --> Drafts|forwardfiles',
 	input: '*id:String(80), *messageId:String(80)',
-	action: function($, m) { return run($, function(store) { return MODS.live.forwardFiles($.user, store, m.id, m.messageId); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.forwardFiles($.user, store, m.id, m.messageId); }); }
 });
 
 NEWACTION('Accounts|sync', {
@@ -63,7 +63,7 @@ NEWACTION('Accounts|sync', {
 	user: true,
 	route: '+API /api/ +account_sync --> Accounts|sync',
 	input: '*accountId:String(80), path:String(500)',
-	action: function($, m) { return run($, function(store) { return MODS.live.sync($.user, store, m.accountId, m.path || 'INBOX'); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.sync($.user, store, m.accountId, m.path || 'INBOX'); }); }
 });
 
 NEWACTION('Messages|erase', {
@@ -71,7 +71,7 @@ NEWACTION('Messages|erase', {
 	user: true,
 	route: '+API /api/ +message_erase --> Messages|erase',
 	input: '*id:String(80)',
-	action: function($, m) { return run($, function(store) { return MODS.live.erase($.user, store, m.id); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.erase($.user, store, m.id); }); }
 });
 
 NEWACTION('Folders|empty', {
@@ -79,7 +79,7 @@ NEWACTION('Folders|empty', {
 	user: true,
 	route: '+API /api/ +trash_empty --> Folders|empty',
 	input: '*accountId:String(80)',
-	action: function($, m) { return run($, function(store) { return MODS.live.emptyTrash($.user, store, m.accountId); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.emptyTrash($.user, store, m.accountId); }); }
 });
 
 NEWACTION('Accounts|search', {
@@ -87,7 +87,7 @@ NEWACTION('Accounts|search', {
 	user: true,
 	route: '+API /api/ +account_search --> Accounts|search',
 	input: '*accountId:String(80), *path:String(500), *query:String(200)',
-	action: function($, m) { return run($, function(store) { return MODS.live.search($.user, store, m.accountId, m.path, m.query); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.search($.user, store, m.accountId, m.path, m.query); }); }
 });
 
 NEWACTION('Accounts|older', {
@@ -95,7 +95,7 @@ NEWACTION('Accounts|older', {
 	user: true,
 	route: '+API /api/ +account_older --> Accounts|older',
 	input: '*accountId:String(80), *path:String(500)',
-	action: function($, m) { return run($, function(store) { return MODS.live.older($.user, store, m.accountId, m.path); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.older($.user, store, m.accountId, m.path); }); }
 });
 
 NEWACTION('Messages|read', {
@@ -103,7 +103,7 @@ NEWACTION('Messages|read', {
 	user: true,
 	route: '+API /api/ +message_read --> Messages|read',
 	input: '*id:String(80)',
-	action: function($, m) { return run($, function(store) { return MODS.live.read($.user, store, m.id); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.read($.user, store, m.id); }); }
 });
 
 // The text of a message as a person reads it (no hidden text, no invisible characters): what an app gives to a model on the
@@ -121,7 +121,7 @@ NEWACTION('Messages|text', {
 				throw Error('@(Message not found.)');
 			if (message.remote && !message.bodyLoaded)
 				throw Error('@(Open the message first so it can be read.)');
-			var read = MODS.ai.readable(message);
+			var read = PLUGINS.ai.assistant.readable(message);
 			return {
 				id: message.id,
 				subject: message.subject || '',
@@ -139,7 +139,7 @@ NEWACTION('Messages|seen', {
 	user: true,
 	route: '+API /api/ +message_seen --> Messages|seen',
 	input: '*id:String(80)',
-	action: function($, m) { return run($, function(store) { return MODS.live.markRead($.user, store, m.id); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.markRead($.user, store, m.id); }); }
 });
 
 NEWACTION('Drafts|send', {
@@ -147,7 +147,7 @@ NEWACTION('Drafts|send', {
 	user: true,
 	route: '+API /api/ +draft_send --> Drafts|send',
 	input: '*id:String(80), confirmed:Boolean, *revision:String(80)',
-	action: function($, m) { return run($, function(store) { return MODS.live.send($.user, store, m.id, m.confirmed === true, m.revision); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.send($.user, store, m.id, m.confirmed === true, m.revision); }); }
 });
 
 NEWACTION('Messages|move', {
@@ -155,7 +155,7 @@ NEWACTION('Messages|move', {
 	user: true,
 	route: '+API /api/ +message_move --> Messages|move',
 	input: '*id:String(80), *path:String(500)',
-	action: function($, m) { return run($, function(store) { return MODS.live.move($.user, store, m.id, m.path); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.move($.user, store, m.id, m.path); }); }
 });
 
 NEWACTION('Folders|create', {
@@ -163,7 +163,7 @@ NEWACTION('Folders|create', {
 	user: true,
 	route: '+API /api/ +folder_create --> Folders|create',
 	input: '*accountId:String(80), *name:String(80), parent:String(500)',
-	action: function($, m) { return run($, function(store) { return MODS.live.createFolder($.user, store, m.accountId, m.name, m.parent || ''); }); }
+	action: function($, m) { return run($, function(store) { return PLUGINS.mail.live.createFolder($.user, store, m.accountId, m.name, m.parent || ''); }); }
 });
 
 NEWACTION('Messages|change', {
@@ -173,8 +173,8 @@ NEWACTION('Messages|change', {
 	input: '*id:String(80), *operation:{read|unread|star|archive|restore|trash}, enabled:Boolean',
 	action: function($, m) {
 		return run($, async function(store) {
-			var result = await MODS.live.change($.user, store, m.id, m.operation, m.enabled);
-			return result.moved !== undefined ? result : MODS.welcome.decorate(result, $.language);
+			var result = await PLUGINS.mail.live.change($.user, store, m.id, m.operation, m.enabled);
+			return result.moved !== undefined ? result : PLUGINS.mail.welcome.decorate(result, $.language);
 		});
 	}
 });
@@ -188,7 +188,7 @@ NEWACTION('Drafts|unattach', {
 		return run($, async function(store) {
 
 			var draft = await store.removeAttachment(m.id, m.attachmentId);
-			await MODS.users.files($.user).remove($.user.id, m.attachmentId);
+			await PLUGINS.mail.mailboxes.files($.user).remove($.user.id, m.attachmentId);
 			return draft;
 		});
 	}
@@ -205,7 +205,7 @@ NEWACTION('Drafts|delete', {
 			var draft = await store.deleteDraft(m.id);
 			for (var list = Array.from(draft.attachments || []), i = 0; i < list.length; i++) {
 				var item = list[i];
-				await MODS.users.files($.user).remove($.user.id, item.id);
+				await PLUGINS.mail.mailboxes.files($.user).remove($.user.id, item.id);
 			}
 			return { id: draft.id };
 		});

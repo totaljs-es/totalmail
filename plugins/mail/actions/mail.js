@@ -1,9 +1,9 @@
 // Whether the assistant exists, where its text goes and, if a knowledge base is connected, where a message is searched.
 function aistatus() {
 
-	var status = MODS.ai.status(MODS.instance.ai());
+	var status = PLUGINS.ai.assistant.status(MODS.instance.ai());
 	if (status.configured)
-		status.knowledge = MODS.knowledge.has();
+		status.knowledge = PLUGINS.ai.knowledge.has();
 	return status;
 }
 
@@ -13,10 +13,10 @@ NEWACTION('Mailboxes|bootstrap', {
 	route: '+API /api/ -bootstrap --> Mailboxes|bootstrap',
 	action: function($) {
 
-		var data = MODS.users.forUser($.user).snapshot();
+		var data = PLUGINS.mail.mailboxes.forUser($.user).snapshot();
 		// Keep submitted records in storage to prevent duplicate sends, but do not list sent mail as drafts.
 		data.drafts = data.drafts.filter(function(draft) { return draft.status !== 'sent'; });
-		data.messages = data.messages.map(function(item) { return MODS.welcome.decorate(item, $.language); });
+		data.messages = data.messages.map(function(item) { return PLUGINS.mail.welcome.decorate(item, $.language); });
 		$.callback(Object.assign({ user: $.user,
 			mode: data.accounts.some(function(a) { return a.configured; }) ? 'configured' : 'empty',
 			ai: aistatus() }, data));
@@ -30,6 +30,6 @@ NEWACTION('Drafts|save', {
 	input: 'id:String(80), *accountId:String(80), from:String(254), to:String(500), cc:String(500), bcc:String(500), subject:String(500), body:String(50000), replyTo:String(80)',
 	action: function($, model) {
 		model.id = model.id || UID();
-		FUNC.run($, function() { return MODS.users.forUser($.user).saveDraft(model); }, '@(Unable to save changes. Please try again.)');
+		FUNC.run($, function() { return PLUGINS.mail.mailboxes.forUser($.user).saveDraft(model); }, '@(Unable to save changes. Please try again.)');
 	}
 });

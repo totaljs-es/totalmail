@@ -1,19 +1,21 @@
 require('total5');
 var { test } = require('node:test');
 var assert = require('node:assert/strict');
-var Oauth = require('../modules/oauth');
+var Oauth = require('../plugins/providers/oauth');
 function fixture(existing, active) {
 	let saved = [],
 		remembered = [];
-	MODS.security = { identities: { get: (id) => (active === false ? null : { id }) } };
-	MODS.users = {
+	PLUGINS.users = { security: { identities: { get: (id) => (active === false ? null : { id }) } } };
+	PLUGINS.mail = {};
+	PLUGINS.providers = {};
+	PLUGINS.mail.mailboxes = {
 		forUser: (user) => ({
 			user,
 			account: () => existing,
 			saveAccount: async (account) => (saved.push(account), { id: account.newId || account.id })
 		})
 	};
-	MODS.providers = {
+	PLUGINS.providers.catalogue = {
 		serversFor: () => ({
 			imap: { host: 'imap.example.test', port: 993, security: 'tls' },
 			smtp: { host: 'smtp.example.test', port: 465, security: 'tls' }

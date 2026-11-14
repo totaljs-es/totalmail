@@ -7,7 +7,7 @@ var { test } = require('node:test'),
 	{ execFileSync } = require('node:child_process');
 require('total5');
 var { ImapFlow } = require('imapflow'),
-	imap = require('../modules/imap');
+	imap = require('../plugins/mail/imap');
 test('actual ImapFlow authenticates over verified TLS, includes INBOX outside an INBOX. namespace and opens it read-only', async (t) => {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tm-imap-'));
 	execFileSync(

@@ -176,7 +176,7 @@ exports.create = function(crypto, storage) {
 
 			return update(function(next) {
 
-				var meta = require('./oauth').meta(provider);
+				var meta = require('../plugins/providers/oauth').meta(provider);
 				if (!meta)
 					throw Error('@(Invalid operation.)');
 				if (clientid && !meta.valid.test(clientid))
@@ -241,15 +241,15 @@ var Lib = exports,
 exports.install = function() {
 	// Nothing is served until the settings are loaded.
 	PAUSESERVER('instance', true);
-	// The key that protects the secrets belongs to the accounts, which MODS.security opens.
+	// The key that protects the secrets belongs to the accounts, which PLUGINS.users.security opens.
 	ON('ready', function() {
-		return MODS.security.ready
+		return PLUGINS.users.security.ready
 			.then(function() {
 				return Lib.open({
 					table: Tables,
 					crypto: {
-						encrypt: function(value) { return MODS.security.identities.encrypt(value); },
-						decrypt: function(value) { return MODS.security.identities.decrypt(value); }
+						encrypt: function(value) { return PLUGINS.users.security.identities.encrypt(value); },
+						decrypt: function(value) { return PLUGINS.users.security.identities.decrypt(value); }
 					},
 					legacy: { file: PATH.root('database/instance.json') }
 				});

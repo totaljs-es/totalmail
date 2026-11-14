@@ -5,7 +5,7 @@ var fs = require('node:fs');
 var http = require('node:http');
 var os = require('node:os');
 var path = require('node:path');
-var ai = require('../modules/ai');
+var ai = require('../plugins/ai/assistant');
 var instance = require('../modules/instance');
 // A model server that answers according to the model name, and remembers what it was asked.
 async function server(t) {

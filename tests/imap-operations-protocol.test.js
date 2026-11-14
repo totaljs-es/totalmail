@@ -7,7 +7,7 @@ var Assert = require('node:assert/strict'),
 var { execFileSync } = require('node:child_process');
 require('total5');
 var { ImapFlow } = require('imapflow'),
-	Imap = require('../modules/imap');
+	Imap = require('../plugins/mail/imap');
 test(
 	'actual ImapFlow confirms flag removal, native UID MOVE/COPYUID and namespace folder creation over TLS',
 	{ timeout: 30000 },

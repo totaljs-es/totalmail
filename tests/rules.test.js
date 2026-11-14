@@ -1,6 +1,6 @@
 var { test } = require('node:test');
 var Assert = require('node:assert/strict');
-var Rules = require('../modules/rules');
+var Rules = require('../plugins/rules/engine');
 var mail = {
 	sender: 'GitHub',
 	email: 'noreply@github.com',

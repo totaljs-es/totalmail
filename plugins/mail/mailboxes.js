@@ -1,8 +1,8 @@
-// The mailbox of each person, in the database and in memory: used as MODS.users.forUser(user). Everyone who exists is loaded when
+// The mailbox of each person, in the database and in memory: used as PLUGINS.mail.mailboxes.forUser(user). Everyone who exists is loaded when
 // the module is installed; a person who is added later starts with an empty mailbox.
 var Mailbox = require('./store'),
-	Mirror = require('./mirror'),
-	Tables = require('./tables').in(PATH.root('database')),
+	Mirror = require('../../modules/mirror'),
+	Tables = require('../../modules/tables').in(PATH.root('database')),
 	Files = require('./files');
 
 var stores = new Map(),
@@ -16,12 +16,12 @@ var valid = function(id) { return REG_ID.test(id || ''); };
 exports.install = function() {
 
 	PAUSESERVER('users', true);
-	// After every module is installed: MODS.security must exist, whatever the order of the files.
+	// After every module is installed: PLUGINS.users.security must exist, whatever the order of the files.
 	ON('ready', function() {
-		return MODS.security.ready
+		return PLUGINS.users.security.ready
 			.then(function() {
 				return Promise.all(
-					MODS.security.identities.list().map(async function(user) {
+					PLUGINS.users.security.identities.list().map(async function(user) {
 						var mailbox = await Mailbox.open({
 							table: Tables,
 							id: user.id,

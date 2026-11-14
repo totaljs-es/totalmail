@@ -5,12 +5,12 @@ NEWACTION('Users|setup', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			if (MODS.security.identities.configured())
+			if (PLUGINS.users.security.identities.configured())
 				throw Error('@(Setup has already been completed.)');
-			if (!MODS.security.allowLogin($, 'initial-setup'))
+			if (!PLUGINS.users.security.allowLogin($, 'initial-setup'))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
-			var user = await MODS.security.identities.createUser(model, true);
-			MODS.security.start($, user);
+			var user = await PLUGINS.users.security.identities.createUser(model, true);
+			PLUGINS.users.security.start($, user);
 			return {
 				success: true
 			};
@@ -25,16 +25,16 @@ NEWACTION('Users|login', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			if (!MODS.security.allowLogin($, model.email))
+			if (!PLUGINS.users.security.allowLogin($, model.email))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
-			var user = await MODS.security.identities.login(model.email, model.password);
+			var user = await PLUGINS.users.security.identities.login(model.email, model.password);
 			if (!user)
 				throw Error('@(Email or password is incorrect.)');
 				// With two-step verification the password is only the first step: no session until the code is right.
 			if (user.totp)
-				return { totp: true, token: MODS.security.pending.login(user.id) };
-			MODS.security.loginSucceeded($, model.email);
-			MODS.security.start($, user);
+				return { totp: true, token: PLUGINS.users.security.pending.login(user.id) };
+			PLUGINS.users.security.loginSucceeded($, model.email);
+			PLUGINS.users.security.start($, user);
 			return {
 				success: true
 			};
@@ -49,21 +49,21 @@ NEWACTION('Users|totp', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			var pending = MODS.security.pending.attempt(model.token);
+			var pending = PLUGINS.users.security.pending.attempt(model.token);
 			if (!pending)
 				throw Error('@(This sign-in took too long or had too many tries. Enter your password again.)');
-			if (!MODS.security.allowLogin($, 'totp-' + pending.userId))
+			if (!PLUGINS.users.security.allowLogin($, 'totp-' + pending.userId))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
-			var result = await MODS.security.identities.checkSecond(pending.userId, model.code);
+			var result = await PLUGINS.users.security.identities.checkSecond(pending.userId, model.code);
 			if (!result.ok)
 				throw Error('@(That code is not right.)');
-			var user = MODS.security.identities.get(pending.userId);
+			var user = PLUGINS.users.security.identities.get(pending.userId);
 			if (!user)
 				throw Error('@(This sign-in took too long or had too many tries. Enter your password again.)');
-			MODS.security.pending.done(model.token);
-			MODS.security.loginSucceeded($, user.email);
-			MODS.security.loginSucceeded($, 'totp-' + user.id);
-			MODS.security.start($, user);
+			PLUGINS.users.security.pending.done(model.token);
+			PLUGINS.users.security.loginSucceeded($, user.email);
+			PLUGINS.users.security.loginSucceeded($, 'totp-' + user.id);
+			PLUGINS.users.security.start($, user);
 			return { success: true, via: result.via, left: result.left };
 		});
 	}
@@ -71,16 +71,16 @@ NEWACTION('Users|totp', {
 
 // Two-step verification of the signed-in person. Every step asks for the password again: an open window is not proof of who is at it.
 async function mine($, password) {
-	if (!MODS.security.allowAttempt('totp-' + $.user.id))
+	if (!PLUGINS.users.security.allowAttempt('totp-' + $.user.id))
 		throw Error('@(Too many attempts. Try again in 15 minutes.)');
-	if (!(await MODS.security.identities.verify($.user.id, password)))
+	if (!(await PLUGINS.users.security.identities.verify($.user.id, password)))
 		throw Error('@(Your current password is incorrect.)');
-	MODS.security.attemptSucceeded('totp-' + $.user.id);
+	PLUGINS.users.security.attemptSucceeded('totp-' + $.user.id);
 }
 
 async function second($, password, code) {
 	await mine($, password);
-	if (!(await MODS.security.identities.checkSecond($.user.id, code)).ok)
+	if (!(await PLUGINS.users.security.identities.checkSecond($.user.id, code)).ok)
 		throw Error('@(That code is not right.)');
 }
 
@@ -93,11 +93,11 @@ NEWACTION('Users|totpbegin', {
 		return FUNC.run($, async function() {
 
 			await mine($, model.password);
-			if (MODS.security.identities.get($.user.id).totp)
+			if (PLUGINS.users.security.identities.get($.user.id).totp)
 				throw Error('@(Two-step verification is already on.)');
-			var secret = MODS.totp.secret();
-			MODS.security.pending.setup($.user.id, secret);
-			return { secret, uri: MODS.totp.uri(secret, $.user.email, 'TotalMail') };
+			var secret = PLUGINS.users.totp.secret();
+			PLUGINS.users.security.pending.setup($.user.id, secret);
+			return { secret, uri: PLUGINS.users.totp.uri(secret, $.user.email, 'TotalMail') };
 		});
 	}
 });
@@ -110,13 +110,13 @@ NEWACTION('Users|totpenable', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			if (!MODS.security.allowAttempt('totp-' + $.user.id))
+			if (!PLUGINS.users.security.allowAttempt('totp-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
-			var secret = MODS.security.pending.takeSetup($.user.id);
+			var secret = PLUGINS.users.security.pending.takeSetup($.user.id);
 			if (!secret)
 				throw Error('@(The setup took too long. Start again.)');
-			var result = await MODS.security.identities.enableTotp($.user.id, secret, model.code);
-			MODS.security.pending.finishSetup($.user.id);
+			var result = await PLUGINS.users.security.identities.enableTotp($.user.id, secret, model.code);
+			PLUGINS.users.security.pending.finishSetup($.user.id);
 			return { user: result.user, recovery: result.recovery };
 		});
 	}
@@ -130,7 +130,7 @@ NEWACTION('Users|totpdisable', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 			await second($, model.password, model.code);
-			return { user: await MODS.security.identities.disableTotp($.user.id) };
+			return { user: await PLUGINS.users.security.identities.disableTotp($.user.id) };
 		});
 	}
 });
@@ -143,7 +143,7 @@ NEWACTION('Users|totprecovery', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 			await second($, model.password, model.code);
-			return { recovery: await MODS.security.identities.newRecovery($.user.id) };
+			return { recovery: await PLUGINS.users.security.identities.newRecovery($.user.id) };
 		});
 	}
 });
@@ -154,7 +154,7 @@ NEWACTION('Users|logout', {
 	route: '+API /api/ -user_logout --> Users|logout',
 	action: function($) {
 		return FUNC.run($, function() {
-			MODS.security.logout($);
+			PLUGINS.users.security.logout($);
 			return {
 				success: true
 			};
@@ -169,7 +169,7 @@ NEWACTION('Users|list', {
 	route: '+API /api/ -user_list --> Users|list',
 	action: function($) {
 		$.callback({
-			users: MODS.security.identities.list()
+			users: PLUGINS.users.security.identities.list()
 		});
 	}
 });
@@ -181,7 +181,7 @@ NEWACTION('Users|create', {
 	route: '+API /api/ +user_create --> Users|create',
 	input: '*name:String(80), *email:Email, *password:String(128)',
 	action: function($, model) {
-		FUNC.run($, function() { return MODS.security.identities.createUser(model, false); });
+		FUNC.run($, function() { return PLUGINS.users.security.identities.createUser(model, false); });
 	}
 });
 
@@ -199,14 +199,14 @@ NEWACTION('Users|profile', {
 				throw Error('@(The new passwords do not match.)');
 			// Only a change that needs the password is a guess at it; a colour or a language is not.
 			var guessing = !!(model.currentPassword || model.newPassword);
-			if (guessing && !MODS.security.allowAttempt('profile-' + $.user.id))
+			if (guessing && !PLUGINS.users.security.allowAttempt('profile-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
-			var result = await MODS.security.identities.updateProfile($.user.id, model);
+			var result = await PLUGINS.users.security.identities.updateProfile($.user.id, model);
 			if (guessing)
-				MODS.security.attemptSucceeded('profile-' + $.user.id);
+				PLUGINS.users.security.attemptSucceeded('profile-' + $.user.id);
 			if (result.credentialsChanged) {
-				MODS.security.revoke($.user.id);
-				MODS.security.start($, result.user);
+				PLUGINS.users.security.revoke($.user.id);
+				PLUGINS.users.security.start($, result.user);
 			}
 			return result;
 		});
@@ -215,11 +215,11 @@ NEWACTION('Users|profile', {
 
 // Managing other people needs an administrator who proves it is them: their own password is asked every time.
 async function confirmed($, model) {
-	if (!MODS.security.allowAttempt('admin-' + $.user.id))
+	if (!PLUGINS.users.security.allowAttempt('admin-' + $.user.id))
 		throw Error('@(Too many attempts. Try again in 15 minutes.)');
-	if (!(await MODS.security.identities.verify($.user.id, model.adminPassword)))
+	if (!(await PLUGINS.users.security.identities.verify($.user.id, model.adminPassword)))
 		throw Error('@(Your current password is incorrect.)');
-	MODS.security.attemptSucceeded('admin-' + $.user.id);
+	PLUGINS.users.security.attemptSucceeded('admin-' + $.user.id);
 }
 
 function others($, id) {
@@ -238,8 +238,8 @@ NEWACTION('Users|reset', {
 
 			await confirmed($, model);
 			others($, model.id);
-			var user = await MODS.security.identities.setPassword(model.id, model.password);
-			MODS.security.revoke(model.id);
+			var user = await PLUGINS.users.security.identities.setPassword(model.id, model.password);
+			PLUGINS.users.security.revoke(model.id);
 			return { user };
 		});
 	}
@@ -256,9 +256,9 @@ NEWACTION('Users|totpreset', {
 
 			await confirmed($, model);
 			others($, model.id);
-			var user = await MODS.security.identities.disableTotp(model.id);
+			var user = await PLUGINS.users.security.identities.disableTotp(model.id);
 			// Their open sessions end: whoever signs in next does it with the new situation.
-			MODS.security.revoke(model.id);
+			PLUGINS.users.security.revoke(model.id);
 			return { user };
 		});
 	}
@@ -275,7 +275,7 @@ NEWACTION('Users|role', {
 
 			await confirmed($, model);
 			others($, model.id);
-			return { user: await MODS.security.identities.setRole(model.id, model.role) };
+			return { user: await PLUGINS.users.security.identities.setRole(model.id, model.role) };
 		});
 	}
 });
@@ -291,10 +291,10 @@ NEWACTION('Users|disable', {
 
 			await confirmed($, model);
 			others($, model.id);
-			var user = await MODS.security.identities.setDisabled(model.id, model.disabled === true);
+			var user = await PLUGINS.users.security.identities.setDisabled(model.id, model.disabled === true);
 			if (user.disabled) {
-				MODS.security.revoke(model.id);
-				MODS.changes.forget(model.id);
+				PLUGINS.users.security.revoke(model.id);
+				PLUGINS.mail.changes.forget(model.id);
 			}
 			return { user };
 		});
@@ -312,17 +312,17 @@ NEWACTION('Users|remove', {
 
 			await confirmed($, model);
 			others($, model.id);
-			if (!MODS.security.identities.list().some(function(u) { return u.id === model.id; }))
+			if (!PLUGINS.users.security.identities.list().some(function(u) { return u.id === model.id; }))
 				throw Error('@(User not found.)');
-			var accounts = MODS.users.forUser({ id: model.id }).snapshot().accounts;
-			var user = await MODS.security.identities.remove(model.id);
-			MODS.security.revoke(model.id);
-			MODS.changes.forget(model.id);
+			var accounts = PLUGINS.mail.mailboxes.forUser({ id: model.id }).snapshot().accounts;
+			var user = await PLUGINS.users.security.identities.remove(model.id);
+			PLUGINS.users.security.revoke(model.id);
+			PLUGINS.mail.changes.forget(model.id);
 			for (var list = Array.from(accounts), i = 0; i < list.length; i++) {
 				var account = list[i];
-				MODS.oauth.forget(account.id);
+				PLUGINS.providers.oauth.forget(account.id);
 			}
-			await MODS.users.drop(model.id);
+			await PLUGINS.mail.mailboxes.drop(model.id);
 			return { user };
 		});
 	}

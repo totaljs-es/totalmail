@@ -7,8 +7,8 @@ var Tls = require('node:tls'),
 	Path = require('node:path');
 var { execFileSync } = require('node:child_process');
 var { ImapFlow } = require('imapflow');
-var Imap = require('../modules/imap'),
-	Watch = require('../modules/watch');
+var Imap = require('../plugins/mail/imap'),
+	Watch = require('../plugins/mail/watch');
 
 function clock() {
 	var now = 0,

@@ -3,7 +3,7 @@
 // devices_devices table; only the SHA-256 of a token is stored, so a token is shown once, when the device is added. The person sees
 // every device (name, system, app, when and from where it was last used) and can sign any of them out. A device that is not used for
 // 180 days signs itself out.
-var Mirror = require('./mirror');
+var Mirror = require('../../modules/mirror');
 exports.limits = { perUser: 20, text: 60, idle: 180 * 86400000 };
 exports.spec = function(table) { return { table, prefix: 'devices', clean: true, lists: ['devices'] }; };
 

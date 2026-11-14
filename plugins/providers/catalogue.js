@@ -1,11 +1,11 @@
 // The catalogue of mail providers (the ones that ship in the plugins and the ones the administrator added). Used as
-// MODS.providers.
+// PLUGINS.providers.catalogue.
 // Mail provider catalogue. Each provider is a JSON file in plugins/<name>/providers/; copying a file adds a provider.
 // Files are validated on load: an invalid file is skipped, never half-applied.
 var Dns = Total.Dns.promises,
 	Fs = Total.Fs,
 	Path = Total.Path,
-	Discovery = require('./discovery');
+	Discovery = require('../accounts/discovery');
 
 var auth = ['password', 'app-password', 'oauth2'];
 
@@ -197,8 +197,8 @@ exports.serversFor = function(provider, email) {
 exports.validate = validate;
 exports.load = load;
 
-// ---- The singleton of the application (MODS.providers)
-var Lazy = require('./lazy'),
+// ---- The singleton of the application (PLUGINS.providers.catalogue)
+var Lazy = require('../../modules/lazy'),
 	Lib = exports;
 
 exports.install = function() {

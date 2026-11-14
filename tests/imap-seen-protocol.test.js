@@ -7,7 +7,7 @@ var { test } = require('node:test'),
 	{ execFileSync } = require('node:child_process');
 require('total5');
 var { ImapFlow } = require('imapflow'),
-	imap = require('../modules/imap');
+	imap = require('../plugins/mail/imap');
 test('actual ImapFlow adds Seen by UID over verified TLS and preserves Flagged', async (t) => {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tm-imap-'));
 	execFileSync(

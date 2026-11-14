@@ -2,7 +2,7 @@
 function overview($) {
 	var now = new Date();
 	return {
-		devices: MODS.security.devices.list($.user.id, now).map(function(d) { return Object.assign({}, d, { current: d.id === $.user.deviceId }); })
+		devices: PLUGINS.users.security.devices.list($.user.id, now).map(function(d) { return Object.assign({}, d, { current: d.id === $.user.deviceId }); })
 	};
 }
 
@@ -25,16 +25,16 @@ NEWACTION('Devices|create', {
 
 			if ($.user.deviceId)
 				throw Error('@(Sign in with your password to add a device.)');
-			if (!MODS.security.allowAttempt('device-' + $.user.id))
+			if (!PLUGINS.users.security.allowAttempt('device-' + $.user.id))
 				throw Error('@(Too many attempts. Try again in 15 minutes.)');
-			if (!(await MODS.security.identities.verify($.user.id, model.password)))
+			if (!(await PLUGINS.users.security.identities.verify($.user.id, model.password)))
 				throw Error('@(Your current password is incorrect.)');
-			MODS.security.attemptSucceeded('device-' + $.user.id);
-			var made = await MODS.security.devices.create($.user.id, {
+			PLUGINS.users.security.attemptSucceeded('device-' + $.user.id);
+			var made = await PLUGINS.users.security.devices.create($.user.id, {
 				name: model.name,
 				platform: model.platform,
 				app: model.app,
-				address: MODS.security.address($)
+				address: PLUGINS.users.security.address($)
 			});
 			return { token: made.token, device: Object.assign({}, made.record, { current: true }) };
 		});
@@ -48,7 +48,7 @@ NEWACTION('Devices|revoke', {
 	input: '*id:String(16)',
 	action: function($, model) {
 		return FUNC.run($, async function() {
-			await MODS.security.devices.revoke(model.id, $.user.id);
+			await PLUGINS.users.security.devices.revoke(model.id, $.user.id);
 			return overview($);
 		});
 	}

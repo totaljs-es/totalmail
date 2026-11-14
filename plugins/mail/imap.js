@@ -1,5 +1,5 @@
 // The search parser is shared with the browser, which filters the loaded list with the same rules.
-var Query = require('../plugins/mail/public/query');
+var Query = require('./public/query');
 var Ics = require('./ics');
 
 var Threading = require('./threading'),

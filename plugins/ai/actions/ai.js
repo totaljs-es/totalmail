@@ -24,16 +24,16 @@ NEWACTION('Assistant|save', {
 				name = (model.model || '').trim();
 				// Claude has one address; leaving it empty means the official one.
 			if (!endpoint && provider === 'anthropic')
-				endpoint = MODS.ai.defaults.anthropic;
+				endpoint = PLUGINS.ai.assistant.defaults.anthropic;
 			if (endpoint)
-				endpoint = MODS.ai.parseendpoint(endpoint).url;
+				endpoint = PLUGINS.ai.assistant.parseendpoint(endpoint).url;
 			if (model.enabled === true && (!endpoint || !name))
 				throw Error('@(Enter the server address and the model before turning the assistant on.)');
 			var key = (model.key || '').trim();
 			// The saved key counts only for the server it was saved with.
 			if (model.enabled === true && provider === 'anthropic' && !key && (!MODS.instance.keyFor(provider, endpoint) || model.clearKey === true))
 				throw Error('@(Claude needs a key.)');
-			var limit = Math.round(Number(model.maxChars) || MODS.ai.defaults.maxChars);
+			var limit = Math.round(Number(model.maxChars) || PLUGINS.ai.assistant.defaults.maxChars);
 			if (limit < 2000 || limit > 60000)
 				throw Error('@(Enter a limit between 2000 and 60000 characters.)');
 			await MODS.instance.saveAi({
@@ -56,7 +56,7 @@ NEWACTION('Assistant|knowledge', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -assistant_knowledge --> Assistant|knowledge',
-	action: function($) { return FUNC.run($, function() { return Object.assign({}, MODS.knowledge.view(), { accept: MODS.extract.supported }); }); }
+	action: function($) { return FUNC.run($, function() { return Object.assign({}, PLUGINS.ai.knowledge.view(), { accept: PLUGINS.ai.extract.supported }); }); }
 });
 
 NEWACTION('Assistant|collection', {
@@ -67,13 +67,13 @@ NEWACTION('Assistant|collection', {
 	input: 'id:String(40), *name:String(80), description:String(200), localonly:Boolean',
 	action: function($, model) {
 		return FUNC.run($, async function() {
-			await MODS.knowledge.saveCollection({
+			await PLUGINS.ai.knowledge.saveCollection({
 				id: model.id || '',
 				name: model.name,
 				description: model.description || '',
 				localonly: model.localonly === true
 			});
-			return MODS.knowledge.view();
+			return PLUGINS.ai.knowledge.view();
 		});
 	}
 });
@@ -86,8 +86,8 @@ NEWACTION('Assistant|collection_delete', {
 	input: '*id:String(40)',
 	action: function($, model) {
 		return FUNC.run($, async function() {
-			await MODS.knowledge.removeCollection(model.id);
-			return MODS.knowledge.view();
+			await PLUGINS.ai.knowledge.removeCollection(model.id);
+			return PLUGINS.ai.knowledge.view();
 		});
 	}
 });
@@ -100,8 +100,8 @@ NEWACTION('Assistant|document_delete', {
 	input: '*id:String(40)',
 	action: function($, model) {
 		return FUNC.run($, async function() {
-			await MODS.knowledge.removeDocument(model.id);
-			return MODS.knowledge.view();
+			await PLUGINS.ai.knowledge.removeDocument(model.id);
+			return PLUGINS.ai.knowledge.view();
 		});
 	}
 });
@@ -117,11 +117,11 @@ NEWACTION('Assistant|test', {
 		return FUNC.run($, async function() {
 
 			var provider = model.provider || 'openai';
-			var target = MODS.ai.parseendpoint(model.endpoint || (provider === 'anthropic' ? MODS.ai.defaults.anthropic : ''));
+			var target = PLUGINS.ai.assistant.parseendpoint(model.endpoint || (provider === 'anthropic' ? PLUGINS.ai.assistant.defaults.anthropic : ''));
 			var started = Date.now(),
 				settings = { provider, endpoint: target.url, model: model.model.trim(), key: (model.key || '').trim() || MODS.instance.keyFor(provider, target.url) };
 			try {
-				var text = await MODS.ai.complete(settings, [{ role: 'user', content: 'Reply with the single word: ready' }], {
+				var text = await PLUGINS.ai.assistant.complete(settings, [{ role: 'user', content: 'Reply with the single word: ready' }], {
 					maxTokens: 64,
 					timeout: 60
 				});
@@ -151,13 +151,13 @@ NEWACTION('Assistant|run', {
 			async function() {
 
 				var settings = MODS.instance.ai();
-				if (!MODS.ai.status(settings).configured)
+				if (!PLUGINS.ai.assistant.status(settings).configured)
 					throw Error('@(The assistant is not turned on.)');
-				var store = MODS.users.forUser($.user),
+				var store = PLUGINS.mail.mailboxes.forUser($.user),
 					data = store.snapshot(),
 					hidden = false;
 				var input = {
-					language: MODS.ai.languagename($.language),
+					language: PLUGINS.ai.assistant.languagename($.language),
 					instruction: (m.instruction || '').replace(/[\r\n]+/g, ' ').trim(),
 					style: m.style,
 					target: m.lang || $.language,
@@ -166,14 +166,14 @@ NEWACTION('Assistant|run', {
 				// The model reads what a person reads: never the plain part of a message that also has HTML, never what a reader cannot see.
 				var visible = function(message) {
 
-					var read = MODS.ai.readable(store.message(message.id));
+					var read = PLUGINS.ai.assistant.readable(store.message(message.id));
 					hidden = hidden || read.hidden;
 					return read.text;
 				};
 				var owner, message;
 				if (m.task === 'compose') {
 					// A new message from the person's own few words: no message is read at all.
-					var asked = MODS.ai.unhide(input.instruction);
+					var asked = PLUGINS.ai.assistant.unhide(input.instruction);
 					input.instruction = asked.text;
 					if (!input.instruction.trim())
 						throw Error('@(Write something first.)');
@@ -181,7 +181,7 @@ NEWACTION('Assistant|run', {
 					if (!owner)
 						throw Error('@(Invalid account.)');
 				} else if (['tone', 'proofread'].includes(m.task) || (m.task === 'translate' && !m.id)) {
-					var own = MODS.ai.unhide(input.text);
+					var own = PLUGINS.ai.assistant.unhide(input.text);
 					input.text = own.text;
 					hidden = hidden || own.hidden;
 					if (!input.text.trim())
@@ -199,20 +199,20 @@ NEWACTION('Assistant|run', {
 					// A translation is of the message that is open; a summary or a reply, of its conversation.
 					input.context =
 						m.task === 'translate'
-							? MODS.ai.excerpt(message, settings.maxChars, visible)
-							: MODS.ai.context(data.messages, message.id, settings.maxChars, visible);
+							? PLUGINS.ai.assistant.excerpt(message, settings.maxChars, visible)
+							: PLUGINS.ai.assistant.context(data.messages, message.id, settings.maxChars, visible);
 					input.other = String(message.sender || message.email || '').replace(/[\r\n]+/g, ' ');
 				}
 				if ((owner && owner.assistant) === false)
 					throw Error('@(The assistant is turned off for this account.)');
 				input.me = String((owner && owner.name) || (owner && owner.email) || '').replace(/[\r\n]+/g, ' ');
 				var sources = [],
-					release = MODS.ai.guard($.user.id);
+					release = PLUGINS.ai.assistant.guard($.user.id);
 				try {
 					// A reply from the knowledge base: the passages related to the message are found first and handed to the model.
 					if (m.task === 'reply' && m.knowledge === true) {
-						var found = MODS.knowledge.search(MODS.knowledge.query(message.subject, visible(message)), {
-							external: MODS.ai.status(settings).scope === 'external'
+						var found = PLUGINS.ai.knowledge.search(PLUGINS.ai.knowledge.query(message.subject, visible(message)), {
+							external: PLUGINS.ai.assistant.status(settings).scope === 'external'
 						});
 						if (!found.results.length)
 							throw Error(
@@ -220,11 +220,11 @@ NEWACTION('Assistant|run', {
 									? '@(Nothing matches, and collections that are local only are not read by a model outside your network.)'
 									: '@(Nothing in the knowledge base matches this message.)'
 							);
-						input.sources = MODS.knowledge.block(found.results, MODS.ai.wrap);
+						input.sources = PLUGINS.ai.knowledge.block(found.results, PLUGINS.ai.assistant.wrap);
 						sources = found.results.map(function(p) { return { document: p.document, section: p.section, collection: p.collection }; });
 					}
-					var vetted = MODS.ai.vet(
-						MODS.ai.tidy(m.task, await MODS.ai.complete(settings, MODS.ai.build(m.task, input))),
+					var vetted = PLUGINS.ai.assistant.vet(
+						PLUGINS.ai.assistant.tidy(m.task, await PLUGINS.ai.assistant.complete(settings, PLUGINS.ai.assistant.build(m.task, input))),
 						[input.context, input.text, input.instruction, input.sources].join('\n')
 					);
 					MODS.instance.countAi(m.task).catch(function() {});

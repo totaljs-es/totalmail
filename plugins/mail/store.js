@@ -1,6 +1,6 @@
 // Private mailbox storage of one person: accounts, cached messages and drafts, in the database (tables mail_<id>_accounts,
 // mail_<id>_messages and mail_<id>_drafts) with the whole mailbox also in memory. Only committed writes replace the snapshot.
-var Mirror = require('./mirror');
+var Mirror = require('../../modules/mirror');
 var Aliases = require('./aliases');
 
 exports.spec = function(table, id) {

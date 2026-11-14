@@ -1,7 +1,7 @@
 require('total5');
 var { test } = require('node:test');
 var assert = require('node:assert/strict');
-var Credential = require('../modules/credential');
+var Credential = require('../plugins/mail/credential');
 function make() {
 	var asked = [];
 	var credential = Credential.create({

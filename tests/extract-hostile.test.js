@@ -2,7 +2,7 @@ require('total5');
 var { test } = require('node:test');
 var assert = require('node:assert/strict');
 var cp = require('node:child_process');
-var Extract = require('../modules/extract');
+var Extract = require('../plugins/ai/extract');
 test('a PDF with a hex string that never closes ends instead of looping forever', () => {
 
 	// Run apart: the defect was an endless loop, which would hang the whole suite instead of failing.

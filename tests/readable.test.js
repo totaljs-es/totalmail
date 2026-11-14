@@ -1,8 +1,8 @@
 require('total5');
 var { test } = require('node:test');
 var assert = require('node:assert/strict');
-var ai = require('../modules/ai');
-var html = require('../modules/html');
+var ai = require('../plugins/ai/assistant');
+var html = require('../plugins/mail/html');
 var seen = (markup) => html.visibletext(markup);
 test('text a reader cannot see is left out of what a model is given', () => {
 	let hidden = [

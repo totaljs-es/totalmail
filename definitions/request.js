@@ -1,7 +1,7 @@
 // Every request that changes something (and the long poll) must come from TotalMail's own page: the custom header cannot be
 // sent by another site without permission, and an Origin, when there is one, must be this host.
 var request = function(ctrl, next) {
-	if ((ctrl.method !== 'GET' || ctrl.uri.pathname === '/changes/') && !MODS.security.checkRequest(ctrl))
+	if ((ctrl.method !== 'GET' || ctrl.uri.pathname === '/changes/') && !PLUGINS.users.security.checkRequest(ctrl))
 		ctrl.invalid(403);
 	else
 		next();

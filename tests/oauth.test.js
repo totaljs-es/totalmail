@@ -2,9 +2,9 @@ require('total5');
 var { test } = require('node:test');
 var Assert = require('node:assert/strict');
 var Crypto = require('node:crypto');
-var Oauth = require('../modules/oauth'),
-	Imap = require('../modules/imap'),
-	Smtp = require('../modules/smtp');
+var Oauth = require('../plugins/providers/oauth'),
+	Imap = require('../plugins/mail/imap'),
+	Smtp = require('../plugins/mail/smtp');
 var CLIENT = '00000000-0000-4000-8000-000000000001';
 // The settings of the installation, as the administrator's window stores them.
 var own = { clientId: CLIENT };

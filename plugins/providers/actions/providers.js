@@ -1,7 +1,7 @@
 // Only administrators configure an installation. Every call checks the session owner and the request headers.
 function overview($) {
 
-	var catalogue = MODS.providers,
+	var catalogue = PLUGINS.providers.catalogue,
 		hidden = MODS.instance.hidden(),
 		defaultid = catalogue.defaultId();
 	var oauth = {};
@@ -13,9 +13,9 @@ function overview($) {
 			clientId: own.clientId || '',
 			tenant: own.tenant || '',
 			secretSet: !!own.secretSet,
-			effectiveTenant: MODS.oauth.settings(provider.id).tenant,
-			ready: MODS.oauth.configured(provider.id),
-			returnUri: MODS.oauth.redirectUri($.controller || $, provider.id)
+			effectiveTenant: PLUGINS.providers.oauth.settings(provider.id).tenant,
+			ready: PLUGINS.providers.oauth.configured(provider.id),
+			returnUri: PLUGINS.providers.oauth.redirectUri($.controller || $, provider.id)
 		};
 	}
 	return {
@@ -90,7 +90,7 @@ NEWACTION('Instance|oauth', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			if (!MODS.providers.all().some(function(p) { return p.id === model.provider && p.auth === 'oauth2'; }))
+			if (!PLUGINS.providers.catalogue.all().some(function(p) { return p.id === model.provider && p.auth === 'oauth2'; }))
 				throw Error('@(Invalid operation.)');
 			await MODS.instance.saveOAuth(model.provider, {
 				clientId: (model.clientId || '').trim(),
@@ -112,7 +112,7 @@ NEWACTION('Instance|type', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			var catalogue = MODS.providers,
+			var catalogue = PLUGINS.providers.catalogue,
 				existing = model.id ? catalogue.get(model.id) : null;
 			if (model.id && !(existing && existing.custom))
 				throw Error('@(Account type not found.)');
@@ -144,7 +144,7 @@ NEWACTION('Instance|type', {
 					delete raw[key];
 			}
 			try {
-				MODS.providers.validate(raw);
+				PLUGINS.providers.catalogue.validate(raw);
 			} catch {
 				throw Error('@(Check the account type: name, servers, ports and https links.)');
 			}
@@ -163,7 +163,7 @@ NEWACTION('Instance|type_delete', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			if (!(MODS.providers.get(model.id) || {}).custom)
+			if (!(PLUGINS.providers.catalogue.get(model.id) || {}).custom)
 				throw Error('@(Account type not found.)');
 			await MODS.instance.deleteProvider(model.id);
 			return overview($);
@@ -180,7 +180,7 @@ NEWACTION('Instance|prefs', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			var known = MODS.providers.all().map(function(p) { return p.id; });
+			var known = PLUGINS.providers.catalogue.all().map(function(p) { return p.id; });
 			var hidden = String(model.hidden || '')
 				.split(/[\s,;]+/)
 				.filter(Boolean);

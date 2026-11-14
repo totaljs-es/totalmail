@@ -4,9 +4,9 @@ var assert = require('node:assert/strict');
 var fs = require('node:fs');
 var os = require('node:os');
 var path = require('node:path');
-var extract = require('../modules/extract');
-var knowledge = require('../modules/knowledge');
-var ai = require('../modules/ai');
+var extract = require('../plugins/ai/extract');
+var knowledge = require('../plugins/ai/knowledge');
+var ai = require('../plugins/ai/assistant');
 var fixture = (name) => fs.readFileSync(path.join(__dirname, 'fixtures/documents', name));
 async function base(t) {
 	let dir = fs.mkdtempSync(path.join(os.tmpdir(), 'totalmail-knowledge-'));

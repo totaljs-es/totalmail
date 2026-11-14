@@ -1,5 +1,5 @@
 var Threading = require('./threading');
-var Format = require('../plugins/mail/public/format');
+var Format = require('./public/format');
 
 exports.create = function(mailer) {
 	var run = function(options, message) {

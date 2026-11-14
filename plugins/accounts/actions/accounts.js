@@ -12,7 +12,7 @@ NEWACTION('Accounts|discover', {
 				throw Error('@(Discovery is already running.)');
 			running.set($.user.id, true);
 			try {
-				return await MODS.discovery.discover(model.email.toLowerCase());
+				return await PLUGINS.accounts.discovery.discover(model.email.toLowerCase());
 			} finally {
 				running.delete($.user.id);
 			}
@@ -49,13 +49,13 @@ NEWACTION('Accounts|save', {
 				status: 'pending',
 				authType: model.authType || '',
 				imap: {
-					host: MODS.discovery.host(model.imapHost),
+					host: PLUGINS.accounts.discovery.host(model.imapHost),
 					port: model.imapPort,
 					security: model.imapSecurity,
 					username: model.imapUsername
 				},
 				smtp: {
-					host: MODS.discovery.host(model.smtpHost),
+					host: PLUGINS.accounts.discovery.host(model.smtpHost),
 					port: model.smtpPort,
 					security: model.smtpSecurity,
 					username: model.smtpUsername
@@ -70,7 +70,7 @@ NEWACTION('Accounts|save', {
 					.trim();
 				// Same for the aliases: only a request that mentions them changes them.
 			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'aliases')) {
-				var parsed = MODS.aliases.parse(model.aliases, account.email);
+				var parsed = PLUGINS.mail.aliases.parse(model.aliases, account.email);
 				if (parsed.error)
 					throw Error('@(Other addresses must be plain email addresses, ten at most, separated by commas.)');
 				account.aliases = parsed.list;
@@ -79,7 +79,7 @@ NEWACTION('Accounts|save', {
 			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'assistant'))
 				account.assistant = model.assistant === true;
 				// A generated ID is new; only explicit IDs can update a user's existing account.
-			var store = MODS.users.forUser($.user);
+			var store = PLUGINS.mail.mailboxes.forUser($.user);
 			// A request that leaves the type out keeps the one the account has (an app may send only what it changes).
 			if (!account.authType) {
 				var current = null;
@@ -91,7 +91,7 @@ NEWACTION('Accounts|save', {
 			if (account.authType === 'oauth2')
 				account.secret = null;
 			else if (model.password)
-				account.secret = MODS.security.identities.encrypt(model.password);
+				account.secret = PLUGINS.users.security.identities.encrypt(model.password);
 			return store.saveAccount(account);
 		});
 	}
@@ -107,10 +107,10 @@ NEWACTION('Accounts|delete', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			var removed = await MODS.users.forUser($.user).deleteAccount(model.id);
+			var removed = await PLUGINS.mail.mailboxes.forUser($.user).deleteAccount(model.id);
 			for (var list = Array.from(removed.files), i = 0; i < list.length; i++) {
 				var file = list[i];
-				await MODS.users.files($.user).remove($.user.id, file);
+				await PLUGINS.mail.mailboxes.files($.user).remove($.user.id, file);
 			}
 			return { id: removed.id };
 		});
@@ -123,18 +123,18 @@ NEWACTION('Accounts|providers', {
 	route: '+API /api/ -account_providers --> Accounts|providers',
 	action: function($) {
 		// OAuth providers are usable only when this server has an application registered for them.
-		var list = MODS.providers.list().map(function(p) {
+		var list = PLUGINS.providers.catalogue.list().map(function(p) {
 
 			if (p.auth !== 'oauth2')
 				return p;
-			var ready = MODS.oauth.configured(p.id);
+			var ready = PLUGINS.providers.oauth.configured(p.id);
 			// The exact return address this server sends, to compare with the one registered at the provider.
 			return Object.assign({}, p, { available: ready,
 				steps: ready ? p.steps : p.setup,
 				note: ready ? '' : p.note,
-				redirectUri: MODS.oauth.redirectUri($.controller || $, p.id) });
+				redirectUri: PLUGINS.providers.oauth.redirectUri($.controller || $, p.id) });
 		});
-		$.callback({ providers: list, defaultProvider: MODS.providers.defaultId() });
+		$.callback({ providers: list, defaultProvider: PLUGINS.providers.catalogue.defaultId() });
 	}
 });
 
@@ -143,7 +143,7 @@ NEWACTION('Accounts|detect', {
 	user: true,
 	route: '+API /api/ +account_detect --> Accounts|detect',
 	input: '*email:Email',
-	action: function($, model) { return FUNC.run($, async function() { return { provider: await MODS.providers.detect(model.email) }; }); }
+	action: function($, model) { return FUNC.run($, async function() { return { provider: await PLUGINS.providers.catalogue.detect(model.email) }; }); }
 });
 
 NEWACTION('Accounts|adminlink', {
@@ -154,14 +154,14 @@ NEWACTION('Accounts|adminlink', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			var provider = MODS.providers.get(model.provider);
+			var provider = PLUGINS.providers.catalogue.get(model.provider);
 			if (!provider || provider.auth !== 'oauth2')
 				throw Error('@(Invalid operation.)');
 			return {
-				url: MODS.oauth.adminConsentUrl(
+				url: PLUGINS.providers.oauth.adminConsentUrl(
 					provider.id,
 					model.email.split('@')[1],
-					MODS.oauth.redirectUri($.controller || $, provider.id)
+					PLUGINS.providers.oauth.redirectUri($.controller || $, provider.id)
 				)
 			};
 		});
@@ -176,22 +176,22 @@ NEWACTION('Accounts|oauth', {
 	action: function($, model) {
 		return FUNC.run($, async function() {
 
-			var provider = MODS.providers.get(model.provider);
+			var provider = PLUGINS.providers.catalogue.get(model.provider);
 			if (!provider || provider.auth !== 'oauth2')
 				throw Error('@(Invalid operation.)');
 			if (model.accountId) {
-				var existing = MODS.users.forUser($.user).account(model.accountId);
+				var existing = PLUGINS.mail.mailboxes.forUser($.user).account(model.accountId);
 				if (existing.email !== model.email.toLowerCase())
 					throw Error('@(That account does not match the email address of this account.)');
 			}
 			return {
-				url: MODS.oauth.start({
+				url: PLUGINS.providers.oauth.start({
 					userId: $.user.id,
 					provider: provider.id,
 					email: model.email,
 					name: (model.name || '').trim() || model.email,
 					accountId: model.accountId,
-					redirectUri: MODS.oauth.redirectUri($.controller || $, provider.id)
+					redirectUri: PLUGINS.providers.oauth.redirectUri($.controller || $, provider.id)
 				})
 			};
 		});

@@ -1,11 +1,11 @@
-// The documents the assistant may read to draft a reply. Used as MODS.knowledge.
+// The documents the assistant may read to draft a reply. Used as PLUGINS.ai.knowledge.
 // The knowledge base of the installation: documents the administrator adds (Word, PDF, Excel, text...) so the assistant
 // can draft a reply from them. Everything is internal to TotalMail: the NoSQL database next to the other data (through Mirror), no other service.
 //
 // Search is by words (BM25) over chunks of about 900 characters: no model, works offline, finds exact terms and names.
 // A collection can be marked local only: then it is never read when the model that will see the passages is outside the
 // organization's network.
-var Mirror = require('./mirror');
+var Mirror = require('../../modules/mirror');
 
 var K1 = 1.2,
 	B = 0.75,
@@ -297,10 +297,10 @@ exports.query = function(subject, body) {
 	return (String(subject || '').replace(/^(re|fwd?)\s*:\s*/gi, '') + '. ' + text).slice(0, 600);
 };
 
-// ---- The singleton of the application (MODS.knowledge)
+// ---- The singleton of the application (PLUGINS.ai.knowledge)
 var Lib = exports,
 	Extract = require('./extract'),
-	Tables = require('./tables').in(PATH.root('database'));
+	Tables = require('../../modules/tables').in(PATH.root('database'));
 
 exports.install = function() {
 	PAUSESERVER('knowledge', true);

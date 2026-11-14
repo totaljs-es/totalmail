@@ -127,7 +127,7 @@ describe('AGENTS.md', () => {
 	});
 
 	test('the request header that the tests need is the one that the application checks', () => {
-		assert.ok(read('modules/security.js').includes("'x-totalmail'"));
+		assert.ok(read('plugins/users/security.js').includes("'x-totalmail'"));
 		assert.ok(read('tests/AGENTS.md').includes('X-TotalMail: 1'));
 	});
 
@@ -228,9 +228,14 @@ describe('the instructions of each area of the repository', () => {
 			assert.ok(read(file).split('\n').length <= 200, file + ' is too long');
 	});
 
-	test('the files that modules/ names exist', () => {
-		for (var name of read('modules/AGENTS.md').match(/`\w+\.js`/g))
-			assert.ok(Fs.existsSync(Path.join(root, 'modules', name.replace(/`/g, ''))) || Fs.existsSync(Path.join(root, 'private', 'vendor', name.replace(/`/g, ''))), name + ' is not in modules/');
+	test('the files that plugins/ and modules/ name exist', () => {
+		for (var area of ['plugins', 'modules'])
+			for (var name of read(area + '/AGENTS.md').match(/`(?:\w+\/)?\w+\.js`/g) || []) {
+				var file = name.replace(/`/g, '');
+				var found = Fs.existsSync(Path.join(root, area, file)) || Fs.existsSync(Path.join(root, 'private', 'vendor', file)) ||
+					Fs.readdirSync(Path.join(root, 'plugins')).some((plugin) => Fs.existsSync(Path.join(root, 'plugins', plugin, file)) || Fs.existsSync(Path.join(root, 'plugins', plugin, 'public', file)));
+				assert.ok(found, file + ' is not where ' + area + '/AGENTS.md says');
+			}
 	});
 
 });
