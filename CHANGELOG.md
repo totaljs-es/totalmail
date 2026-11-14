@@ -18,7 +18,7 @@
 - A PDF whose hex string never closes no longer hangs the server when it is added to the knowledge base, compressed parts of documents may not expand past 32 MB, and the connection check ends when a server stalls STARTTLS or never ends a line.
 - A draft whose delivery is unknown (after an SMTP failure or a restart while sending) can be discarded once you have looked in Sent, and no longer keeps its account from being removed. Nothing is ever sent again.
 - Saving an account without `authType` keeps its type (an app using `account_save` no longer turns an OAuth account into a password one); Greek is accepted by the assistant's translation; a failed OAuth token renewal no longer blocks the account until a restart.
-- Code: `mail.js` is split into `display.js`, `undo.js`, `notify.js`, `selection.js` and `composer.js`, with 38 tests that run the real file in Node; every action has a `name`.
+- Code: `mail.js` is split into `display.js`, `undo.js`, `notify.js`, `selection.js` and `composer.js`, with 38 tests that run the real file in Node; every action has a `name`; `lib/` is gone (Total.js has no such folder): its files are in `modules/` and the vendored SMTP sender is in `private/vendor/`.
 
 ## 1.0.0
 
