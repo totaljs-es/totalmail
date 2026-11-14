@@ -6,6 +6,7 @@ function run($, fn) {
 }
 
 NEWACTION('Rules|save', {
+	name: 'Save a rule',
 	user: true,
 	route: '+API /api/ +rule_save --> Rules|save',
 	input: 'id:String(40), *accountId:String(80), *name:String(60), enabled:Boolean, *field:{from|to|subject}, *op:{contains|is}, *value:String(100), *action:{archive|trash|read|star|move}, path:String(500)',
@@ -21,6 +22,7 @@ NEWACTION('Rules|save', {
 });
 
 NEWACTION('Rules|delete', {
+	name: 'Delete a rule',
 	user: true,
 	route: '+API /api/ +rule_delete --> Rules|delete',
 	input: '*accountId:String(80), *id:String(40)',
@@ -29,6 +31,7 @@ NEWACTION('Rules|delete', {
 
 // How many of the messages already in the inbox cache a rule would have matched: a way to check it before relying on it.
 NEWACTION('Rules|test', {
+	name: 'Test a rule',
 	user: true,
 	route: '+API /api/ +rule_test --> Rules|test',
 	input: '*accountId:String(80), *field:{from|to|subject}, *op:{contains|is}, *value:String(100)',

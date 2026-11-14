@@ -7,6 +7,7 @@ function overview($) {
 }
 
 NEWACTION('Devices|list', {
+	name: 'List the devices',
 	user: true,
 	route: '+API /api/ -device_list --> Devices|list',
 	action: function($) { return FUNC.run($, function() { return overview($); }); }
@@ -15,6 +16,7 @@ NEWACTION('Devices|list', {
 // An app asks for its device token after the person signed in (password and two-step code). The password is asked again so that
 // a session that was left open cannot be turned into a sign-in that outlives it. The token is in this answer and nowhere else.
 NEWACTION('Devices|create', {
+	name: 'Add a device',
 	user: true,
 	route: '+API /api/ +device_create --> Devices|create',
 	input: '*name:String(60), platform:String(60), app:String(60), *password:String(128)',
@@ -40,6 +42,7 @@ NEWACTION('Devices|create', {
 });
 
 NEWACTION('Devices|revoke', {
+	name: 'Revoke a device',
 	user: true,
 	route: '+API /api/ +device_revoke --> Devices|revoke',
 	input: '*id:String(16)',

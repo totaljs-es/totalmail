@@ -74,6 +74,7 @@ function steps(text) {
 }
 
 NEWACTION('Instance|get', {
+	name: 'Read the settings of the installation',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -instance_get --> Instance|get',
@@ -81,6 +82,7 @@ NEWACTION('Instance|get', {
 });
 
 NEWACTION('Instance|oauth', {
+	name: 'Save the sign-in application of a provider',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +instance_oauth --> Instance|oauth',
@@ -102,6 +104,7 @@ NEWACTION('Instance|oauth', {
 });
 
 NEWACTION('Instance|type', {
+	name: 'Save an account type',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +instance_type --> Instance|type',
@@ -152,6 +155,7 @@ NEWACTION('Instance|type', {
 });
 
 NEWACTION('Instance|type_delete', {
+	name: 'Delete an account type',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +instance_type_delete --> Instance|type_delete',
@@ -168,6 +172,7 @@ NEWACTION('Instance|type_delete', {
 });
 
 NEWACTION('Instance|prefs', {
+	name: 'Save the preferences of the person',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +instance_prefs --> Instance|prefs',

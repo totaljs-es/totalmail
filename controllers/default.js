@@ -4,6 +4,14 @@ var Html = require('../lib/html');
 var REG_MESSAGE = /^imap-[a-f0-9]{64}$/;
 var REG_ANYID = /^[A-Za-z0-9_-]{1,100}$/;
 
+// An error written for the person is an ordinary "no"; anything else (an unreachable server, a broken file) is
+// logged, so an outage does not look like a message that does not exist.
+function failed($, err, status) {
+	if (!err || !String(err.message || '').startsWith('@('))
+		Total.error(err, 'TotalMail ' + $.url);
+	return $.invalid(status);
+}
+
 exports.install = function() {
 
 	ROUTE('GET /', async function($) {
@@ -78,7 +86,7 @@ exports.install = function() {
 				$.response.headers['content-security-policy'] = "default-src 'none'; sandbox";
 				$.binary(file.content, 'application/octet-stream', file.name);
 			})
-			.catch(function() { return $.invalid(404); });
+			.catch(function(err) { return failed($, err, 404); });
 	});
 	// Attachments leave the server only as opaque downloads of the signed-in user's own messages.
 	ROUTE('+GET /attachment/{id}/{index}/', function($) {
@@ -95,7 +103,7 @@ exports.install = function() {
 				$.response.headers['content-security-policy'] = "default-src 'none'; sandbox";
 				$.binary(file.content, 'application/octet-stream', file.name);
 			})
-			.catch(function() { return $.invalid(404); });
+			.catch(function(err) { return failed($, err, 404); });
 	});
 	// Outgoing attachments: stored privately per user and linked to one of the user's own drafts.
 	ROUTE('+POST /upload/{draft}/ @upload <16mb', function($) {
@@ -157,7 +165,7 @@ exports.install = function() {
 				$.response.headers['cache-control'] = 'private, no-store';
 				$.json(value);
 			})
-			.catch(function() { return $.invalid(500); });
+			.catch(function(err) { return failed($, err, 500); });
 	});
 	// The provider sends the browser back here. The session cookie (SameSite=Strict) does not travel with that
 	// cross-site navigation, so the one-time state created by the signed-in user identifies who this belongs to,

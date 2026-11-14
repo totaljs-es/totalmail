@@ -1,6 +1,7 @@
 var Totp = require('../../../lib/totp');
 
 NEWACTION('Users|setup', {
+	name: 'Create the first administrator',
 	route: 'API /api/ +user_setup --> Users|setup',
 	input: '*name:String(80), *email:Email, *password:String(128)',
 	action: function($, model) {
@@ -20,6 +21,7 @@ NEWACTION('Users|setup', {
 });
 
 NEWACTION('Users|login', {
+	name: 'Sign in',
 	route: 'API /api/ +user_login --> Users|login',
 	input: '*email:Email, *password:String(128)',
 	action: function($, model) {
@@ -43,6 +45,7 @@ NEWACTION('Users|login', {
 });
 
 NEWACTION('Users|totp', {
+	name: 'Check the two-step code',
 	route: 'API /api/ +user_totp --> Users|totp',
 	input: '*token:String(80), *code:String(40)',
 	action: function($, model) {
@@ -84,6 +87,7 @@ async function second($, password, code) {
 }
 
 NEWACTION('Users|totpbegin', {
+	name: 'Begin two-step verification',
 	user: true,
 	route: '+API /api/ +user_totp_begin --> Users|totpbegin',
 	input: '*password:String(128)',
@@ -101,6 +105,7 @@ NEWACTION('Users|totpbegin', {
 });
 
 NEWACTION('Users|totpenable', {
+	name: 'Turn on two-step verification',
 	user: true,
 	route: '+API /api/ +user_totp_enable --> Users|totpenable',
 	input: '*code:String(40)',
@@ -120,6 +125,7 @@ NEWACTION('Users|totpenable', {
 });
 
 NEWACTION('Users|totpdisable', {
+	name: 'Turn off two-step verification',
 	user: true,
 	route: '+API /api/ +user_totp_disable --> Users|totpdisable',
 	input: '*password:String(128), *code:String(40)',
@@ -132,6 +138,7 @@ NEWACTION('Users|totpdisable', {
 });
 
 NEWACTION('Users|totprecovery', {
+	name: 'Make new recovery codes',
 	user: true,
 	route: '+API /api/ +user_totp_recovery --> Users|totprecovery',
 	input: '*password:String(128), *code:String(40)',
@@ -144,6 +151,7 @@ NEWACTION('Users|totprecovery', {
 });
 
 NEWACTION('Users|logout', {
+	name: 'Sign out',
 	user: true,
 	route: '+API /api/ -user_logout --> Users|logout',
 	action: function($) {
@@ -157,6 +165,7 @@ NEWACTION('Users|logout', {
 });
 
 NEWACTION('Users|list', {
+	name: 'List the users',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -user_list --> Users|list',
@@ -168,6 +177,7 @@ NEWACTION('Users|list', {
 });
 
 NEWACTION('Users|create', {
+	name: 'Create a user',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +user_create --> Users|create',
@@ -178,6 +188,7 @@ NEWACTION('Users|create', {
 });
 
 NEWACTION('Users|profile', {
+	name: 'Save the profile',
 	user: true,
 	route: '+API /api/ +user_profile --> Users|profile',
 	input: '*name:String(80), *email:Email, *color:String(7), *language:String(35), currentPassword:String(128), newPassword:String(128), confirmPassword:String(128)',
@@ -219,6 +230,7 @@ function others($, id) {
 }
 
 NEWACTION('Users|reset', {
+	name: 'Reset the password of a user',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +user_reset --> Users|reset',
@@ -236,6 +248,7 @@ NEWACTION('Users|reset', {
 });
 
 NEWACTION('Users|totpreset', {
+	name: 'Remove the two-step verification of a user',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +user_totp_reset --> Users|totpreset',
@@ -254,6 +267,7 @@ NEWACTION('Users|totpreset', {
 });
 
 NEWACTION('Users|role', {
+	name: 'Change the role of a user',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +user_role --> Users|role',
@@ -269,6 +283,7 @@ NEWACTION('Users|role', {
 });
 
 NEWACTION('Users|disable', {
+	name: 'Disable or enable a user',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +user_disable --> Users|disable',
@@ -289,6 +304,7 @@ NEWACTION('Users|disable', {
 });
 
 NEWACTION('Users|remove', {
+	name: 'Remove a user',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +user_remove --> Users|remove',
@@ -298,6 +314,8 @@ NEWACTION('Users|remove', {
 
 			await confirmed($, model);
 			others($, model.id);
+			if (!MODS.security.identities.list().some(function(u) { return u.id === model.id; }))
+				throw Error('@(User not found.)');
 			var accounts = MODS.users.forUser({ id: model.id }).snapshot().accounts;
 			var user = await MODS.security.identities.remove(model.id);
 			MODS.security.revoke(model.id);

@@ -5,6 +5,7 @@ function overview() {
 }
 
 NEWACTION('Assistant|get', {
+	name: 'Read the settings of the assistant',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -assistant_get --> Assistant|get',
@@ -12,6 +13,7 @@ NEWACTION('Assistant|get', {
 });
 
 NEWACTION('Assistant|save', {
+	name: 'Save the settings of the assistant',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +assistant_save --> Assistant|save',
@@ -52,6 +54,7 @@ NEWACTION('Assistant|save', {
 
 // The knowledge base: collections of documents the assistant may read. Administrators only.
 NEWACTION('Assistant|knowledge', {
+	name: 'Read the knowledge base',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -assistant_knowledge --> Assistant|knowledge',
@@ -59,6 +62,7 @@ NEWACTION('Assistant|knowledge', {
 });
 
 NEWACTION('Assistant|collection', {
+	name: 'Add a collection of documents',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +assistant_collection --> Assistant|collection',
@@ -77,6 +81,7 @@ NEWACTION('Assistant|collection', {
 });
 
 NEWACTION('Assistant|collection_delete', {
+	name: 'Delete a collection of documents',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +assistant_collection_delete --> Assistant|collection_delete',
@@ -90,6 +95,7 @@ NEWACTION('Assistant|collection_delete', {
 });
 
 NEWACTION('Assistant|document_delete', {
+	name: 'Delete a document',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +assistant_document_delete --> Assistant|document_delete',
@@ -104,6 +110,7 @@ NEWACTION('Assistant|document_delete', {
 
 // A short question to the model with the values on screen, before they are saved.
 NEWACTION('Assistant|test', {
+	name: 'Test the connection of the assistant',
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ +assistant_test --> Assistant|test',
@@ -136,6 +143,7 @@ NEWACTION('Assistant|test', {
 
 // The tasks every signed-in person can run. The conversation comes from the person's own mailbox, never from the request.
 NEWACTION('Assistant|run', {
+	name: 'Run a task of the assistant',
 	user: true,
 	route: '+API /api/ +assistant_run --> Assistant|run',
 	input: '*task:{summarize|translate|reply|tone|proofread|compose}, id:String(80), accountId:String(80), instruction:String(500), style:{clearer|shorter|formal|friendly}, lang:{en|es|sk|cs|de|fr|it|pt|pl|el}, text:String(20000), knowledge:Boolean',
@@ -172,6 +180,8 @@ NEWACTION('Assistant|run', {
 					if (!input.instruction.trim())
 						throw Error('@(Write something first.)');
 					owner = data.accounts.find(function(a) { return a.id === m.accountId; });
+					if (!owner)
+						throw Error('@(Invalid account.)');
 				} else if (['tone', 'proofread'].includes(m.task) || (m.task === 'translate' && !m.id)) {
 					var own = MODS.ai.unhide(input.text);
 					input.text = own.text;
@@ -179,6 +189,8 @@ NEWACTION('Assistant|run', {
 					if (!input.text.trim())
 						throw Error('@(Write something first.)');
 					owner = data.accounts.find(function(a) { return a.id === m.accountId; });
+					if (!owner)
+						throw Error('@(Invalid account.)');
 				} else {
 					message = data.messages.find(function(x) { return x.id === m.id; });
 					if (!message || message.welcome)

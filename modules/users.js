@@ -16,22 +16,24 @@ var valid = function(id) { return REG_ID.test(id || ''); };
 exports.install = function() {
 
 	PAUSESERVER('users', true);
-	var loading = MODS.security.ready
-		.then(function() {
-			return Promise.all(
-				MODS.security.identities.list().map(async function(user) {
-					var mailbox = await Mailbox.open({
-						table: Tables,
-						id: user.id,
-						legacy: { file: Total.Path.join(database, 'mail-' + user.id + '.json') }
-					});
-					stores.set(user.id, mailbox);
-				})
-			);
-		}
-		)
-		.then(function() { return PAUSESERVER('users', false); });
-	loading.catch(function(error) { return Total.error(error, 'TotalMail mailboxes'); });
+	// After every module is installed: MODS.security must exist, whatever the order of the files.
+	ON('ready', function() {
+		return MODS.security.ready
+			.then(function() {
+				return Promise.all(
+					MODS.security.identities.list().map(async function(user) {
+						var mailbox = await Mailbox.open({
+							table: Tables,
+							id: user.id,
+							legacy: { file: Total.Path.join(database, 'mail-' + user.id + '.json') }
+						});
+						stores.set(user.id, mailbox);
+					})
+				);
+			})
+			.then(function() { return PAUSESERVER('users', false); })
+			.catch(function(error) { return Total.error(error, 'TotalMail mailboxes'); });
+	});
 	// Changed and removed messages are wiped from the files every six hours (the service runs every minute).
 	ON('service', function(minutes) {
 		if (minutes % 360 === 0)

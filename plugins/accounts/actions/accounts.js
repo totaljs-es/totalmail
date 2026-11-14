@@ -4,6 +4,7 @@ var Aliases = require('../../../lib/aliases'),
 var running = new Map();
 
 NEWACTION('Accounts|discover', {
+	name: 'Discover the servers of an address',
 	user: true,
 	route: '+API /api/ +account_discover --> Accounts|discover',
 	input: '*email:Email',
@@ -23,6 +24,7 @@ NEWACTION('Accounts|discover', {
 });
 
 NEWACTION('Accounts|save', {
+	name: 'Save a mail account',
 	user: true,
 	route: '+API /api/ +account_save --> Accounts|save',
 	input: 'id:String(80), *name:String(80), *email:Email, *imapHost:String(253), *imapPort:Number, *imapSecurity:{tls|starttls}, *imapUsername:String(254), *smtpHost:String(253), *smtpPort:Number, *smtpSecurity:{tls|starttls}, *smtpUsername:String(254), authType:{password|oauth2}, password:String(500), signature:String(1000), aliases:String(1500), assistant:Boolean',
@@ -101,6 +103,7 @@ NEWACTION('Accounts|save', {
 // A person removes one of their own accounts: it leaves TotalMail with its cached mail and drafts. The mailbox on the mail
 // server is never touched.
 NEWACTION('Accounts|delete', {
+	name: 'Delete a mail account',
 	user: true,
 	route: '+API /api/ +account_delete --> Accounts|delete',
 	input: '*id:String(80)',
@@ -118,6 +121,7 @@ NEWACTION('Accounts|delete', {
 });
 
 NEWACTION('Accounts|providers', {
+	name: 'List the account types',
 	user: true,
 	route: '+API /api/ -account_providers --> Accounts|providers',
 	action: function($) {
@@ -138,6 +142,7 @@ NEWACTION('Accounts|providers', {
 });
 
 NEWACTION('Accounts|detect', {
+	name: 'Detect the account type of an address',
 	user: true,
 	route: '+API /api/ +account_detect --> Accounts|detect',
 	input: '*email:Email',
@@ -145,6 +150,7 @@ NEWACTION('Accounts|detect', {
 });
 
 NEWACTION('Accounts|adminlink', {
+	name: 'Link for the administrator of a provider',
 	user: true,
 	route: '+API /api/ +account_oauth_admin --> Accounts|adminlink',
 	input: '*provider:String(30), *email:Email',
@@ -166,6 +172,7 @@ NEWACTION('Accounts|adminlink', {
 });
 
 NEWACTION('Accounts|oauth', {
+	name: 'Start the sign-in with a provider',
 	user: true,
 	route: '+API /api/ +account_oauth_start --> Accounts|oauth',
 	input: '*provider:String(30), *email:Email, name:String(80), accountId:String(80)',

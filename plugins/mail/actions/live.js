@@ -19,6 +19,7 @@ function run($, fn) {
 }
 
 NEWACTION('Accounts|verify', {
+	name: 'Verify a mail account',
 	user: true,
 	route: '+API /api/ +account_verify --> Accounts|verify',
 	input: '*accountId:String(80)',
@@ -27,6 +28,7 @@ NEWACTION('Accounts|verify', {
 
 // Support for an account that does not work: the checks, written in the person's language.
 NEWACTION('Accounts|diagnose', {
+	name: 'Diagnose a mail account',
 	user: true,
 	route: '+API /api/ +account_diagnose --> Accounts|diagnose',
 	input: '*accountId:String(80)',
@@ -51,6 +53,7 @@ NEWACTION('Accounts|diagnose', {
 });
 
 NEWACTION('Drafts|forwardfiles', {
+	name: 'Attach the files of a forwarded message',
 	user: true,
 	route: '+API /api/ +draft_forward_files --> Drafts|forwardfiles',
 	input: '*id:String(80), *messageId:String(80)',
@@ -58,6 +61,7 @@ NEWACTION('Drafts|forwardfiles', {
 });
 
 NEWACTION('Accounts|sync', {
+	name: 'Synchronize a mail account',
 	user: true,
 	route: '+API /api/ +account_sync --> Accounts|sync',
 	input: '*accountId:String(80), path:String(500)',
@@ -65,6 +69,7 @@ NEWACTION('Accounts|sync', {
 });
 
 NEWACTION('Messages|erase', {
+	name: 'Delete messages for good',
 	user: true,
 	route: '+API /api/ +message_erase --> Messages|erase',
 	input: '*id:String(80)',
@@ -72,6 +77,7 @@ NEWACTION('Messages|erase', {
 });
 
 NEWACTION('Folders|empty', {
+	name: 'Empty a folder',
 	user: true,
 	route: '+API /api/ +trash_empty --> Folders|empty',
 	input: '*accountId:String(80)',
@@ -79,6 +85,7 @@ NEWACTION('Folders|empty', {
 });
 
 NEWACTION('Accounts|search', {
+	name: 'Search a mail account on the server',
 	user: true,
 	route: '+API /api/ +account_search --> Accounts|search',
 	input: '*accountId:String(80), *path:String(500), *query:String(200)',
@@ -86,6 +93,7 @@ NEWACTION('Accounts|search', {
 });
 
 NEWACTION('Accounts|older', {
+	name: 'Load older messages',
 	user: true,
 	route: '+API /api/ +account_older --> Accounts|older',
 	input: '*accountId:String(80), *path:String(500)',
@@ -93,6 +101,7 @@ NEWACTION('Accounts|older', {
 });
 
 NEWACTION('Messages|read', {
+	name: 'Read a message',
 	user: true,
 	route: '+API /api/ +message_read --> Messages|read',
 	input: '*id:String(80)',
@@ -102,6 +111,7 @@ NEWACTION('Messages|read', {
 // The text of a message as a person reads it (no hidden text, no invisible characters): what an app gives to a model on the
 // device. The same filter as the assistant of the server, which needs no assistant to be turned on.
 NEWACTION('Messages|text', {
+	name: 'Read the text of a message',
 	user: true,
 	route: '+API /api/ +message_text --> Messages|text',
 	input: '*id:String(80)',
@@ -127,6 +137,7 @@ NEWACTION('Messages|text', {
 });
 
 NEWACTION('Messages|seen', {
+	name: 'Mark messages as read or unread',
 	user: true,
 	route: '+API /api/ +message_seen --> Messages|seen',
 	input: '*id:String(80)',
@@ -134,6 +145,7 @@ NEWACTION('Messages|seen', {
 });
 
 NEWACTION('Drafts|send', {
+	name: 'Send a draft',
 	user: true,
 	route: '+API /api/ +draft_send --> Drafts|send',
 	input: '*id:String(80), confirmed:Boolean, *revision:String(80)',
@@ -141,6 +153,7 @@ NEWACTION('Drafts|send', {
 });
 
 NEWACTION('Messages|move', {
+	name: 'Move messages',
 	user: true,
 	route: '+API /api/ +message_move --> Messages|move',
 	input: '*id:String(80), *path:String(500)',
@@ -148,6 +161,7 @@ NEWACTION('Messages|move', {
 });
 
 NEWACTION('Folders|create', {
+	name: 'Create a folder',
 	user: true,
 	route: '+API /api/ +folder_create --> Folders|create',
 	input: '*accountId:String(80), *name:String(80), parent:String(500)',
@@ -155,6 +169,7 @@ NEWACTION('Folders|create', {
 });
 
 NEWACTION('Messages|change', {
+	name: 'Star or archive messages',
 	user: true,
 	route: '+API /api/ +message_change --> Messages|change',
 	input: '*id:String(80), *operation:{read|unread|star|archive|restore|trash}, enabled:Boolean',
@@ -167,6 +182,7 @@ NEWACTION('Messages|change', {
 });
 
 NEWACTION('Drafts|unattach', {
+	name: 'Remove an attachment from a draft',
 	user: true,
 	route: '+API /api/ +draft_attachment_remove --> Drafts|unattach',
 	input: '*id:String(80), *attachmentId:String(32)',
@@ -181,6 +197,7 @@ NEWACTION('Drafts|unattach', {
 });
 
 NEWACTION('Drafts|delete', {
+	name: 'Delete a draft',
 	user: true,
 	route: '+API /api/ +draft_delete --> Drafts|delete',
 	input: '*id:String(80)',
