@@ -1,4 +1,14 @@
-# TotalMail
+<p align="center"><img src="public/img/totalmail-logo.png" width="128" height="128" alt="TotalMail logo" /></p>
+
+<h1 align="center">TotalMail</h1>
+
+<p align="center">
+  <a href="https://github.com/totaljs-es/totalmail/releases/latest"><img src="https://img.shields.io/github/v/release/totaljs-es/totalmail?label=version&color=f26d21" alt="Latest version" /></a>
+  <a href="https://github.com/totaljs-es/totalmail/actions/workflows/ci.yml"><img src="https://github.com/totaljs-es/totalmail/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/totaljs-es/totalmail/actions/workflows/docker.yml"><img src="https://github.com/totaljs-es/totalmail/actions/workflows/docker.yml/badge.svg" alt="Docker image" /></a>
+  <a href="https://www.totaljs.com"><img src="https://img.shields.io/badge/built%20with-Total.js%205-f26d21" alt="Built with Total.js 5" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/totaljs-es/totalmail" alt="MIT license" /></a>
+</p>
 
 A self-hosted mail client for companies and teams, equally suited to personal use. Read and send from any IMAP/SMTP account (Gmail, Outlook and Microsoft 365, iCloud, Yahoo, Seznam, your own hosting) in one place, with a private mailbox for every user.
 
