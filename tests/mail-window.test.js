@@ -1,0 +1,414 @@
+// What the mail window does, with the real plugins/mail/public/mail.js and a server that answers from a small mailbox. These tests
+// are the net under any change to that file (splitting it, binding it differently): they check the lists it draws and the calls
+// it makes, not how it looks.
+var { test } = require('node:test');
+var Assert = require('node:assert/strict');
+var Harness = require('./mail-harness');
+
+function mailbox() {
+	return {
+		user: { id: 'u1', name: 'Ana Ruiz', email: 'ana@example.test', role: 'admin' },
+		accounts: [
+			{ id: 'a1', name: 'Work', email: 'ana@example.test', color: '#4285F4', configured: true, status: 'synced', mailboxes: [] },
+			{ id: 'a2', name: 'Home', email: 'ana@home.test', color: '#db9265', configured: true, status: 'synced', mailboxes: [] }
+		],
+		messages: [
+			{ id: 'm1', accountId: 'a1', folder: 'inbox', unread: true, sender: 'Luis Gómez', email: 'luis@example.test', subject: 'Proposal', body: 'Hello,\nHere is the proposal.', date: '2026-11-10T10:00:00Z', messageId: '<1@x>' },
+			{ id: 'm2', accountId: 'a1', folder: 'inbox', unread: false, sender: 'Eva Soto', email: 'eva@example.test', subject: 'Invoice 42', body: 'Please pay.', date: '2026-11-11T10:00:00Z', messageId: '<2@x>' },
+			{ id: 'm3', accountId: 'a2', folder: 'inbox', unread: true, sender: 'Pablo', email: 'pablo@example.test', subject: 'Holidays', body: 'Where to?', date: '2026-11-12T10:00:00Z', messageId: '<3@x>', starred: true },
+			{ id: 'm4', accountId: 'a1', folder: 'inbox', unread: false, sender: 'Luis Gómez', email: 'luis@example.test', subject: 'Re: Proposal', body: 'Thanks.', date: '2026-11-13T10:00:00Z', messageId: '<4@x>', inReplyTo: '<1@x>' },
+			{ id: 'm5', accountId: 'a1', folder: 'trash', unread: false, sender: 'Spam', email: 'spam@example.test', subject: 'Win', body: 'Win now', date: '2026-11-09T10:00:00Z', messageId: '<5@x>' }
+		],
+		drafts: []
+	};
+}
+// A server that keeps what it is told: the window reloads from it after most operations, as it does in production.
+async function start(options) {
+
+	options = options || {};
+	var db = mailbox(),
+		counter = 0;
+	var by = (id) => db.messages.find((m) => m.id === id);
+	var h = await Harness.create({
+		lang: options.lang,
+		api: {
+			bootstrap: () => JSON.parse(JSON.stringify(db)),
+			message_change: (d) => {
+				var m = by(d.id);
+				if (d.operation === 'read')
+					m.unread = false;
+				else if (d.operation === 'unread')
+					m.unread = true;
+				else if (d.operation === 'star')
+					m.starred = d.enabled;
+				else if (d.operation === 'trash')
+					m.folder = 'trash';
+				else if (d.operation === 'archive')
+					m.folder = 'archive';
+				else if (d.operation === 'restore')
+					m.folder = 'inbox';
+				return { id: m.id, unread: m.unread, starred: m.starred, folder: m.folder };
+			},
+			draft_save: (d) => {
+				var saved = Object.assign({ status: 'draft', revision: 'r' + ++counter, attachments: [] }, db.drafts.find((x) => x.id === d.id), d, { id: d.id || 'd' + ++counter, updated: '2026-11-14T10:00:00Z' });
+				db.drafts = db.drafts.filter((x) => x.id !== saved.id).concat(saved);
+				return saved;
+			},
+			draft_delete: (d) => {
+				db.drafts = db.drafts.filter((x) => x.id !== d.id);
+				return {};
+			}
+		}
+	});
+	h.db = db;
+	return h;
+}
+var ids = (h) => Array.from(h.mail().rows, (r) => r.id);
+
+test('the window starts with the inbox of every account, the newest conversation first', async () => {
+	var h = await start();
+	var m = h.mail();
+	Assert.deepEqual(h.calls.map((c) => c.schema), ['bootstrap']);
+	Assert.equal(m.ui.userName, 'Ana Ruiz');
+	Assert.equal(m.ui.userInitials, 'AR');
+	Assert.equal(m.ui.admin, true);
+	Assert.equal(m.ui.folderTitle, 'Inbox');
+	Assert.equal(m.ui.accountScope, 'All accounts');
+	// Threads: m1 and m4 are one conversation, shown by its newest message; the trash is not in the inbox.
+	Assert.deepEqual(ids(h), ['m4', 'm3', 'm2']);
+	Assert.equal(m.rows[0].count, 2, 'the conversation says how many messages it has');
+	Assert.equal(m.ui.resultsCount, '3 messages');
+	Assert.equal(m.listState.empty, false);
+	Assert.equal(m.ui.listStatus, '', 'with a synced account there is nothing to set up');
+	Assert.deepEqual(h.plain(m.accounts.map((a) => [a.id, a.unreadCount])), [['a1', 1], ['a2', 1]]);
+});
+
+test('without conversations every message has its own line, and the choice is remembered', async () => {
+	var h = await start();
+	await h.plugin.togglethreads();
+	Assert.deepEqual(ids(h), ['m4', 'm3', 'm2', 'm1']);
+	Assert.equal(h.mail().ui.threads, false);
+	Assert.equal(h.storage['totalmail-threads-u1'], '0');
+	await h.plugin.togglethreads();
+	Assert.equal(h.mail().ui.threads, true);
+	Assert.deepEqual(ids(h), ['m4', 'm3', 'm2']);
+});
+
+test('the unread filter and the account filter narrow the list', async () => {
+	var h = await start();
+	await h.click({ filter: 'unread' });
+	Assert.deepEqual(ids(h), ['m3', 'm1'], 'the conversation of m1 stays because m1 is unread, and is shown by that message');
+	Assert.equal(h.mail().ui.filter, 'unread');
+	await h.click({ filter: 'all' });
+	await h.click({ account: 'a2' });
+	Assert.deepEqual(ids(h), ['m3']);
+	Assert.equal(h.mail().ui.accountScope, 'Home');
+	await h.click({ account: 'a2' });
+	Assert.equal(h.mail().ui.accountScope, 'All accounts', 'the same account again clears the filter');
+});
+
+test('the folders show their own messages, and starred ones from every folder', async () => {
+	var h = await start();
+	await h.click({ folder: 'trash' });
+	Assert.deepEqual(ids(h), ['m5']);
+	Assert.equal(h.mail().ui.folderTitle, 'Trash');
+	await h.click({ folder: 'starred' });
+	Assert.deepEqual(ids(h), ['m3']);
+	await h.click({ folder: 'drafts' });
+	Assert.deepEqual(ids(h), []);
+	Assert.equal(h.mail().ui.unreadOff, true, 'there is no unread filter among drafts');
+});
+
+test('searching filters what is loaded, with the operators of the search box', async () => {
+	var h = await start();
+	h.set('mail.search', 'invoice');
+	h.plugin.search();
+	Assert.deepEqual(ids(h), ['m2']);
+	h.set('mail.search', 'from:luis is:unread');
+	h.plugin.search();
+	Assert.deepEqual(ids(h), ['m1'], 'the conversation is found through its unread message, and shown by it');
+	h.set('mail.search', 'zzz');
+	h.plugin.search();
+	Assert.deepEqual(ids(h), []);
+	Assert.equal(h.mail().listState.message, 'No matches. Try another search.');
+	h.plugin.clearsearch();
+	Assert.equal(h.mail().search, '');
+	// The search box tells the window when its text changes (exec); clearing is one more change.
+	h.plugin.search();
+	Assert.deepEqual(ids(h), ['m4', 'm3', 'm2']);
+});
+
+test('opening a message shows it and marks it as read on the server', async () => {
+	var h = await start();
+	await h.click({ message: 'm3' });
+	Assert.equal(h.mail().ui.hasReader, true);
+	Assert.equal(h.mail().reader.empty, false);
+	Assert.equal(h.mail().reader.subject, 'Holidays');
+	Assert.deepEqual(h.called('message_change').map((c) => c.data), [{ id: 'm3', operation: 'read' }]);
+	Assert.equal(h.mail().rows.find((r) => r.id === 'm3').unread, false);
+	Assert.equal(h.mail().rows.find((r) => r.id === 'm3').selected, true);
+	Assert.equal(h.mail().accounts.find((a) => a.id === 'a2').unreadCount, 0);
+	// A message that is read already is not marked again.
+	await h.click({ message: 'm2' });
+	Assert.equal(h.called('message_change').length, 1);
+});
+
+test('star, archive and move to the trash change the message on the server and reload', async () => {
+	var h = await start();
+	await h.click({ message: 'm2' });
+	await h.click({ command: 'star' });
+	Assert.deepEqual(h.called('message_change').pop().data, { id: 'm2', operation: 'star', enabled: true });
+	Assert.equal(h.db.messages.find((m) => m.id === 'm2').starred, true);
+	await h.click({ command: 'trash' });
+	Assert.equal(h.db.messages.find((m) => m.id === 'm2').folder, 'trash');
+	Assert.ok(!ids(h).includes('m2'), 'it left the inbox');
+	Assert.ok(h.mail().ui.undoShown, 'moving from the inbox can be undone');
+});
+
+test('ctrl-click selects lines for a bulk action without opening them', async () => {
+	var h = await start();
+	await h.click({ message: 'm3' }, { ctrlKey: true });
+	await h.click({ message: 'm2' }, { ctrlKey: true });
+	Assert.equal(h.mail().ui.bulkShown, true);
+	Assert.equal(h.mail().ui.bulkCount, '2 selected');
+	Assert.equal(h.mail().ui.hasReader, false, 'nothing was opened');
+	Assert.deepEqual(Array.from(h.mail().rows.filter((r) => r.checked), (r) => r.id).sort(), ['m2', 'm3']);
+	Assert.equal(h.called('message_change').length, 0);
+});
+
+test('a new message is saved as a draft a moment after the person types, once', async () => {
+	var h = await start();
+	await h.click({ command: 'compose' });
+	Assert.equal(h.mail().window, 'composer');
+	Assert.equal(h.mail().compose.accountId, 'a1');
+	Assert.equal(h.called('draft_save').length, 0, 'nothing is saved before the person writes');
+	h.set('mail.compose.to', 'eva@example.test');
+	h.set('mail.compose.subject', 'Hello');
+	h.set('mail.compose.body', 'Hi Eva');
+	Assert.equal(h.mail().ui.draftStatus, 'Unsaved changes…');
+	await h.flush();
+	var saves = h.called('draft_save');
+	Assert.equal(saves.length, 1, 'three edits make one save');
+	Assert.equal(saves[0].data.to, 'eva@example.test');
+	Assert.equal(saves[0].data.subject, 'Hello');
+	Assert.equal(saves[0].data.body, 'Hi Eva');
+	Assert.equal(saves[0].data.accountId, 'a1');
+	Assert.equal(h.mail().ui.draftStatus, 'Saved on your server');
+	Assert.equal(h.db.drafts.length, 1);
+	// A second edit saves the same draft, not another.
+	h.set('mail.compose.body', 'Hi Eva, again');
+	await h.flush();
+	Assert.equal(h.called('draft_save')[1].data.id, h.db.drafts[0].id);
+	Assert.equal(h.db.drafts.length, 1);
+});
+
+test('closing the composer saves what is pending first', async () => {
+	var h = await start();
+	await h.click({ command: 'compose' });
+	h.set('mail.compose.subject', 'Draft me');
+	await h.click({ command: 'close-compose' });
+	Assert.equal(h.called('draft_save').length, 1);
+	Assert.equal(h.mail().window, '');
+	Assert.equal(h.plugin.pending(), false, 'nothing is left to lose');
+});
+
+test('discarding a draft needs a second press, then removes it everywhere', async () => {
+	var h = await start();
+	await h.click({ command: 'compose' });
+	h.set('mail.compose.subject', 'Throw me away');
+	await h.flush();
+	await h.click({ command: 'discard-compose' });
+	Assert.equal(h.called('draft_delete').length, 0, 'the first press only asks');
+	Assert.ok(h.toasts.some((t) => /Press again to discard this draft/.test(t)));
+	await h.click({ command: 'discard-compose' });
+	Assert.equal(h.called('draft_delete').length, 1);
+	Assert.equal(h.db.drafts.length, 0);
+	Assert.equal(h.mail().window, '');
+});
+
+test('a reply starts from the message: the right account and recipient, "Re:", and the original quoted', async () => {
+	var h = await start();
+	await h.click({ message: 'm3' });
+	await h.click({ command: 'reply' });
+	var compose = h.mail().compose;
+	Assert.equal(h.mail().window, 'composer');
+	Assert.equal(compose.accountId, 'a2');
+	Assert.equal(compose.to, 'pablo@example.test');
+	Assert.match(compose.subject, /^Re: Holidays/);
+	Assert.match(compose.body, /Where to\?/, 'the original is quoted');
+	Assert.equal(h.mail().ui.composeTitle, 'Your reply');
+	// Opening it is not an edit: nothing is saved until the person changes something.
+	await h.flush();
+	Assert.equal(h.called('draft_save').length, 0);
+});
+
+test('a forward has its own title and no recipient', async () => {
+	var h = await start();
+	await h.click({ message: 'm2' });
+	await h.click({ command: 'forward' });
+	Assert.equal(h.mail().ui.composeTitle, 'Forward');
+	Assert.equal(h.mail().compose.to, '');
+	Assert.match(h.mail().compose.subject, /^Fwd: Invoice 42|^Fw: Invoice 42/i);
+});
+
+test('the sync button syncs the inbox of the open account and reloads', async () => {
+	var h = await start();
+	await h.click({ account: 'a1' });
+	await h.click({ command: 'sync' });
+	Assert.deepEqual(h.called('account_sync').map((c) => c.data), [{ accountId: 'a1', path: 'INBOX' }]);
+	Assert.equal(h.called('bootstrap').length, 2, 'the window reloads what the server holds');
+});
+
+test('background sync skips an account that failed, and backs off before trying it again', async () => {
+	var h = await start();
+	h.answer('account_sync', (d) => (d.accountId === 'a2' ? Error('Server busy') : {}));
+	await h.plugin.backgroundSync();
+	Assert.deepEqual(h.called('account_sync').map((c) => c.data.accountId), ['a1', 'a2']);
+	Assert.equal(h.mail().accounts.find((a) => a.id === 'a2').syncFailed, true);
+	Assert.equal(h.mail().accounts.find((a) => a.id === 'a1').syncFailed, false);
+	await h.plugin.backgroundSync();
+	Assert.deepEqual(h.called('account_sync').map((c) => c.data.accountId), ['a1', 'a2', 'a1'], 'the failed one waits');
+});
+
+test('background sync does nothing while a window is open or an operation runs', async () => {
+	var h = await start();
+	h.set('mail.window', 'settings');
+	Assert.equal(h.plugin.backgroundReady(), false);
+	await h.plugin.backgroundSync();
+	Assert.equal(h.called('account_sync').length, 0);
+	h.set('mail.window', '');
+	Assert.equal(h.plugin.backgroundReady(), true);
+});
+
+test('a message goes out only after the preview is confirmed, for the revision that was reviewed', async () => {
+	var h = await start();
+	await h.click({ command: 'compose' });
+	h.set('mail.compose.to', 'eva@example.test');
+	h.set('mail.compose.subject', 'Hello');
+	h.set('mail.compose.body', 'Hi Eva');
+	await h.click({ command: 'preview-send' });
+	Assert.equal(h.mail().window, 'send-confirm');
+	Assert.equal(h.called('draft_send').length, 0, 'the preview sends nothing');
+	var revision = h.db.drafts[0].revision;
+	h.answer('draft_send', () => ({ sentCopy: 'saved' }));
+	await h.click({ command: 'confirm-send' });
+	Assert.deepEqual(h.called('draft_send').map((c) => c.data), [{ id: h.db.drafts[0].id, confirmed: true, revision }]);
+	Assert.equal(h.mail().window, '');
+	Assert.ok(h.toasts.some((t) => /Email sent and saved/.test(t)));
+});
+
+test('a failed send keeps the composer and says why', async () => {
+	var h = await start();
+	await h.click({ command: 'compose' });
+	h.set('mail.compose.to', 'eva@example.test');
+	h.set('mail.compose.body', 'Hi');
+	await h.click({ command: 'preview-send' });
+	h.answer('draft_send', Error('The server refused the message.'));
+	await h.click({ command: 'confirm-send' });
+	Assert.equal(h.mail().ui.sendError, 'The server refused the message.');
+	Assert.notEqual(h.mail().window, '', 'the window is not closed');
+});
+
+test('a bulk action applies to every selected conversation, empties the selection and can be undone', async () => {
+	var h = await start();
+	await h.click({ message: 'm3' }, { ctrlKey: true });
+	await h.click({ message: 'm2' }, { ctrlKey: true });
+	await h.plugin.bulk([{ dataset: { bulk: 'trash' } }]);
+	await h.settle();
+	var changed = h.called('message_change').map((c) => c.data.id).sort();
+	Assert.deepEqual(changed, ['m2', 'm3']);
+	Assert.deepEqual(ids(h), ['m4'], 'only the conversation that was not selected is left in the inbox');
+	Assert.equal(h.mail().ui.bulkShown, false, 'the selection is empty');
+	Assert.equal(h.mail().ui.undoShown, true);
+	await h.plugin.undo();
+	await h.settle();
+	Assert.equal(h.db.messages.find((m) => m.id === 'm2').folder, 'inbox');
+	Assert.equal(h.db.messages.find((m) => m.id === 'm3').folder, 'inbox');
+	Assert.deepEqual(ids(h), ['m4', 'm3', 'm2']);
+	Assert.equal(h.mail().ui.undoShown, false);
+});
+
+test('starring keeps the selection, and a conversation is starred only when none of the lines is', async () => {
+	var h = await start();
+	await h.click({ message: 'm3' }, { ctrlKey: true });
+	await h.click({ message: 'm2' }, { ctrlKey: true });
+	await h.plugin.bulk([{ dataset: { bulk: 'star' } }]);
+	await h.settle();
+	Assert.deepEqual(h.called('message_change').map((c) => c.data.enabled), [true, true], 'm3 was starred already, but not every line was');
+	Assert.equal(h.mail().ui.bulkShown, true, 'more can follow');
+});
+
+test('deleting from the trash for good asks twice', async () => {
+	var h = await start();
+	await h.click({ folder: 'trash' });
+	await h.click({ message: 'm5' }, { ctrlKey: true });
+	h.answer('message_erase', {});
+	await h.plugin.bulk([{ dataset: { bulk: 'trash' } }]);
+	Assert.equal(h.called('message_erase').length, 0);
+	Assert.ok(h.toasts.some((t) => /Press again to delete permanently/.test(t)));
+	await h.plugin.bulk([{ dataset: { bulk: 'trash' } }]);
+	await h.settle();
+	Assert.deepEqual(h.called('message_erase').map((c) => c.data), [{ id: 'm5' }]);
+});
+
+test('a draft opens in the composer with its saved text', async () => {
+	var h = await start();
+	h.db.drafts.push({ id: 'd9', accountId: 'a2', from: '', to: 'x@example.test', cc: '', bcc: '', subject: 'Saved one', body: 'Body', status: 'draft', revision: 'r0', attachments: [], updated: '2026-11-14T09:00:00Z' });
+	await h.plugin.reload();
+	await h.click({ folder: 'drafts' });
+	Assert.deepEqual(ids(h), ['d9']);
+	await h.click({ message: 'd9' });
+	Assert.equal(h.mail().window, 'composer');
+	Assert.equal(h.mail().compose.subject, 'Saved one');
+	Assert.equal(h.mail().compose.accountId, 'a2');
+	Assert.equal(h.mail().ui.draftStatus, 'Saved on your server');
+	await h.flush();
+	Assert.equal(h.called('draft_save').length, 0, 'opening is not an edit');
+});
+
+test('a draft that was submitted cannot be edited again', async () => {
+	var h = await start();
+	h.db.drafts.push({ id: 'd8', accountId: 'a1', to: 'x@example.test', subject: 'Sent?', body: 'B', status: 'unknown', revision: 'r0', attachments: [], updated: '2026-11-14T09:00:00Z' });
+	await h.plugin.reload();
+	await h.click({ folder: 'drafts' });
+	await h.click({ message: 'd8' });
+	Assert.equal(h.mail().ui.locked, true);
+	Assert.equal(h.mail().ui.sendOff, true);
+	await h.click({ command: 'preview-send' });
+	Assert.equal(h.mail().window, 'composer', 'there is no preview of a message that may already have gone');
+});
+
+test('loading older mail asks every folder that has more, then reloads', async () => {
+	var h = await start();
+	h.db.accounts[0].remaining = { INBOX: 40 };
+	await h.plugin.reload();
+	Assert.equal(h.mail().ui.olderShown, true);
+	await h.click({ command: 'older' });
+	Assert.deepEqual(h.called('account_older').map((c) => c.data), [{ accountId: 'a1', path: 'INBOX' }]);
+	Assert.equal(h.called('bootstrap').length, 3);
+});
+
+test('a long list is drawn in stretches and shows more on request', async () => {
+	var h = await start();
+	for (var i = 0; i < 200; i++)
+		h.db.messages.push({ id: 'x' + i, accountId: 'a1', folder: 'inbox', unread: false, sender: 'S', email: 's@example.test', subject: 'Bulk ' + i, body: 'b', date: '2026-10-' + String((i % 28) + 1).padStart(2, '0') + 'T10:00:00Z' });
+	await h.plugin.reload();
+	Assert.equal(h.mail().rows.length, 150);
+	Assert.equal(h.mail().ui.moreShown, true);
+	h.plugin.showmore();
+	Assert.ok(h.mail().rows.length > 150);
+	Assert.equal(h.mail().ui.resultsCount, '203 messages', 'the count is of the whole list, not of what is drawn');
+});
+
+test('an operation cannot start while another one runs', async () => {
+	var h = await start();
+	var release;
+	h.answer('account_sync', () => new Promise((resolve) => (release = resolve)));
+	var running = h.plugin.operation(async () => h.plugin.api('account_sync', { accountId: 'a1', path: 'INBOX' }));
+	await h.settle();
+	await Assert.rejects(() => h.plugin.operation(async () => 1), /busy/);
+	Assert.equal(h.mail().ui.busy, true);
+	release({});
+	await running;
+	Assert.equal(h.mail().ui.busy, false);
+});
