@@ -9,6 +9,7 @@ var files = [
 	'plugins/mail/public/behaviors.js',
 	'plugins/mail/public/threads.js',
 	'plugins/mail/public/contacts.js',
+	'plugins/mail/public/display.js',
 	'plugins/mail/public/mail.js',
 	'plugins/accounts/public/accounts.js',
 	'plugins/users/public/users.js',

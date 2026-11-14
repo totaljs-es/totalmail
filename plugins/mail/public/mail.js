@@ -178,25 +178,11 @@ PLUGIN('mail', function(exports) {
 		composeloading = false,
 		dirty = false,
 		pendingsaves = 0;
-	function esc(value) {
-		return String(value == null ? '' : value).replace(
-			/[&<>"']/g,
-			function(c) {
-				return ({
-					'&': '&amp;',
-					'<': '&lt;',
-					'>': '&gt;',
-					'"': '&quot;',
-					"'": '&#39;'
-				})[c];
-			}
-		);
-	}
 	function account(id) {
 		return state.accounts.find(function(item) { return item.id === id; });
 	}
 	function toast(text) {
-		SETTER('notify/info', esc(text));
+		SETTER('notify/info', totalmaildisplay.esc(text));
 	}
 	function api(schema, data) {
 		return totalmailrequest.api(schema, data);
@@ -567,46 +553,6 @@ PLUGIN('mail', function(exports) {
 		});
 		renderbulk();
 	}
-	function filesize(bytes) {
-
-		if (!bytes)
-			return '';
-		if (bytes < 1024)
-			return bytes + ' B';
-		if (bytes < 1048576)
-			return Math.round(bytes / 1024) + ' KB';
-		return (bytes / 1048576).toFixed(1) + ' MB';
-	}
-	// A calendar invitation as the reader shows it. Times written with a zone are shown as written, with the zone.
-	function invitecard(invite) {
-
-		var lang = document.documentElement.lang;
-		function show(t, withdate) {
-
-			if (!t)
-				return '';
-			if (t.allDay)
-				return new Date(t.iso + 'T00:00:00').toLocaleDateString(lang, { dateStyle: 'full' });
-			if (t.iso.endsWith('Z'))
-				return new Date(t.iso).toLocaleString(
-					lang,
-					withdate === false ? { timeStyle: 'short' } : { dateStyle: 'full', timeStyle: 'short' }
-				);
-			var day = new Date(t.iso.slice(0, 10) + 'T00:00:00').toLocaleDateString(lang, { dateStyle: 'full' });
-			return (withdate === false ? '' : day + ', ') + t.iso.slice(11, 16) + (t.tz && withdate !== false ? ' (' + t.tz + ')' : '');
-		}
-		var start = show(invite.start),
-			end = '';
-		if (invite.end && !(invite.start && invite.start.allDay))
-			end = invite.end.iso.slice(0, 10) === invite.start.iso.slice(0, 10) ? show(invite.end, false) : show(invite.end);
-		return {
-			title: invite.summary || TRANSLATE('@(No subject)'),
-			when: start + (end ? ' – ' + end : ''),
-			where: invite.location,
-			organizer: invite.organizer,
-			cancelled: invite.cancelled
-		};
-	}
 	function renderreader() {
 
 		var m = state.messages.find(function(item) { return item.id === state.selected; });
@@ -660,7 +606,7 @@ PLUGIN('mail', function(exports) {
 					})
 					: [],
 		unsubscribe: m.unsubscribe || null,
-		invite: m.invite ? invitecard(m.invite) : null,
+		invite: m.invite ? totalmaildisplay.invitecard(m.invite, document.documentElement.lang, TRANSLATE('@(No subject)')) : null,
 		showHtml: !!m.hasHtml && !plainview,
 		viewLabel: TRANSLATE(plainview ? '@(Show formatted)' : '@(Show plain text)'),
 		frameSrc: '/html/' + encodeURIComponent(m.id) + '/' + (imagesfor.has(m.id) ? '?images=1' : ''),
@@ -673,7 +619,7 @@ PLUGIN('mail', function(exports) {
 		files: (m.attachments || []).map(function(f) {
 			return {
 				name: f.name,
-				size: filesize(f.size),
+				size: totalmaildisplay.filesize(f.size),
 				href: '/attachment/' + encodeURIComponent(m.id) + '/' + f.index + '/'
 			};
 		}),
@@ -801,7 +747,7 @@ PLUGIN('mail', function(exports) {
 		drafttimer = setTimeout(function() { return savedraft().catch(function(e) { return toast(e.message); }); }, 650);
 	}
 	function draftfiles(source) {
-		return ((source && source.attachments) || []).map(function(f) { return { id: f.id, name: f.name, size: filesize(f.size) }; });
+		return ((source && source.attachments) || []).map(function(f) { return { id: f.id, name: f.name, size: totalmaildisplay.filesize(f.size) }; });
 	}
 	function draftchanged(saved) {
 
@@ -1133,30 +1079,10 @@ PLUGIN('mail', function(exports) {
 		return true;
 	}
 	// Files dropped on the window or pasted from the clipboard (a screenshot, say) are attached like the button's files.
-	function stamp(file) {
-
-		if (file.name && !/^image\.(png|jpe?g|gif|webp)$/i.test(file.name))
-			return file;
-		var now = new Date(),
-			pad = function(n) { return String(n).padStart(2, '0'); },
-			extension = (file.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
-		var name =
-			'image-' +
-			now.getFullYear() +
-			pad(now.getMonth() + 1) +
-			pad(now.getDate()) +
-			'-' +
-			pad(now.getHours()) +
-			pad(now.getMinutes()) +
-			pad(now.getSeconds()) +
-			'.' +
-			extension;
-		return new File([file], name, { type: file.type });
-	}
 	// Files dropped on the window (the dropfiles component): on the composer they are attached, on the mailbox they start a new message.
 	exports.dropped = async function(files) {
 
-		var list = files.map(stamp);
+		var list = files.map(function(f) { return totalmaildisplay.stamp(f); });
 		if (!list.length || (mail.window && mail.window !== 'composer'))
 			return;
 		try {
@@ -1168,7 +1094,7 @@ PLUGIN('mail', function(exports) {
 		}
 	};
 	// Files pasted into the message (the mailbody component).
-	exports.pasted = function(files) { return attachfiles(files.map(stamp)).catch(function(e) { return toast(e.message); }); };
+	exports.pasted = function(files) { return attachfiles(files.map(function(f) { return totalmaildisplay.stamp(f); })).catch(function(e) { return toast(e.message); }); };
 	// Address suggestions while typing in To, Cc and Bcc, from the mail already loaded. Nothing leaves the browser.
 	var contactcache = { size: -1, list: [] };
 	// The addresses of the mail already loaded and of the accounts: the list the suggestions draw from (mail.contacts).
