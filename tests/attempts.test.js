@@ -17,3 +17,15 @@ test('these tries never use the places of the sign-in page of an address', () =>
 	for (let i = 0; i < 100; i++)
 		assert.equal(Security.allowLogin($, 'a' + i + '@example.test'), true, 'sign-in from the same address still has all of its places');
 });
+test('the address of the sign-in buckets follows trust_proxy_from in config', () => {
+	let $ = { headers: { 'x-forwarded-for': '203.0.113.9' }, req: { socket: { remoteAddress: '198.51.100.7' } } };
+	let before = CONF.trust_proxy_from;
+	try {
+		delete CONF.trust_proxy_from;
+		assert.equal(Security.address($), '198.51.100.7', 'a public proxy that is not named is the client');
+		CONF.trust_proxy_from = '198.51.100.0/24';
+		assert.equal(Security.address($), '203.0.113.9', 'once named, the address it appended counts');
+	} finally {
+		CONF.trust_proxy_from = before;
+	}
+});

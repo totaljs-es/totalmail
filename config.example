@@ -7,7 +7,7 @@ production : false
 // $port : 8000
 $ip : 0.0.0.0
 trust_proxy : true
-// A proxy with a public address is named here (addresses or IPv4 ranges, separated by commas):
+// A proxy with a public address is named here (addresses or ranges, IPv4 or IPv6, separated by commas):
 // trust_proxy_from : 203.0.113.5, 198.51.100.0/24
 
 // oauth_base_url : https://mail.example.com

@@ -35,7 +35,7 @@ By default Total.js starts in *debug* mode: it restarts when a file changes and 
 
 ## Behind a reverse proxy
 
-Serve TotalMail over HTTPS from a proxy such as nginx, Caddy or Traefik. The proxy must send `X-Forwarded-Proto` and append the client address to `X-Forwarded-For`; the sign-in rate limit uses the last address, the one your proxy added, and only when the connection comes from the proxy itself (the same machine or a private network); a proxy on a public address is named in `config` with `trust_proxy_from : 203.0.113.5, 198.51.100.0/24` (addresses or IPv4 ranges), or every client would count as the proxy. Without a proxy, add `trust_proxy : false` to `config`. The proxy's read timeout must be longer than 25 seconds (the new-mail long poll); the default of nginx is 60.
+Serve TotalMail over HTTPS from a proxy such as nginx, Caddy or Traefik. The proxy must send `X-Forwarded-Proto` and append the client address to `X-Forwarded-For`; the sign-in rate limit uses the last address, the one your proxy added, and only when the connection comes from the proxy itself (the same machine, a private or carrier-grade NAT network such as Tailscale, or link-local); a proxy on a public address is named in `config` with `trust_proxy_from : 203.0.113.5, 198.51.100.0/24` (addresses or ranges, IPv4 or IPv6), or every client would count as the proxy. Without a proxy, add `trust_proxy : false` to `config`. The proxy's read timeout must be longer than 25 seconds (the new-mail long poll); the default of nginx is 60.
 
 ## Updates
 

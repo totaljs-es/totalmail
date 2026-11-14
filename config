@@ -11,8 +11,8 @@ production : false
 $ip : 0.0.0.0
 
 // The normal deployment is behind an HTTPS reverse proxy. The address that it appends to X-Forwarded-For is used only when the
-// connection comes from the proxy itself (the same machine or a private network); from anywhere else the header is ignored. Use false
-// when connecting directly without a proxy. A proxy that has a public address is named here (addresses or IPv4 ranges, separated
+// connection comes from the proxy itself (the same machine, a private or carrier-grade NAT network such as Tailscale, or link-local); from anywhere else the header is ignored. Use false
+// when connecting directly without a proxy. A proxy that has a public address is named here (addresses or ranges, IPv4 or IPv6, separated
 // by commas), or every client would be taken for the proxy:
 // trust_proxy_from : 203.0.113.5, 198.51.100.0/24
 trust_proxy : true
