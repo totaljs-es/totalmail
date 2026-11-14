@@ -1,6 +1,6 @@
 {
 	"name": "totalmail",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "A self-hosted mail client for teams and personal use, built with Total.js 5: IMAP and SMTP, private mailboxes, optional manual AI assistant.",
 	"private": true,
 	"license": "MIT",

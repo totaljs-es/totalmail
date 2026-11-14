@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 — 2026-11-14
 
 - Sent mail: quotes inside quotes (`> >`) become nested blockquotes, and web links and email addresses in the signature can be clicked.
 - Received mail: styled links (buttons) keep their safe styles, and more everyday layout styles are allowed (plain-colour `background`, `font`, border width and style, corner radii, `table-layout`).
