@@ -28,7 +28,6 @@ a { text-decoration: none; color: inherit}
 .folder.active .folder-count { color: #E0E0E0; background: #595959; padding: 1px 6px; border-radius: var(--radius)}
 .accounts-heading { display: flex; align-items: center; margin-top: 36px}
 .accounts-heading .nav-label { margin-bottom: 0}
-.small-label { font-size: 8px; letter-spacing: .8px; margin-left: auto; margin-right: 12px; color: #a9a9a9; border: 1px solid #525252; padding: 2px 4px; border-radius: 3px}
 #accounts { margin-top: 12px}
 .account { display: flex; width: 100%; align-items: center; text-align: left; gap: 10px; padding: 10px 12px; border-radius: var(--radius)}
 .account.active,.account:hover { background: #3c3c3c}
@@ -40,13 +39,10 @@ a { text-decoration: none; color: inherit}
 .demo-label { font-size: 11px; display: flex; align-items: center; gap: 7px; padding: 0 13px}
 .status-dot { width: 5px; height: 5px; display: inline-block; border-radius: 50%; background: #74aa98; flex-shrink: 0}
 .sidebar-bottom>p { font-size: 11px; line-height: 1.6; color: #a1a1a1; margin: 8px 13px 18px}
-.settings-button { display: flex; align-items: center; gap: 10px; color: #c0c0c0; width: 100%; padding: 10px 13px; text-align: left; font-size: 12px}
-.settings-button .ti { width: 16px}
 .user { display: flex; gap: 10px; align-items: center; border-top: 1px solid #434343; margin-top: 15px; padding: 18px 12px 0}
 .user-avatar { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #4c4c4c; color: #e4d9d0}
 .user strong { display: block; color: #E0E0E0; font-size: 11px; font-weight: 500}
 .user small { display: block; font-size: 11px; margin-top: 4px; color: #9d9d9d}
-.tiny-heart { margin-left: auto; color: #acacac; font-size: 20px}
 .main { min-width: 0; flex: 1; display: flex; flex-direction: column; background: var(--surface)}
 .topbar { height: 76px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 24px; padding: 0 30px; flex-shrink: 0}
 .breadcrumb { font-size: 12px; color: var(--muted-ink); white-space: nowrap}
@@ -124,7 +120,6 @@ h1 { font-size: 23px; letter-spacing: -.8px; line-height: 1.3; margin: 9px 0 7px
 .ai-card p { font-size: 11px; color: var(--muted-ink); line-height: 1.7; margin: 10px 0 15px}
 .ai-actions { display: flex; gap: 7px; flex-wrap: wrap}
 .ai-actions button { font-size: 12px; padding: 8px 12px}
-.ai-instruction { width: 100%; margin: 12px 0 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: var(--radius); font-size: 12px; background: var(--surface); color: var(--ink)}
 .ai-result { font-size: 12px; color: var(--muted-ink)}
 .ai-result > ui-bind:not(.hidden):not(:empty) { margin-top: 14px}
 .ai-text { white-space: pre-wrap; line-height: 1.65; font-size: 13px; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; max-height: 320px; overflow: auto}
@@ -155,7 +150,7 @@ h1 { font-size: 23px; letter-spacing: -.8px; line-height: 1.3; margin: 9px 0 7px
 .composer-ai .ai-actions { margin-top: 12px}
 .composer-ai strong { display: block; font-size: 11px; font-weight: 500}
 .composer-ai small { display: block; font-size: 11px; margin-top: 5px; color: var(--muted-ink)}
-.error-text { color: #a35164!important}
+.error-text { color: var(--danger-text)!important}
 @media(min-width: 1550px) { .mail-list { width: 410px}
 .reader-content { padding: 45px 65px; max-width: 950px; width: 100%; margin: 0 auto}
 }
@@ -229,7 +224,6 @@ ui-component[name=repeater],ui-component[name=template] { display: block}
 .private-badge .ti { font-size: 14px}
 .mini-star .ti { font-size: 12px}
 .reader-empty>.ti { font-size: 44px}
-.settings-button .ti { font-size: 16px}
 .ai-heading .ti { font-size: 17px}
 @media(max-width: 730px) { .language-control ui-component { width: 77px}
 .ui-modal .composer-heading { padding: 24px 20px 15px}
@@ -241,7 +235,6 @@ ui-component[name=repeater],ui-component[name=template] { display: block}
 }
 .account-add { padding: 0; color: #aeaeae}
 .account-add .ti { font-size: 14px}
-.sidebar-bottom .settings-button { margin: 6px 0}
 .sidebar-bottom .user { margin-top: 15px}
 .user small { overflow: hidden; text-overflow: ellipsis; max-width: 145px}
 .access-page { min-height: 100dvh; display: grid; place-items: center; background: linear-gradient(135deg,#252525,#484848); padding: 28px}
@@ -258,7 +251,6 @@ ui-bind.contents { display: contents}
 .icon-button.starred { color: #b59c56}
 ui-bind.contents.hidden { display: none}
 .access-card .primary-button { width: 100%; justify-content: center; margin-top: 20px}
-.access-card .access-note { text-align: center; font-size: 11px; margin: 24px 0 0}
 .access-card #access-error { font-size: 12px; margin: 15px 0 0}
 .settings-modal { width: 900px}
 .settings-heading { height: 90px; display: flex; align-items: center; justify-content: space-between; padding: 20px 28px; border-bottom: 0}
@@ -283,7 +275,6 @@ ui-bind.contents.hidden { display: none}
 .access-card { padding: 30px 24px}
 .access-language { right: 24px; top: 31px}
 }
-.settings-hub .settings-body .secondary-button { width: 100%; margin: 10px 0}
 .settings-hub .settings-footer { height: 20px; padding: 0; border: 0}
 .workspace-settings { flex-shrink: 0}
 .topbar { gap: 12px}
@@ -296,9 +287,6 @@ ui-bind.contents.hidden { display: none}
 .settings-footer { gap: 8px}
 .settings-footer .secondary-button { height: auto; line-height: normal; background: var(--surface-soft); color: var(--muted-ink); font-size: 11px; border-radius: var(--radius); padding: 8px}
 .folder .ti-folder { font-size: 17px}
-@media(max-width: 730px) { #account-setup .settings-footer { height: 110px; flex-wrap: wrap; justify-content: center; padding: 12px}
-.ui-modal .compose-footer-area { height: 140px}
-}
 /* Official j-Modal measures content height. Padding belongs to inner content. */
 .ui-modal .composer-heading, .ui-modal .settings-heading { padding: 0; display: block; }
 .modal-heading-content { height: 100%; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; }
@@ -340,8 +328,6 @@ ui-bind.contents.hidden { display: none}
 .compose-body .modal-body-content > ui-component[name='input'] { display: block; margin-bottom: 14px; }
 .reader-reply { flex-wrap: wrap; }
 .ui-modal .settings-footer button { min-height: 36px; height: auto; line-height: normal; }
-@media(max-width: 480px) {
-}
 
 /* j-Input owns selection; j-Directory supplies its shared picker. */
 .language-control ui-component { min-width: 0; }
@@ -601,7 +587,7 @@ ui-bind.admin-link-block { margin-top: 10px}
 .bulk-bar [role=status] { font-size: 12px; font-weight: 600; flex: 1}
 .bulk-actions { display: flex; gap: 2px}
 .bulk-actions button { width: 32px; height: 32px; border-radius: 8px; display: inline-grid; place-items: center; color: var(--ink-2); cursor: pointer; background: transparent}
-.bulk-actions button:hover { background: #E6ECFB}
+.bulk-actions button:hover { background: var(--hover-tint)}
 .bulk-actions button:focus-visible { outline: 2px solid var(--color-text, #1d4ed8); outline-offset: 1px}
 .shortcut-list { margin: 8px 0 0}
 .shortcut-list > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 13px}
@@ -653,8 +639,8 @@ ui-bind.admin-link-block { margin-top: 10px}
 /* Colour scheme. Every surface, text and line colour of the app is a variable; "dark" redefines them. The page sets data-mode
    (light or dark) on <html> from the person's choice or the system's, before it paints (see views/head.html). jComponent's own
    inputs, lists and pickers switch with the ui-dark class that goes with it. */
-:root { color-scheme: light; --surface: #FFFFFF; --surface-soft: #F8F8F8; --surface-hover: #F0F0F0; --tint: #EEF3FF; --tint-soft: #F4F7FF; --tint-line: #C7D6FB; --ink-2: #404040; --muted-ink: #606060; --line-strong: #C8C8C8; --chip: #E0E0E0; --avatar-ink: #7A5744}
-:root[data-mode='dark'] { color-scheme: dark; --surface: #1A1E26; --surface-soft: #12151B; --surface-hover: #262C37; --tint: #1B2842; --tint-soft: #172033; --tint-line: #2C3F66; --ink: #E7EAF0; --ink-2: #CDD3DD; --muted-ink: #A6AFBD; --muted: #8A94A3; --line: #2F3643; --line-strong: #434C5C; --chip: #2F3643; --avatar-ink: #E8D9CF; --sidebar: #0D1015; --color-text: color-mix(in srgb, var(--color) 55%, #fff)}
+:root { color-scheme: light; --surface: #FFFFFF; --surface-soft: #F8F8F8; --surface-hover: #F0F0F0; --tint: #EEF3FF; --tint-soft: #F4F7FF; --tint-line: #C7D6FB; --ink-2: #404040; --muted-ink: #606060; --line-strong: #C8C8C8; --chip: #E0E0E0; --avatar-ink: #7A5744; --danger-text: #a35164; --ok: #15803d; --warn: #b45309; --fail: #b91c1c; --hover-tint: #E6ECFB}
+:root[data-mode='dark'] { color-scheme: dark; --surface: #1A1E26; --surface-soft: #12151B; --surface-hover: #262C37; --tint: #1B2842; --tint-soft: #172033; --tint-line: #2C3F66; --ink: #E7EAF0; --ink-2: #CDD3DD; --muted-ink: #A6AFBD; --muted: #8A94A3; --line: #2F3643; --line-strong: #434C5C; --chip: #2F3643; --avatar-ink: #E8D9CF; --danger-text: #f2a7ba; --ok: #4ade80; --warn: #fbbf24; --fail: #f87171; --hover-tint: #26344f; --sidebar: #0D1015; --color-text: color-mix(in srgb, var(--color) 55%, #fff)}
 .hub-theme { padding: 14px 0 0}
 
 /* The review step shows the message as it will arrive */
@@ -691,9 +677,9 @@ ui-bind.admin-link-block { margin-top: 10px}
 .check { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; font-size: 13px; color: var(--ink)}
 .check small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-2)}
 .check i { margin-top: 2px; flex: none}
-.check-ok i { color: #15803d}
-.check-warn i { color: #b45309}
-.check-fail i { color: #b91c1c}
+.check-ok i { color: var(--ok)}
+.check-warn i { color: var(--warn)}
+.check-fail i { color: var(--fail)}
 .check-skip i { color: var(--muted-ink)}
 
 /* Composer: Cc and Bcc beside the To label, the actions in one row, the status and the note under them */
