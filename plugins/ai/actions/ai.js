@@ -1,5 +1,3 @@
-var Extract = require('../../../modules/extract');
-
 function overview() {
 	return MODS.instance.aiView();
 }
@@ -58,7 +56,7 @@ NEWACTION('Assistant|knowledge', {
 	user: true,
 	permissions: 'admin',
 	route: '+API /api/ -assistant_knowledge --> Assistant|knowledge',
-	action: function($) { return FUNC.run($, function() { return Object.assign({}, MODS.knowledge.view(), { accept: Extract.supported }); }); }
+	action: function($) { return FUNC.run($, function() { return Object.assign({}, MODS.knowledge.view(), { accept: MODS.extract.supported }); }); }
 });
 
 NEWACTION('Assistant|collection', {

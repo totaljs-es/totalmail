@@ -1,5 +1,3 @@
-var Totp = require('../../../modules/totp');
-
 NEWACTION('Users|setup', {
 	name: 'Create the first administrator',
 	route: 'API /api/ +user_setup --> Users|setup',
@@ -97,9 +95,9 @@ NEWACTION('Users|totpbegin', {
 			await mine($, model.password);
 			if (MODS.security.identities.get($.user.id).totp)
 				throw Error('@(Two-step verification is already on.)');
-			var secret = Totp.secret();
+			var secret = MODS.totp.secret();
 			MODS.security.pending.setup($.user.id, secret);
-			return { secret, uri: Totp.uri(secret, $.user.email, 'TotalMail') };
+			return { secret, uri: MODS.totp.uri(secret, $.user.email, 'TotalMail') };
 		});
 	}
 });

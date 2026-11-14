@@ -1,6 +1,3 @@
-var Files = require('../modules/files');
-var Html = require('../modules/html');
-
 var REG_MESSAGE = /^imap-[a-f0-9]{64}$/;
 var REG_ANYID = /^[A-Za-z0-9_-]{1,100}$/;
 
@@ -44,9 +41,9 @@ exports.install = function() {
 		if (!message.html)
 			return $.invalid(404);
 		var images = $.query.images === '1';
-		Object.assign($.response.headers, Html.headers(images, $.protocol + '://' + $.headers.host));
+		Object.assign($.response.headers, MODS.html.headers(images, $.protocol + '://' + $.headers.host));
 		$.response.minify = false;
-		$.html(Html.document(message.html, images));
+		$.html(MODS.html.document(message.html, images));
 	});
 	// A message laid out for paper in its own tab: the details, then the cleaned HTML or the plain text. No script runs here
 	// (same policy as the frame), so printing is the browser's own command.
@@ -61,7 +58,7 @@ exports.install = function() {
 			return $.invalid(404);
 		}
 		var images = $.query.images === '1';
-		Object.assign($.response.headers, Html.headers(images, "'none'"));
+		Object.assign($.response.headers, MODS.html.headers(images, "'none'"));
 		$.response.minify = false;
 		$.view('print', {
 			subject: message.subject || TRANSLATE($.language, '@(No subject)'),
@@ -69,7 +66,7 @@ exports.install = function() {
 			to: (message.toRecipients || []).join(', ') || message.to,
 			cc: (message.ccRecipients || []).join(', ') || message.cc,
 			date: message.date ? new Date(message.date).toLocaleString($.language || 'en') : '',
-			html: message.html ? Html.display(message.html, images) : '',
+			html: message.html ? MODS.html.display(message.html, images) : '',
 			text: message.body
 		});
 	});
@@ -113,7 +110,7 @@ exports.install = function() {
 			store = MODS.users.forUser($.user);
 		if (!file || $.files.length !== 1 || !file.size)
 			return $.invalid('@(Choose a file to attach.)');
-		if (file.size > Files.limits.file)
+		if (file.size > MODS.files.limits.file)
 			return $.invalid('@(Attachments can add up to 15 MB per message.)');
 		var name =
 			String(file.filename || '')
@@ -135,7 +132,7 @@ exports.install = function() {
 						type: Total.TUtils.contentTypes[Total.TUtils.getExtension(name)] || 'application/octet-stream',
 						size: file.size
 					},
-					Files.limits
+					MODS.files.limits
 				);
 			})
 			.then(function(draft) { return $.json(draft); })

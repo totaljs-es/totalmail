@@ -1,6 +1,3 @@
-var Aliases = require('../../../modules/aliases'),
-	Discovery = require('../../../modules/discovery');
-
 var running = new Map();
 
 NEWACTION('Accounts|discover', {
@@ -15,7 +12,7 @@ NEWACTION('Accounts|discover', {
 				throw Error('@(Discovery is already running.)');
 			running.set($.user.id, true);
 			try {
-				return await Discovery.discover(model.email.toLowerCase());
+				return await MODS.discovery.discover(model.email.toLowerCase());
 			} finally {
 				running.delete($.user.id);
 			}
@@ -52,13 +49,13 @@ NEWACTION('Accounts|save', {
 				status: 'pending',
 				authType: model.authType || '',
 				imap: {
-					host: Discovery.host(model.imapHost),
+					host: MODS.discovery.host(model.imapHost),
 					port: model.imapPort,
 					security: model.imapSecurity,
 					username: model.imapUsername
 				},
 				smtp: {
-					host: Discovery.host(model.smtpHost),
+					host: MODS.discovery.host(model.smtpHost),
 					port: model.smtpPort,
 					security: model.smtpSecurity,
 					username: model.smtpUsername
@@ -73,7 +70,7 @@ NEWACTION('Accounts|save', {
 					.trim();
 				// Same for the aliases: only a request that mentions them changes them.
 			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'aliases')) {
-				var parsed = Aliases.parse(model.aliases, account.email);
+				var parsed = MODS.aliases.parse(model.aliases, account.email);
 				if (parsed.error)
 					throw Error('@(Other addresses must be plain email addresses, ten at most, separated by commas.)');
 				account.aliases = parsed.list;

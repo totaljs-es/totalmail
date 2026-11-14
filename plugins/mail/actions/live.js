@@ -1,5 +1,3 @@
-var Welcome = require('../../../modules/welcome');
-
 // A message's sanitized HTML has its own route; no Action answer carries it.
 function strip(value) {
 	if (value && typeof value === 'object' && !Array.isArray(value) && 'html' in value) {
@@ -176,7 +174,7 @@ NEWACTION('Messages|change', {
 	action: function($, m) {
 		return run($, async function(store) {
 			var result = await MODS.live.change($.user, store, m.id, m.operation, m.enabled);
-			return result.moved !== undefined ? result : Welcome.decorate(result, $.language);
+			return result.moved !== undefined ? result : MODS.welcome.decorate(result, $.language);
 		});
 	}
 });

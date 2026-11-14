@@ -1,5 +1,3 @@
-var Welcome = require('../../../modules/welcome');
-
 // Whether the assistant exists, where its text goes and, if a knowledge base is connected, where a message is searched.
 function aistatus() {
 
@@ -18,7 +16,7 @@ NEWACTION('Mailboxes|bootstrap', {
 		var data = MODS.users.forUser($.user).snapshot();
 		// Keep submitted records in storage to prevent duplicate sends, but do not list sent mail as drafts.
 		data.drafts = data.drafts.filter(function(draft) { return draft.status !== 'sent'; });
-		data.messages = data.messages.map(function(item) { return Welcome.decorate(item, $.language); });
+		data.messages = data.messages.map(function(item) { return MODS.welcome.decorate(item, $.language); });
 		$.callback(Object.assign({ user: $.user,
 			mode: data.accounts.some(function(a) { return a.configured; }) ? 'configured' : 'empty',
 			ai: aistatus() }, data));

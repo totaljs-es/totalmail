@@ -24,7 +24,7 @@ test('bootstrap excludes sent drafts after restart while retaining pending draft
 	Vm.runInNewContext(Fs.readFileSync(Path.join(__dirname, '../plugins/mail/actions/mail.js'), 'utf8'), {
 		require: require('node:module').createRequire(Path.join(__dirname, '../plugins/mail/actions/mail.js')),
 		NEWACTION: (name, action) => (actions[name] = action),
-		MODS: { users: { forUser: () => store }, ai: { status: () => ({ configured: false }) }, instance: { ai: () => ({}) } }
+		MODS: { welcome: require('../modules/welcome'), users: { forUser: () => store }, ai: { status: () => ({ configured: false }) }, instance: { ai: () => ({}) } }
 	});
 	actions['Mailboxes|bootstrap'].action({ user: { id: 'u' }, language: 'en', callback: (value) => (data = value) });
 	Assert.deepEqual(new Set(data.drafts.map((d) => d.id)), new Set(['editable', 'sending', 'unknown']));
