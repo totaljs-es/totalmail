@@ -662,3 +662,42 @@ test('signing out from the settings with unsaved changes asks first', async () =
 	Assert.equal(h.called('user_logout').length, 0, 'the person stayed');
 	Assert.equal(h.asked.length, 1);
 });
+
+test('the reader shows formatted mail or plain text, and remote images only for the message they were asked for', async () => {
+	var h = await start();
+	h.db.messages.push({ id: 'h1', accountId: 'a1', folder: 'inbox', unread: false, sender: 'News', email: 'news@example.test', subject: 'Letter', body: 'Text', date: '2026-11-14T08:00:00Z', hasHtml: true, remoteImages: 3, remote: true, bodyLoaded: true, attachments: [] });
+	h.db.messages.push({ id: 'h2', accountId: 'a1', folder: 'inbox', unread: false, sender: 'Shop', email: 'shop@example.test', subject: 'Offer', body: 'Text', date: '2026-11-14T07:00:00Z', hasHtml: true, remoteImages: 1, remote: true, bodyLoaded: true, attachments: [] });
+	await h.plugin.reload();
+	await h.click({ message: 'h1' });
+	var reader = h.mail().reader;
+	Assert.equal(reader.showHtml, true);
+	Assert.equal(reader.remoteBlocked, true, 'remote images wait');
+	Assert.equal(reader.frameSrc, '/html/h1/');
+	h.plugin.showimages();
+	Assert.equal(h.mail().reader.frameSrc, '/html/h1/?images=1');
+	Assert.equal(h.mail().reader.remoteBlocked, false);
+	await h.click({ message: 'h2' });
+	Assert.equal(h.mail().reader.remoteBlocked, true, 'another message still waits');
+	h.plugin.togglehtml();
+	Assert.equal(h.mail().reader.showHtml, false, 'plain text');
+	await h.click({ message: 'h1' });
+	Assert.equal(h.mail().reader.showHtml, false, 'for every message until the page is reloaded');
+	h.plugin.togglehtml();
+	Assert.equal(h.mail().reader.showHtml, true);
+});
+
+test('while a mail operation runs, the buttons of the reader are off, except print', async () => {
+	var h = await start();
+	await h.click({ message: 'm2' });
+	Assert.equal(h.mail().ui.t.archive.off, false);
+	var release;
+	h.answer('account_sync', () => new Promise((resolve) => (release = resolve)));
+	var running = h.plugin.operation(async () => h.plugin.api('account_sync', { accountId: 'a1', path: 'INBOX' }));
+	await h.settle();
+	Assert.equal(h.mail().ui.t.archive.off, true);
+	Assert.equal(h.mail().ui.t.trash.off, true);
+	Assert.equal(h.mail().ui.t.print.off, false);
+	release({});
+	await running;
+	Assert.equal(h.mail().ui.t.archive.off, false);
+});

@@ -117,9 +117,7 @@ PLUGIN('mail', function(exports) {
 		selected: '',
 		loading: true
 	};
-	var searchhits = null,
-		plainview = false,
-		imagesfor = new Set();
+	var searchhits = null;
 	// Conversations: messages are grouped by their Message-ID, In-Reply-To and References links.
 	function isgrouping() {
 		try {
@@ -556,82 +554,9 @@ PLUGIN('mail', function(exports) {
 		});
 		selection.render();
 	}
+	var reader = totalmailreader({ state, ui, account, conversation, isgrouping, isbusy: function() { return networkbusy; } });
 	function renderreader() {
-
-		var m = state.messages.find(function(item) { return item.id === state.selected; });
-		// The buttons of the toolbar: switched off when there is nothing to do with them, labelled for what they do now.
-		var off = function(command) {
-			return !m ||
-				(m.outgoing && command !== 'print') ||
-				(command !== 'print' && networkbusy) ||
-				(['move', 'source'].includes(command) && !m.remote) ||
-				(command === 'trash' && m.folder === 'trash' && !m.remote);
-		};
-		ui({
-			t: {
-				archive: {
-					off: off('archive'),
-					label: TRANSLATE(m && ['archive', 'trash'].includes(m.folder) ? '@(Move to inbox)' : '@(Archive message)')
-				},
-				star: { off: off('star'), starred: !!(m && m.starred) },
-				move: { off: off('move') },
-				trash: { off: off('trash'), label: TRANSLATE((m && m.folder) === 'trash' ? '@(Delete permanently)' : '@(Move to trash)') },
-				unread: {
-					off: off('unread'),
-					label: TRANSLATE((m && m.unread) ? '@(Mark as read)' : '@(Mark as unread)'),
-					icon: 'ti ti-' + ((m && m.unread) ? 'envelope-open' : 'envelope')
-				},
-				print: { off: off('print') },
-				source: { off: off('source') }
-			}
-		});
-
-		if (!m) {
-			SET('mail.reader', {
-				empty: true,
-				noaccounts: !state.accounts.length
-			});
-			return;
-		}
-		var a = account(m.accountId);
-		var chain = conversation(m);
-		SET('mail.reader', Object.assign({}, m, { thread:
-				isgrouping() && chain.length > 1
-					? chain.map(function(x) {
-						return {
-							id: x.id,
-							current: x.id === m.id,
-							unread: !!x.unread,
-							who: x.outgoing ? TRANSLATE('@(You)') : x.sender || x.email,
-							when: x.date ? new Date(x.date).toLocaleDateString(document.documentElement.lang) : '',
-							snippet: (x.body || '').replace(/\s+/g, ' ').slice(0, 90)
-						};
-					})
-					: [],
-		unsubscribe: m.unsubscribe || null,
-		invite: m.invite ? totalmaildisplay.invitecard(m.invite, document.documentElement.lang, TRANSLATE('@(No subject)')) : null,
-		showHtml: !!m.hasHtml && !plainview,
-		viewLabel: TRANSLATE(plainview ? '@(Show formatted)' : '@(Show plain text)'),
-		frameSrc: '/html/' + encodeURIComponent(m.id) + '/' + (imagesfor.has(m.id) ? '?images=1' : ''),
-		remoteBlocked: !!m.hasHtml && !plainview && m.remoteImages > 0 && !imagesfor.has(m.id),
-		empty: false,
-		color: a.color,
-		accountName: a.name,
-		accountEmail: m.outgoing ? m.to : a.email,
-		messageKind: m.welcome ? TRANSLATE('@(Message)') : '',
-		files: (m.attachments || []).map(function(f) {
-			return {
-				name: f.name,
-				size: totalmaildisplay.filesize(f.size),
-				href: '/attachment/' + encodeURIComponent(m.id) + '/' + f.index + '/'
-			};
-		}),
-		body: m.remote && !m.bodyLoaded ? TRANSLATE('@(Loading message securely…)') : m.body,
-		initials: m.sender
-			.split(' ')
-			.map(function(s) { return s[0]; })
-			.slice(0, 2)
-			.join('') }));
+		reader.render();
 	}
 	async function selectmessage(id) {
 
@@ -830,7 +755,7 @@ PLUGIN('mail', function(exports) {
 				'/print/' +
 					encodeURIComponent(m.id) +
 					'/?images=' +
-					(imagesfor.has(m.id) ? '1' : '0') +
+					(reader.images(m.id) ? '1' : '0') +
 					'&lang=' +
 					encodeURIComponent(document.documentElement.lang),
 				'_blank',
@@ -1193,16 +1118,9 @@ PLUGIN('mail', function(exports) {
 		}
 	};
 	// Formatted mail or plain text, for every message until the page is reloaded.
-	exports.togglehtml = function() {
-		plainview = !plainview;
-		renderreader();
-	};
+	exports.togglehtml = reader.togglehtml;
 	// Remote images load only for the message the reader asked about.
-	exports.showimages = function() {
-		if (state.selected)
-			imagesfor.add(state.selected);
-		renderreader();
-	};
+	exports.showimages = function() { reader.showimages(state.selected); };
 	exports.togglethreads = function() {
 
 		try {

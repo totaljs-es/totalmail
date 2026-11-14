@@ -15,6 +15,7 @@ var order = [
 	'plugins/mail/public/notify.js',
 	'plugins/mail/public/selection.js',
 	'plugins/mail/public/composer.js',
+	'plugins/mail/public/reader.js',
 	'plugins/mail/public/query.js',
 	'plugins/mail/public/mail.js'
 ];
