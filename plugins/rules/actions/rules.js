@@ -39,7 +39,7 @@ NEWACTION('Rules|test', {
 
 			var account = store.account(model.accountId);
 			var rule = PLUGINS.rules.engine.validate({ name: 'test', field: model.field, op: model.op, value: model.value, action: 'read' }, account);
-			var hits = store.folderMessages(model.accountId, 'inbox').filter(function(m) { return PLUGINS.rules.engine.matches(rule, m); });
+			var hits = store.folderMessages(model.accountId, 'inbox', function(m) { return PLUGINS.rules.engine.matches(rule, m); });
 			return { matching: hits.length, sample: hits.slice(0, 5).map(function(m) { return String(m.subject || '').slice(0, 80); }) };
 		});
 	}

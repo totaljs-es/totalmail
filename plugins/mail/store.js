@@ -497,9 +497,10 @@ exports.create = function(storage) {
 			return found ? structuredClone(found) : undefined;
 		},
 		// The messages of the server in one folder of one account, copied (with the sanitized HTML left out, as in the snapshot).
-		folderMessages: function(accountid, folder) {
+		// `match(message)` narrows them before anything is copied; it must only read the message.
+		folderMessages: function(accountid, folder, match) {
 			return state.messages
-				.filter(function(m) { return m.remote && m.accountId === accountid && m.folder === folder; })
+				.filter(function(m) { return m.remote && m.accountId === accountid && m.folder === folder && (!match || match(m)); })
 				.map(function(m) {
 					var copy = structuredClone(m);
 					delete copy.html;

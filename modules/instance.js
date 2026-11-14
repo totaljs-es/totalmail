@@ -32,7 +32,8 @@ function origin(value) {
 	}
 }
 
-function item_provider(value) {
+// The protocol of the assistant: Claude's own, or the OpenAI chat protocol that every other server speaks.
+function providerkind(value) {
 	return value === 'anthropic' ? 'anthropic' : 'openai';
 }
 
@@ -76,7 +77,7 @@ exports.create = function(crypto, storage) {
 			} catch {}
 			return {
 				enabled: item.enabled === true,
-				provider: item.provider === 'anthropic' ? 'anthropic' : 'openai',
+				provider: providerkind(item.provider),
 				endpoint: item.endpoint || '',
 				model: item.model || '',
 				key,
@@ -88,7 +89,7 @@ exports.create = function(crypto, storage) {
 		keyFor(provider, endpoint) {
 
 			var item = state.ai || {};
-			if (!item.key || (item.provider === 'anthropic' ? 'anthropic' : 'openai') !== (provider === 'anthropic' ? 'anthropic' : 'openai') || origin(item.endpoint) !== origin(endpoint))
+			if (!item.key || providerkind(item.provider) !== providerkind(provider) || origin(item.endpoint) !== origin(endpoint))
 				return '';
 			return crypto.decrypt(item.key);
 		},
@@ -109,7 +110,7 @@ exports.create = function(crypto, storage) {
 			}
 			return {
 				enabled: item.enabled === true,
-				provider: item.provider === 'anthropic' ? 'anthropic' : 'openai',
+				provider: providerkind(item.provider),
 				endpoint: item.endpoint || '',
 				model: item.model || '',
 				keySet: !!item.key,
@@ -132,11 +133,11 @@ exports.create = function(crypto, storage) {
 				var current = next.ai || {};
 				var item = {
 					enabled: enabled === true,
-					provider: provider === 'anthropic' ? 'anthropic' : 'openai',
+					provider: providerkind(provider),
 					endpoint,
 					model,
 					maxChars: maxchars,
-					key: current.key && (current.provider === 'anthropic' ? 'anthropic' : 'openai') === item_provider(provider) && origin(current.endpoint) === origin(endpoint) ? current.key : null
+					key: current.key && providerkind(current.provider) === providerkind(provider) && origin(current.endpoint) === origin(endpoint) ? current.key : null
 				};
 				if (clearkey)
 					item.key = null;

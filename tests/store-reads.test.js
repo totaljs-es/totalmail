@@ -44,3 +44,8 @@ test('the messages of a folder are those of the server in that account, without 
 	assert.equal(store.folderMessages('a', 'inbox')[0].subject, 'One');
 	assert.equal(store.message('m1').html, '<p>big</p>', 'the stored message keeps it');
 });
+test('a folder can be narrowed before it is copied', (t) => {
+	let store = fixture(t, data());
+	assert.deepEqual(store.folderMessages('a', 'inbox', (m) => m.subject === 'One').map((m) => m.id), ['m1']);
+	assert.deepEqual(store.folderMessages('a', 'inbox', () => false), []);
+});
