@@ -489,3 +489,73 @@ test('a bulk action on drafts can only throw them away, after a second press', a
 	Assert.deepEqual(h.called('draft_delete').map((c) => c.data.id).sort(), ['d1', 'd2']);
 	Assert.deepEqual(ids(h), []);
 });
+
+test('leaving the page asks first while a draft has unsaved changes', async () => {
+	var h = await start();
+	Assert.equal(h.plugin.pending(), false);
+	await h.click({ command: 'compose' });
+	Assert.equal(h.plugin.pending(), false, 'an untouched new message loses nothing');
+	h.set('mail.compose.body', 'Half a thought');
+	Assert.equal(h.plugin.pending(), true);
+	await h.flush();
+	Assert.equal(h.plugin.pending(), false, 'saved');
+});
+
+test('changing the language saves the draft first, and signing out does too', async () => {
+	var h = await start();
+	await h.click({ command: 'compose' });
+	h.set('mail.compose.subject', 'Before leaving');
+	await h.click({ command: 'logout' });
+	Assert.equal(h.called('draft_save').length, 1);
+	Assert.equal(h.called('user_logout').length, 1);
+	Assert.ok(h.called('draft_save')[0].data.subject === 'Before leaving');
+});
+
+test('what the assistant writes goes before the quoted original, only when the person asks for it', async () => {
+	var h = await start();
+	await h.plugin.replywith('m3', 'Thanks, see you there.');
+	Assert.equal(h.mail().window, 'composer');
+	Assert.match(h.mail().compose.body, /^Thanks, see you there\./);
+	Assert.match(h.mail().compose.body, /Where to\?/);
+	h.plugin.writebody('A new text');
+	Assert.equal(h.mail().compose.body, 'A new text');
+});
+
+test('files dropped on the mailbox start a new message with them attached', async () => {
+	var h = await start();
+	h.answer('draft_save', (d) => Object.assign({ id: 'dd', revision: 'r1', status: 'draft', attachments: [] }, d));
+	var file = new File(['hello'], 'notes.txt', { type: 'text/plain' });
+	await h.plugin.dropped([file]);
+	Assert.equal(h.mail().window, 'composer');
+});
+
+test('the second account of a message changes its sender and keeps an unwritten signature in step', async () => {
+	var h = await start();
+	h.db.accounts[0].signature = '-- Ana (work)';
+	h.db.accounts[1].signature = '-- Ana (home)';
+	await h.plugin.reload();
+	await h.click({ command: 'compose' });
+	Assert.match(h.mail().compose.body, /Ana \(work\)/, 'a new message starts with the signature of its account');
+	h.set('mail.compose.accountId', 'a2');
+	Assert.match(h.mail().compose.body, /Ana \(home\)/, 'the signature of the new account');
+	Assert.doesNotMatch(h.mail().compose.body, /Ana \(work\)/);
+});
+
+test('pressing confirm twice sends once', async () => {
+	var h = await start();
+	await h.click({ command: 'compose' });
+	h.set('mail.compose.to', 'eva@example.test');
+	h.set('mail.compose.body', 'Hi');
+	await h.click({ command: 'preview-send' });
+	var release;
+	h.answer('draft_send', () => new Promise((resolve) => (release = resolve)));
+	var first = h.plugin.click([{ dataset: { command: 'confirm-send' }, disabled: false }]);
+	await h.settle();
+	var second = h.plugin.click([{ dataset: { command: 'confirm-send' }, disabled: false }]);
+	await h.settle();
+	Assert.equal(h.called('draft_send').length, 1, 'the second press finds a send in progress');
+	release({ sentCopy: 'saved' });
+	await first;
+	await second;
+	Assert.equal(h.called('draft_send').length, 1);
+});

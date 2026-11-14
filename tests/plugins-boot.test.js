@@ -13,6 +13,7 @@ var files = [
 	'plugins/mail/public/undo.js',
 	'plugins/mail/public/notify.js',
 	'plugins/mail/public/selection.js',
+	'plugins/mail/public/composer.js',
 	'plugins/mail/public/mail.js',
 	'plugins/accounts/public/accounts.js',
 	'plugins/users/public/users.js',
