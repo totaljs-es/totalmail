@@ -1,4 +1,4 @@
-<ui-component name="modal" path="mail.window" config="if:profile;width:620;center:true;cancel:users/closeprofile" id="profile" class="settings-modal profile-modal hidden" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+<ui-component name="modal" path="mail.window" config="if:profile;width:900;center:true;cancel:users/closeprofile" id="profile" class="settings-modal profile-modal hidden" role="dialog" aria-modal="true" aria-labelledby="profile-title">
 	<div class="settings-heading">
 		<div class="modal-heading-content">
 			<div><span class="eyebrow">@(USER PROFILE)</span><h2 id="profile-title">@(My profile)</h2></div>
@@ -6,6 +6,7 @@
 		</div>
 	</div>
 	<div class="settings-body">
+		@{view('#mail/views/settings-nav', 'profile')}
 		<div class="modal-body-content">
 			<ui-component name="input" path="users.profileform.name" config="label:@(Full name);maxlength:80;$delay:1"></ui-component>
 			<ui-component name="input" path="users.profileform.email" config="label:@(Login email);type:email;maxlength:254;$delay:1"></ui-component>

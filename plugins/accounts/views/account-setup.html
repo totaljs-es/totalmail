@@ -2,7 +2,7 @@
 	<ui-component
 		name="modal"
 		path="mail.window"
-		config="if:account-setup;width:680;center:true"
+		config="if:account-setup;width:900;center:true"
 		id="account-setup"
 		class="settings-modal hidden"
 		role="dialog"
@@ -26,6 +26,7 @@
 			</div>
 		</div>
 		<div class="settings-body">
+			@{view('#mail/views/settings-nav', 'account-setup')}
 			<div class="modal-body-content">
 				<ui-component
 					id="account-edit-select"

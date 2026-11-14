@@ -801,3 +801,4 @@ Tritlkx : Compte retiré.
 T6hc3ox : Retirer le compte
 T1x1fhtq : Retirer ce compte de TotalMail ? Son courrier enregistré et ses brouillons sont supprimés ici. La boîte aux lettres de votre serveur de messagerie n’est pas modifiée.
 T3az20r : Effacer la recherche
+Tosmo8z : Paramètres

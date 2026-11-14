@@ -2,7 +2,7 @@
 	<ui-component
 		name="modal"
 		path="mail.window"
-		config="if:devices;width:620;center:true"
+		config="if:devices;width:900;center:true"
 		id="devices"
 		class="settings-modal hidden"
 		role="dialog"
@@ -20,6 +20,7 @@
 			</div>
 		</div>
 		<div class="settings-body">
+			@{view('#mail/views/settings-nav', 'devices')}
 			<div class="modal-body-content">
 				<p class="settings-note">@(The apps where you are signed in to this TotalMail. If you do not recognize one, or you lost a device, sign it out: it stops working at once.)</p>
 				<ui-bind path="devices.items" config="template" class="block"

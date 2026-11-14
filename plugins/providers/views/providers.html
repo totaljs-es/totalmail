@@ -2,7 +2,7 @@
 	<ui-component
 		name="modal"
 		path="mail.window"
-		config="if:providers;width:720;center:true"
+		config="if:providers;width:900;center:true"
 		id="providers"
 		class="settings-modal hidden"
 		role="dialog"
@@ -20,6 +20,7 @@
 			</div>
 		</div>
 		<div class="settings-body">
+			@{view('#mail/views/settings-nav', 'providers')}
 			<div class="modal-body-content">
 				<h3>@(Sign in with Microsoft)</h3>
 				<p class="settings-note" role="status"><ui-bind path="providers.msStatus" config="text:value"></ui-bind></p>

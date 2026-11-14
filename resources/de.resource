@@ -801,3 +801,4 @@ Tritlkx : Konto entfernt.
 T6hc3ox : Konto entfernen
 T1x1fhtq : Dieses Konto aus TotalMail entfernen? Seine gespeicherten E-Mails und Entwürfe werden hier entfernt. Das Postfach auf Ihrem E-Mail-Server bleibt unberührt.
 T3az20r : Suche löschen
+Tosmo8z : Einstellungen

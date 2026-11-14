@@ -801,3 +801,4 @@ Tritlkx : Conta removida.
 T6hc3ox : Remover conta
 T1x1fhtq : Remover esta conta do TotalMail? O correio guardado e os rascunhos são removidos aqui. A caixa de correio no seu servidor de correio não é tocada.
 T3az20r : Limpar pesquisa
+Tosmo8z : Definições

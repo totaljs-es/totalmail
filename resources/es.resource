@@ -801,3 +801,4 @@ Tritlkx : Cuenta quitada.
 T6hc3ox : Quitar cuenta
 T1x1fhtq : ¿Quitar esta cuenta de TotalMail? Aquí se borran su correo guardado y sus borradores. El buzón de tu servidor de correo no se toca.
 T3az20r : Limpiar búsqueda
+Tosmo8z : Ajustes

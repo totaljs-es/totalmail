@@ -801,3 +801,4 @@ Tritlkx : Account removed.
 T6hc3ox : Remove account
 T1x1fhtq : Remove this account from TotalMail? Its saved mail and drafts are removed here. The mailbox on your mail server is not touched.
 T3az20r : Clear search
+Tosmo8z : Settings

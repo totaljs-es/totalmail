@@ -2,7 +2,7 @@
 	<ui-component
 		name="modal"
 		path="mail.window"
-		config="if:rules;width:640;center:true"
+		config="if:rules;width:900;center:true"
 		id="rules"
 		class="settings-modal hidden"
 		role="dialog"
@@ -20,6 +20,7 @@
 			</div>
 		</div>
 		<div class="settings-body">
+			@{view('#mail/views/settings-nav', 'rules')}
 			<div class="modal-body-content">
 				<p class="settings-note">@(A rule acts on mail that arrives in the inbox while TotalMail is open. The first rule that matches decides. Rules never send mail.)</p>
 				<ui-component name="input" path="rules.accountId" config="dirsource:mail.accountOptions;label:@(Account);$delay:1"></ui-component>

@@ -1,0 +1,18 @@
+<nav class="settings-nav" aria-label="@(Settings)">
+	<button type="button" class="exec" data-exec="mail/click" data-command="settings"@{if model === 'settings'} aria-current="page"@{fi}><i class="ti ti-settings" aria-hidden="true"></i>@(Preferences)</button>
+	<span class="settings-nav-label">@(Mail)</span>
+	<button type="button" class="exec" data-exec="accounts/open"@{if model === 'account-setup'} aria-current="page"@{fi}><i class="ti ti-envelope" aria-hidden="true"></i>@(Mail accounts)</button>
+	<button type="button" class="exec" data-exec="rules/open"@{if model === 'rules'} aria-current="page"@{fi}><i class="ti ti-filter" aria-hidden="true"></i>@(Rules)</button>
+	<span class="settings-nav-label">@(Account)</span>
+	<button type="button" class="exec" data-exec="users/profile"@{if model === 'profile'} aria-current="page"@{fi}><i class="ti ti-user" aria-hidden="true"></i>@(My profile)</button>
+	<button type="button" class="exec" data-exec="devices/open"@{if model === 'devices'} aria-current="page"@{fi}><i class="ti ti-phone-laptop" aria-hidden="true"></i>@(My devices)</button>
+	<ui-bind path="mail.ui" config="show:value.admin" class="contents">
+		<span class="settings-nav-label">@(Administration)</span>
+		<button type="button" class="exec" data-exec="users/open"@{if model === 'users'} aria-current="page"@{fi}><i class="ti ti-users" aria-hidden="true"></i>@(Company users)</button>
+		<button type="button" class="exec" data-exec="providers/open"@{if model === 'providers'} aria-current="page"@{fi}><i class="ti ti-key" aria-hidden="true"></i>@(Account types and sign-in)</button>
+		<button type="button" class="exec" data-exec="ai/open"@{if model === 'ai'} aria-current="page"@{fi}><i class="ti ti-magic" aria-hidden="true"></i>@(AI assistant)</button>
+	</ui-bind>
+	<span class="settings-nav-gap"></span>
+	<button type="button" class="exec" data-exec="mail/click" data-command="shortcuts"><i class="ti ti-keyboard" aria-hidden="true"></i>@(Shortcuts)</button>
+	<button type="button" class="exec" data-exec="mail/click" data-command="logout"><i class="ti ti-sign-out" aria-hidden="true"></i>@(Sign out)</button>
+</nav>

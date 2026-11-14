@@ -801,3 +801,4 @@ Tritlkx : Účet bol odstránený.
 T6hc3ox : Odstrániť účet
 T1x1fhtq : Odstrániť tento účet z TotalMailu? Uložená pošta a koncepty sa tu odstránia. Schránka na vašom poštovom serveri sa nezmení.
 T3az20r : Vymazať vyhľadávanie
+Tosmo8z : Nastavenia

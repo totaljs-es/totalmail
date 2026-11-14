@@ -2,7 +2,7 @@
 	<ui-component
 		name="modal"
 		path="mail.window"
-		config="if:ai;width:640;center:true"
+		config="if:ai;width:900;center:true"
 		id="ai"
 		class="settings-modal hidden"
 		role="dialog"
@@ -20,6 +20,7 @@
 			</div>
 		</div>
 		<div class="settings-body">
+			@{view('#mail/views/settings-nav', 'ai')}
 			<div class="modal-body-content">
 				<p class="settings-note">@(The assistant summarizes conversations, drafts replies and adjusts the tone of a draft. It only suggests text: nothing is sent without the person's review.)</p>
 				<ui-bind path="ai.enabled" config="attr aria-checked button:String(!!value)" class="block"

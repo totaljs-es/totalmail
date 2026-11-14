@@ -2,7 +2,7 @@
 	<ui-component
 		name="modal"
 		path="mail.window"
-		config="if:users;width:560;center:true"
+		config="if:users;width:900;center:true"
 		id="users"
 		class="settings-modal hidden"
 		role="dialog"
@@ -22,6 +22,7 @@
 			</div>
 		</div>
 		<div class="settings-body">
+			@{view('#mail/views/settings-nav', 'users')}
 			<div class="modal-body-content">
 				<ui-bind path="users.items" config="template" class="block"
 					><script type="text/html">

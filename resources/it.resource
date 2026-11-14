@@ -801,3 +801,4 @@ Tritlkx : Account rimosso.
 T6hc3ox : Rimuovi account
 T1x1fhtq : Rimuovere questo account da TotalMail? La sua posta salvata e le sue bozze vengono rimosse qui. La casella sul suo server di posta non viene toccata.
 T3az20r : Cancella ricerca
+Tosmo8z : Impostazioni
