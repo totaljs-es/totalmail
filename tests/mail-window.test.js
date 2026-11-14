@@ -701,3 +701,47 @@ test('while a mail operation runs, the buttons of the reader are off, except pri
 	await running;
 	Assert.equal(h.mail().ui.t.archive.off, false);
 });
+
+test('emptying the trash asks with a second press, then empties the trash of every account that has mail in it', async () => {
+	var h = await start();
+	h.db.messages.find((m) => m.id === 'm5').remote = true;
+	await h.plugin.reload();
+	await h.click({ folder: 'trash' });
+	Assert.equal(h.mail().ui.trashShown, true);
+	Assert.equal(h.mail().ui.trashLabel, 'Empty the trash');
+	await h.click({ command: 'empty-trash' });
+	Assert.equal(h.called('trash_empty').length, 0, 'the first press only asks');
+	Assert.equal(h.mail().ui.trashLabel, 'Press again to empty the trash');
+	await h.click({ command: 'empty-trash' });
+	Assert.deepEqual(h.called('trash_empty').map((c) => c.data), [{ accountId: 'a1' }], 'a2 has nothing in the trash');
+	Assert.ok(h.toasts.some((t) => /Trash emptied/.test(t)));
+});
+
+test('searching the mail server asks every connected inbox in view and keeps what it found in the list', async () => {
+	var h = await start();
+	h.answer('account_search', (d) => (d.accountId === 'a1' ? { ids: ['m2'], found: 1, limited: false } : { ids: [], found: 0, limited: false }));
+	h.set('mail.search', 'xx');
+	h.plugin.search();
+	Assert.deepEqual(ids(h), [], 'nothing loaded matches');
+	Assert.equal(h.mail().ui.searchShown, true);
+	await h.click({ command: 'server-search' });
+	Assert.deepEqual(h.called('account_search').map((c) => c.data), [{ accountId: 'a1', path: 'INBOX', query: 'xx' }, { accountId: 'a2', path: 'INBOX', query: 'xx' }]);
+	Assert.deepEqual(ids(h), ['m2'], 'what the server found is in the list');
+	Assert.ok(h.toasts.some((t) => /Found 1 on the server/.test(t)));
+	Assert.equal(h.mail().ui.busy, false);
+});
+
+test('the mail server is not searched while another mail operation runs', async () => {
+	var h = await start();
+	var release;
+	h.answer('account_sync', () => new Promise((resolve) => (release = resolve)));
+	var running = h.plugin.operation(async () => h.plugin.api('account_sync', { accountId: 'a1', path: 'INBOX' }));
+	await h.settle();
+	h.set('mail.search', 'xx');
+	h.plugin.search();
+	await h.click({ command: 'server-search' });
+	Assert.equal(h.called('account_search').length, 0);
+	Assert.ok(h.toasts.some((t) => /already running/.test(t)));
+	release({});
+	await running;
+});
