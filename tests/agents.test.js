@@ -246,12 +246,20 @@ describe('the instructions of each area of the repository', () => {
 
 describe('the plugins', () => {
 
+	test('modules/ loads only files without state from a plugin: what has an install() is read through PLUGINS', () => {
+		for (var file of Fs.readdirSync(Path.join(root, 'modules')).filter((name) => name.endsWith('.js')))
+			for (var match of read('modules/' + file).matchAll(/require\('\.\.\/plugins\/(\w+)\/([\w/-]+)'\)/g)) {
+				var target = read('plugins/' + match[1] + '/' + match[2] + '.js');
+				assert.ok(!/^exports\.install\b/m.test(target), 'modules/' + file + ' loads plugins/' + match[1] + '/' + match[2] + '.js, which has an install()');
+			}
+	});
+
 	test('a plugin loads only files without state from another plugin: what has an install() is read through PLUGINS', () => {
 		var plugins = Fs.readdirSync(Path.join(root, 'plugins')).filter((name) => Fs.statSync(Path.join(root, 'plugins', name)).isDirectory());
 		for (var plugin of plugins)
 			for (var file of Fs.readdirSync(Path.join(root, 'plugins', plugin)).filter((name) => name.endsWith('.js'))) {
 				var text = read('plugins/' + plugin + '/' + file);
-				for (var match of text.matchAll(/require\('\.\.\/(\w+)\/([\w/]+)'\)/g)) {
+				for (var match of text.matchAll(/require\('\.\.\/(\w+)\/([\w/-]+)'\)/g)) {
 					if (match[1] === plugin || !plugins.includes(match[1]))
 						continue;
 					var target = read('plugins/' + match[1] + '/' + match[2] + '.js');

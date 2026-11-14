@@ -14,3 +14,15 @@ test('a numeric entity beyond Unicode stays as it is instead of failing the docu
 	var out = Extract.read('page.html', Buffer.from('<p>a &#x110000; b</p>'));
 	assert.ok(out.text.includes('a &#x110000; b'));
 });
+test('the parts of one document together may not expand past the limit either, and the next document starts again', () => {
+	var zero = Total.Zlib.deflateSync(Buffer.alloc(30 * 1024 * 1024));
+	var parts = [Buffer.from('%PDF-1.4\n')];
+	for (var n = 1; n <= 3; n++)
+		parts.push(Buffer.from(n + ' 0 obj\n<< /Type /ObjStm /N 1 /First 4 /Filter /FlateDecode /Length ' + zero.length + ' >>\nstream\n'), zero, Buffer.from('\nendstream\nendobj\n'));
+	parts.push(Buffer.from('trailer\n<< >>\n%%EOF'));
+	assert.throws(() => Extract.read('bomb.pdf', Buffer.concat(parts)), /too long/, 'three parts of 30 MB are 90 MB');
+	assert.equal(Extract.read('note.txt', Buffer.from('hello')).text, 'hello');
+	var fs = require('node:fs'),
+		path = require('node:path');
+	assert.ok(Extract.read('handbook.docx', fs.readFileSync(path.join(__dirname, 'fixtures/documents/handbook.docx'))).text.length > 0, 'a real document after the bomb is read in full');
+});

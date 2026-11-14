@@ -1,38 +1,7 @@
 // OAuth sign-in to mail providers. Used as PLUGINS.providers.oauth.
 // OAuth 2.0 authorization-code flow with PKCE for mail providers that no longer accept passwords.
 // Only the refresh token is stored (encrypted, per account); access tokens live in memory until they expire.
-// What differs between providers; the rest of the flow is the same. `valid` is the shape of an application ID.
-var providers = {
-	microsoft: {
-		name: 'Microsoft',
-		host: 'login.microsoftonline.com',
-		authorize: function(tenant) { return '/' + tenant + '/oauth2/v2.0/authorize'; },
-		token: function(tenant) { return '/' + tenant + '/oauth2/v2.0/token'; },
-		// One token for IMAP and SMTP: both scopes belong to the same resource.
-		scope: 'https://outlook.office.com/IMAP.AccessAsUser.All https://outlook.office.com/SMTP.Send offline_access openid email profile',
-		valid: /^[0-9a-f-]{36}$/i,
-		tenant: true,
-		adminConsent: true,
-		sendScope: true,
-		params: { response_mode: 'query' }
-	},
-	google: {
-		name: 'Google',
-		host: 'accounts.google.com',
-		tokenHost: 'oauth2.googleapis.com',
-		authorize: function() { return '/o/oauth2/v2/auth'; },
-		token: function() { return '/token'; },
-		// Google has no narrower scope for IMAP and SMTP than the whole mailbox.
-		scope: 'https://mail.google.com/ openid email',
-		valid: /^[0-9]{6,}-[a-z0-9]+\.apps\.googleusercontent\.com$/i,
-		tenant: false,
-		adminConsent: false,
-		// Google rejects a scope on the code exchange and the renewal; without prompt=consent a repeated sign-in brings no refresh token.
-		sendScope: false,
-		params: { access_type: 'offline', prompt: 'consent', include_granted_scopes: 'false' },
-		verifiedEmail: true
-	}
-};
+var providers = require('./oauth-providers').providers;
 
 var ttl = 10 * 60000,
 	maxstates = 200;
@@ -82,7 +51,10 @@ function claims(jwt) {
 	var part = String(jwt || '').split('.')[1];
 	if (!part)
 		throw Error('Missing identity');
-	return JSON.parse(Buffer.from(part, 'base64url').toString('utf8'));
+	var value = Buffer.from(part, 'base64url').toString('utf8').parseJSON();
+	if (!value)
+		throw Error('invalid_identity');
+	return value;
 }
 
 exports.create = function(dependencies = {}) {
@@ -282,7 +254,7 @@ exports.create = function(dependencies = {}) {
 exports.settings = settings;
 
 // The shape of an application ID for a provider, and whether it has tenants, for the administrator's window.
-exports.meta = function(provider) { return providers[provider] ? { name: providers[provider].name, valid: providers[provider].valid, tenant: providers[provider].tenant } : null; };
+exports.meta = require('./oauth-providers').meta;
 
 exports.useInstance = function(value) { return instance = value; };
 exports.claims = claims;

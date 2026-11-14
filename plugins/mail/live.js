@@ -1,5 +1,8 @@
 // The mail itself: what is read from and sent to the mail servers. Used as PLUGINS.mail.live.
-var Credential = require('./credential'),
+var Aliases = require('./aliases'),
+	Credential = require('./credential'),
+	Files = require('./files'),
+	Query = require('./public/query'),
 	Lazy = require('../../modules/lazy'),
 	Network = require('./network'),
 	Rules = require('../rules/engine'),
@@ -8,6 +11,12 @@ var Credential = require('./credential'),
 	smtp = require('./smtp').create(require('../../private/vendor/total5-mail').Mailer);
 
 var active = new Set();
+
+// A folder other than the inbox has to be one of the account's on the server.
+function available(account, path) {
+	if (path !== 'INBOX' && !(account.mailboxes && account.mailboxes.some(function(f) { return f.path === path; })))
+		throw Error('@(This folder is not available on the server.)');
+}
 
 exports.create = function(dependencies = {}) {
 
@@ -179,8 +188,7 @@ exports.create = function(dependencies = {}) {
 
 				var tmp = await credential(store, id);
 				var account = tmp.account, password = tmp.password;
-				if (path !== 'INBOX' && !(account.mailboxes && account.mailboxes.some(function(f) { return f.path === path; })))
-					throw Error('@(This folder is not available on the server.)');
+				available(account, path);
 				var target = await resolve(account.imap.host);
 				var summary = await store.commitSync(id, await engine.sync(account, password, target, path, store.known(id, path)));
 				// Rules only look at mail that arrived since the last sync; a failure never fails the sync itself.
@@ -220,12 +228,11 @@ exports.create = function(dependencies = {}) {
 				query = String(query || '')
 					.replace(/[\x00-\x1f\x7f]+/g, ' ')
 					.trim();
-				if (query.length < 2 || query.length > 200 || require('./public/query').parse(query).empty)
+				if (query.length < 2 || query.length > 200 || Query.parse(query).empty)
 					throw Error('@(Type at least two characters to search.)');
 				var tmp = await credential(store, id);
 				var account = tmp.account, password = tmp.password;
-				if (path !== 'INBOX' && !(account.mailboxes && account.mailboxes.some(function(f) { return f.path === path; })))
-					throw Error('@(This folder is not available on the server.)');
+				available(account, path);
 				var result = await engine.search(account, password, await resolve(account.imap.host), path, query);
 				return store.commitFound(id, result, 5000);
 			});
@@ -235,8 +242,7 @@ exports.create = function(dependencies = {}) {
 
 				var tmp = await credential(store, id);
 				var account = tmp.account, password = tmp.password;
-				if (path !== 'INBOX' && !(account.mailboxes && account.mailboxes.some(function(f) { return f.path === path; })))
-					throw Error('@(This folder is not available on the server.)');
+				available(account, path);
 				var before = store.oldest(id, path, 5000);
 				return store.commitOlder(id, await engine.older(account, password, await resolve(account.imap.host), path, before));
 			});
@@ -284,7 +290,6 @@ exports.create = function(dependencies = {}) {
 			var draft = store.draft(draftid);
 			if (!draft)
 				throw Error('@(Draft not found.)');
-			var Files = require('./files');
 			for (var list = Array.from(message.remote ? message.attachments || [] : []), i = 0; i < list.length; i++) {
 				var item = list[i];
 				var used = (draft.attachments || []).reduce(function(sum, a) { return sum + a.size; }, 0);
@@ -439,7 +444,7 @@ exports.create = function(dependencies = {}) {
 				var delivered;
 				try {
 					// The alias is looked at again here: it may have been removed from the account since the draft was written.
-					var from = require('./aliases').sender(account, sending.from);
+					var from = Aliases.sender(account, sending.from);
 					delivered = await sender.send(
 						sender.options(account, password, target),
 						from ? Object.assign({}, account, { email: from }) : account,

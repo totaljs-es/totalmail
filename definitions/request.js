@@ -16,8 +16,14 @@ ON('ready', function() { return NEWMIDDLEWARE('request', request, 'routes'); });
 FUNC.run = function($, fn, fallback) {
 	Promise.resolve()
 		.then(fn)
-		.then(function(value) { return $.callback(value); })
-		.catch(function(err) {
+		.then(function(value) {
+			// An error of the answer itself is logged: the request has been answered, it must not be answered again.
+			try {
+				$.callback(value);
+			} catch (err) {
+				Total.error(err, 'TotalMail');
+			}
+		}, function(err) {
 			if ((err.message && err.message.startsWith('@(')) || err.plain)
 				$.invalid(err.message);
 			else {

@@ -14,10 +14,6 @@ var K1 = 1.2,
 
 exports.limits = { collections: 30, documents: 300, characters: 3000000, results: 6 };
 
-function failure(message) {
-	return Error(message);
-}
-
 // Words without accents and without a final plural s, so "propuestas" finds "propuesta".
 function tokens(text) {
 	var words =
@@ -179,15 +175,15 @@ exports.create = function(storage) {
 					.trim()
 					.slice(0, 80);
 				if (!name)
-					throw failure('@(Give the collection a name.)');
+					throw Error('@(Give the collection a name.)');
 				if (next.collections.some(function(c) { return c.id !== id && c.name.toLowerCase() === name.toLowerCase(); }))
-					throw failure('@(A collection with this name already exists.)');
+					throw Error('@(A collection with this name already exists.)');
 				var item = next.collections.find(function(c) { return c.id === id; });
 				if (id && !item)
-					throw failure('@(Collection not found.)');
+					throw Error('@(Collection not found.)');
 				if (!item) {
 					if (next.collections.length >= exports.limits.collections)
-						throw failure('@(There are too many collections.)');
+						throw Error('@(There are too many collections.)');
 					item = { id: UID(), created: new Date().toISOString() };
 					next.collections.push(item);
 				}
@@ -199,7 +195,7 @@ exports.create = function(storage) {
 			return update(function(next) {
 
 				if (!next.collections.some(function(c) { return c.id === id; }))
-					throw failure('@(Collection not found.)');
+					throw Error('@(Collection not found.)');
 				next.collections = next.collections.filter(function(c) { return c.id !== id; });
 				next.docs = next.docs.filter(function(d) { return d.collectionid !== id; });
 				return {};
@@ -209,15 +205,15 @@ exports.create = function(storage) {
 			return update(function(next) {
 
 				if (!next.collections.some(function(c) { return c.id === collectionid; }))
-					throw failure('@(Collection not found.)');
+					throw Error('@(Collection not found.)');
 				text = String(text || '');
 				if (text.length > exports.limits.characters)
-					throw failure('@(This document is too long to add.)');
+					throw Error('@(This document is too long to add.)');
 				var list = chunks(text);
 				if (!list.length)
-					throw failure('@(The document has no text.)');
+					throw Error('@(The document has no text.)');
 				if (next.docs.length >= exports.limits.documents)
-					throw failure('@(There are too many documents.)');
+					throw Error('@(There are too many documents.)');
 				var doc = {
 					id: UID(),
 					collectionid,
@@ -234,7 +230,7 @@ exports.create = function(storage) {
 			return update(function(next) {
 
 				if (!next.docs.some(function(d) { return d.id === id; }))
-					throw failure('@(Document not found.)');
+					throw Error('@(Document not found.)');
 				next.docs = next.docs.filter(function(d) { return d.id !== id; });
 				return {};
 			});

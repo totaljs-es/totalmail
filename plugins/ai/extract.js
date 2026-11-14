@@ -16,9 +16,15 @@ var WINANSI = '€�‚ƒ„…†‡ˆ‰Š‹Œ�Ž��‘’“”•–�
 
 // The most a compressed part may expand to: a small file must not become gigabytes in memory.
 var MAXINFLATE = 32 * 1024 * 1024;
+// And all of the parts of one document together: many parts just under the limit must not add up to gigabytes either.
+var MAXTOTAL = 64 * 1024 * 1024;
+var budget = MAXTOTAL;
 
-function zlib() {
-	return Total.Zlib;
+function spend(buffer) {
+	budget -= buffer.length;
+	if (budget < 0)
+		throw new Error('@(This document is too long to add.)');
+	return buffer;
 }
 
 function entities(text) {
@@ -91,7 +97,7 @@ function unzip(buffer) {
 			if (f.method === 0)
 				return data;
 			if (f.method === 8)
-				return zlib().inflateRawSync(data, { maxOutputLength: MAXINFLATE });
+				return spend(Total.Zlib.inflateRawSync(data, { maxOutputLength: MAXINFLATE }));
 			throw new Error('@(The file uses an unsupported compression.)');
 		}
 	};
@@ -312,15 +318,17 @@ function inflate(data, dict) {
 	if (!/\/FlateDecode|\/Fl\b/.test(dict || ''))
 		return data;
 
+	var out;
 	try {
-		return zlib().inflateSync(data, { finishFlush: zlib().constants.Z_SYNC_FLUSH, maxOutputLength: MAXINFLATE });
+		out = Total.Zlib.inflateSync(data, { finishFlush: Total.Zlib.constants.Z_SYNC_FLUSH, maxOutputLength: MAXINFLATE });
 	} catch {
 		try {
-			return zlib().inflateRawSync(data.subarray(2), { finishFlush: zlib().constants.Z_SYNC_FLUSH, maxOutputLength: MAXINFLATE });
+			out = Total.Zlib.inflateRawSync(data.subarray(2), { finishFlush: Total.Zlib.constants.Z_SYNC_FLUSH, maxOutputLength: MAXINFLATE });
 		} catch {
 			return null;
 		}
 	}
+	return spend(out);
 }
 
 function parsecmap(text) {
@@ -839,6 +847,7 @@ function pdf(buffer) {
 // Returns { text, note }. Throws an Error with a message for the person when the file cannot be read.
 exports.read = function(filename, buffer) {
 
+	budget = MAXTOTAL;
 	var name = filename.toLowerCase();
 
 	if (PLAIN.test(name) || !/\.[a-z0-9]+$/.test(name)) {

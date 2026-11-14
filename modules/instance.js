@@ -3,7 +3,8 @@
 // Settings that belong to one TotalMail installation (not to the shared code): the sign-in application of each
 // OAuth provider, the account types the administrator added, which shipped ones are hidden and the default type.
 // Kept in the instance_* tables of the NoSQL database, with the client secret encrypted like every other credential.
-var Mirror = require('./mirror');
+var Mirror = require('./mirror'),
+	Providers = require('../plugins/providers/oauth-providers');
 var tenantpattern = /^(common|organizations|consumers|[0-9a-f-]{36})$/i;
 var defaults = { providers: [], oauth: {}, hidden: [], defaultProvider: '', ai: {}, aiUsage: {} };
 
@@ -177,7 +178,7 @@ exports.create = function(crypto, storage) {
 
 			return update(function(next) {
 
-				var meta = require('../plugins/providers/oauth').meta(provider);
+				var meta = Providers.meta(provider);
 				if (!meta)
 					throw Error('@(Invalid operation.)');
 				if (clientid && !meta.valid.test(clientid))

@@ -4,10 +4,11 @@ function overview($) {
 	var catalogue = PLUGINS.providers.catalogue,
 		hidden = MODS.instance.hidden(),
 		defaultid = catalogue.defaultId();
-	var oauth = {};
+	var oauth = {},
+		view = MODS.instance.view();
 	for (var list = catalogue.all().filter(function(p) { return p.auth === 'oauth2'; }), i = 0; i < list.length; i++) {
 		var provider = list[i];
-		var own = MODS.instance.view().oauth[provider.id] || {};
+		var own = view.oauth[provider.id] || {};
 		oauth[provider.id] = {
 			name: provider.name,
 			clientId: own.clientId || '',

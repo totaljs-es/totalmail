@@ -67,7 +67,7 @@ exports.create = function(directory, storage) {
 			.trim()
 			.toLowerCase();
 	};
-	async function hash(password, salt) {
+	function hash(password, salt) {
 		return new Promise(function(resolve, reject) { return crypto.scrypt(password, salt, 64, function(err, value) { return err ? reject(err) : resolve(value.toString('hex')); }); }
 		);
 	}
