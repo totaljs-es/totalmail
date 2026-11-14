@@ -26,7 +26,7 @@ function walk(tree, path, create) {
 	for (var i = 0; i < parts.length; i++) {
 		if (node == null)
 			return undefined;
-		if (create && (node[parts[i]] == null || typeof node[parts[i]] !== 'object') && i < parts.length - 1)
+		if (create && (node[parts[i]] == null || typeof node[parts[i]] !== 'object') )
 			node[parts[i]] = {};
 		node = node[parts[i]];
 	}

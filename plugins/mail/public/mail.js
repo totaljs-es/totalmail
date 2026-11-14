@@ -795,20 +795,12 @@ PLUGIN('mail', function(exports) {
 			SET('mail.window', 'settings');
 		else if (name === 'account-setup')
 			await PLUGINS.accounts.open();
-		else if (name === 'close-settings') {
-			SET('mail.window', '');
-			SET('accounts.form.password', '');
-			SET('users.form.password', '');
-		} else if (name === 'logout') {
+		else if (name === 'logout') {
 			await composer.flush();
 			await api('user_logout');
 			location.reload();
 		} else if (name === 'sync')
 			await syncmail(undefined, currentpath());
-		else if (name === 'verify-account')
-			await verifyaccount();
-		else if (name === 'sync-account')
-			await syncmail(GET('accounts.form.id'));
 		else if (name === 'preview-send')
 			await composer.preview();
 		else if (name === 'edit-send') {
@@ -973,11 +965,8 @@ PLUGIN('mail', function(exports) {
 			}
 			if (mail.window === 'composer')
 				composer.close();
-			else {
-				SET('mail.window', '');
-				SET('accounts.form.password', '');
-				SET('users.form.password', '');
-			}
+			else
+				closewindow();
 			return;
 		}
 		if (
@@ -1112,32 +1101,6 @@ PLUGIN('mail', function(exports) {
 		renderreader();
 		updatesyncstatus();
 	}
-	async function verifyaccount() {
-
-		if (PLUGINS.accounts.busy)
-			return;
-		var id = GET('accounts.form.id');
-		if (!id) {
-			toast(TRANSLATE('@(Save the account before connecting.)'));
-			return;
-		}
-		PLUGINS.accounts.busy = true;
-		PLUGINS.accounts.ui({ verifying: true, discoveryStatus: TRANSLATE('@(Checking IMAP and SMTP securely…)') });
-		PLUGINS.accounts.error('');
-		try {
-			await api('account_verify', {
-				accountId: id
-			});
-			await reloadmail();
-			PLUGINS.accounts.ui({ discoveryStatus: TRANSLATE('@(IMAP and SMTP authentication confirmed. You can sync the inbox.)') });
-		} catch (e) {
-			PLUGINS.accounts.error(e.message);
-			PLUGINS.accounts.ui({ discoveryStatus: '' });
-		} finally {
-			PLUGINS.accounts.busy = false;
-			PLUGINS.accounts.ui({ verifying: false });
-		}
-	}
 	function currentpath() {
 		return (((account(state.account) || {}).mailboxes || []).findItem('id', state.folder) || {}).path || '';
 	}
@@ -1249,6 +1212,14 @@ PLUGIN('mail', function(exports) {
 	};
 	exports.togglenotifications = notify.toggle;
 	exports.operation = perform;
+	// Closes a window of the settings, and forgets the passwords that were typed in it.
+	function closewindow() {
+		SET('mail.window', '');
+		SET('accounts.form.password', '');
+		SET('users.form.password', '');
+	}
+	exports.closewindow = closewindow;
+	exports.syncaccount = function(id) { return syncmail(id); };
 	exports.reload = reloadmail;
 	exports.store = state;
 	exports.api = api;

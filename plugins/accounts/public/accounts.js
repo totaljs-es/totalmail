@@ -557,6 +557,33 @@ PLUGIN('accounts', function(exports) {
 					exports.busy = false;
 				}
 			};
+			// Checks the saved settings with the mail server (IMAP and SMTP sign-in) and reloads what the server holds.
+			exports.verify = async function() {
+
+				if (exports.busy)
+					return;
+				var id = GET('accounts.form.id');
+				if (!id) {
+					mailbox.notify(TRANSLATE('@(Save the account before connecting.)'));
+					return;
+				}
+				exports.busy = true;
+				ui({ verifying: true, discoveryStatus: TRANSLATE('@(Checking IMAP and SMTP securely…)') });
+				error('');
+				try {
+					await mailbox.api('account_verify', { accountId: id });
+					await mailbox.reload();
+					ui({ discoveryStatus: TRANSLATE('@(IMAP and SMTP authentication confirmed. You can sync the inbox.)') });
+				} catch (e) {
+					error(e.message);
+					ui({ discoveryStatus: '' });
+				} finally {
+					exports.busy = false;
+					ui({ verifying: false });
+				}
+			};
+			// Synchronizes the inbox of the account of the form.
+			exports.sync = function() { return mailbox.syncaccount(GET('accounts.form.id')).catch(function(e) { return mailbox.notify(e.message); }); };
 			// A change of the id (the account chosen in the list) loads that account into the form.
 			WATCH('accounts.form.id', function(value, flags) {
 

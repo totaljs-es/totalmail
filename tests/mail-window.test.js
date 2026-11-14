@@ -559,3 +559,25 @@ test('pressing confirm twice sends once', async () => {
 	await second;
 	Assert.equal(h.called('draft_send').length, 1);
 });
+
+test('closing a settings window forgets the passwords typed in it, with the button or with Escape', async () => {
+	var h = await start();
+	h.set('mail.window', 'account-setup');
+	h.set('accounts.form.password', 'secret');
+	h.set('users.form.password', 'another');
+	h.plugin.closewindow();
+	Assert.equal(h.mail().window, '');
+	Assert.equal(h.get('accounts.form.password'), '');
+	Assert.equal(h.get('users.form.password'), '');
+	h.set('mail.window', 'users');
+	h.set('users.form.password', 'again');
+	h.plugin.keys({ key: 'Escape', target: { tagName: 'BODY', matches: () => false }, preventDefault() {} });
+	Assert.equal(h.mail().window, '');
+	Assert.equal(h.get('users.form.password'), '');
+});
+
+test('the sync button of the account form syncs that account\'s inbox', async () => {
+	var h = await start();
+	await h.plugin.syncaccount('a2');
+	Assert.deepEqual(h.called('account_sync').map((c) => c.data), [{ accountId: 'a2', path: 'INBOX' }]);
+});

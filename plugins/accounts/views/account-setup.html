@@ -17,8 +17,7 @@
 				</div>
 				<button
 					class="icon-button exec"
-					data-exec="mail/click"
-					data-command="close-settings"
+					data-exec="mail/closewindow"
 					aria-label="@(Close)"
 				>
 					<i class="ti ti-times" aria-hidden="true"></i>
@@ -224,10 +223,10 @@
 				<ui-bind path="accounts.form.id" config="show:value" class="contents"
 					><button class="secondary-button danger-button exec" data-exec="accounts/remove"><i class="ti ti-trash" aria-hidden="true"></i>@(Remove account)</button></ui-bind
 				><ui-bind path="accounts.ui" config="hide:value.signin;disabled:value.blocked||value.verifying||!value.saved" class="contents"
-					><button class="secondary-button exec" data-exec="mail/click" data-command="verify-account">@(Verify IMAP and SMTP)</button></ui-bind
+					><button class="secondary-button exec" data-exec="accounts/verify">@(Verify IMAP and SMTP)</button></ui-bind
 				><ui-bind path="mail.ui" config="disabled:value.busy||!value.accountSaved" class="contents"
 					><ui-bind path="accounts.ui" config="hide:value.signin" class="contents"
-						><button class="secondary-button exec" data-exec="mail/click" data-command="sync-account">@(Sync inbox)</button></ui-bind
+						><button class="secondary-button exec" data-exec="accounts/sync">@(Sync inbox)</button></ui-bind
 					></ui-bind
 				><ui-bind path="accounts.ui" config="show:value.start" class="contents"
 					><button class="primary-button exec" data-exec="accounts/oauth" data-again="0">
