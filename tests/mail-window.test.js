@@ -455,3 +455,37 @@ test('the notification switch says why it cannot work in this browser', async ()
 	await h.plugin.togglenotifications();
 	Assert.equal(h.mail().ui.notifications, false);
 });
+
+test('shift selects a range of lines, the select-all box takes every line, and Escape clears the selection', async () => {
+	var h = await start();
+	await h.click({ message: 'm4' }, { ctrlKey: true });
+	await h.click({ message: 'm2' }, { shiftKey: true });
+	Assert.deepEqual(Array.from(h.mail().rows.filter((r) => r.checked), (r) => r.id).sort(), ['m2', 'm3', 'm4']);
+	Assert.equal(h.mail().ui.bulkAll, true);
+	h.plugin.bulkall([{ checked: false }]);
+	Assert.equal(h.mail().ui.bulkShown, false);
+	h.plugin.bulkall([{ checked: true }]);
+	Assert.equal(h.mail().ui.bulkCount, '3 selected');
+	Assert.equal(h.plugin.keys({ key: 'Escape', target: { tagName: 'BODY', matches: () => false }, preventDefault() {} }), undefined);
+	Assert.equal(h.mail().ui.bulkShown, false, 'Escape clears it');
+});
+
+test('a bulk action on drafts can only throw them away, after a second press', async () => {
+	var h = await start();
+	h.db.drafts.push(
+		{ id: 'd1', accountId: 'a1', to: '', subject: 'One', body: '', status: 'draft', revision: 'r', attachments: [], updated: '2026-11-14T09:00:00Z' },
+		{ id: 'd2', accountId: 'a1', to: '', subject: 'Two', body: '', status: 'draft', revision: 'r', attachments: [], updated: '2026-11-14T09:01:00Z' }
+	);
+	await h.plugin.reload();
+	await h.click({ folder: 'drafts' });
+	await h.click({ message: 'd1' }, { ctrlKey: true });
+	await h.click({ message: 'd2' }, { ctrlKey: true });
+	Assert.equal(h.mail().ui.bulkDrafts, true);
+	await h.plugin.bulk([{ dataset: { bulk: 'archive' } }]);
+	Assert.equal(h.called('message_change').length + h.called('draft_delete').length, 0, 'archive is not for drafts');
+	await h.plugin.bulk([{ dataset: { bulk: 'trash' } }]);
+	Assert.equal(h.called('draft_delete').length, 0, 'the first press only asks');
+	await h.plugin.bulk([{ dataset: { bulk: 'trash' } }]);
+	Assert.deepEqual(h.called('draft_delete').map((c) => c.data.id).sort(), ['d1', 'd2']);
+	Assert.deepEqual(ids(h), []);
+});
