@@ -13,6 +13,13 @@
 - Under the list of messages, the way to load older mail is a button, as in the native app.
 - Language selectors are wide enough for the flag and the name.
 
+- Settings is one window with a list of sections on the left (Preferences, Mail accounts, Rules, My profile, My devices and, for administrators, Company users, Account types and sign-in, AI assistant); on a phone the list becomes tabs. The forms have more room, and the colours of errors and checks keep their contrast in dark mode.
+- Security: the address of a client comes from `X-Forwarded-For` only when the connection is from a proxy of ours (loopback or private network); the saved assistant key is sent only to the server it was saved with (a new server address asks for the key again); the lookup of a domain's mail configuration connects to the address that was checked and stops at 64 kB; password tries of a signed-in person count per person and no longer use up the places of the sign-in page of their address; the command-line recovery (`bin/admin.js`) also revokes the devices; an OAuth sign-in of a person disabled meanwhile adds nothing, and one person cannot use up the places of the others.
+- A PDF whose hex string never closes no longer hangs the server when it is added to the knowledge base, compressed parts of documents may not expand past 32 MB, and the connection check ends when a server stalls STARTTLS or never ends a line.
+- A draft whose delivery is unknown (after an SMTP failure or a restart while sending) can be discarded once you have looked in Sent, and no longer keeps its account from being removed. Nothing is ever sent again.
+- Saving an account without `authType` keeps its type (an app using `account_save` no longer turns an OAuth account into a password one); Greek is accepted by the assistant's translation; a failed OAuth token renewal no longer blocks the account until a restart.
+- Code: `mail.js` is split into `display.js`, `undo.js`, `notify.js`, `selection.js` and `composer.js`, with 38 tests that run the real file in Node; every action has a `name`.
+
 ## 1.0.0
 
 First public release.
