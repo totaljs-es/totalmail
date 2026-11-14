@@ -796,6 +796,8 @@ PLUGIN('mail', function(exports) {
 		else if (name === 'account-setup')
 			await PLUGINS.accounts.open();
 		else if (name === 'logout') {
+			if (!leave())
+				return;
 			await composer.flush();
 			await api('user_logout');
 			location.reload();

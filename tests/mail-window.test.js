@@ -618,3 +618,14 @@ test('a section that saves says so, and the section that is open is not opened a
 	h.plugin.section([{ dataset: { open: 'settings' }, getAttribute: () => null }]);
 	Assert.equal(h.mail().window, 'settings');
 });
+
+test('signing out from the settings with unsaved changes asks first', async () => {
+	var h = await start();
+	h.set('mail.window', 'users');
+	h.set('users.form', { name: '', email: '' });
+	h.set('users.form.name', 'Rosa');
+	h.confirming = false;
+	await h.click({ command: 'logout' });
+	Assert.equal(h.called('user_logout').length, 0, 'the person stayed');
+	Assert.equal(h.asked.length, 1);
+});
