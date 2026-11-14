@@ -5,7 +5,7 @@ TotalMail is a Total.js 5 application written the way the framework suggests. If
 ## What starts the application
 
 - `index.js` loads `total5`, reads `config` with `LOADCONFIG()` and calls `Total.run()`. The Total.js watcher is on unless the instance runs in production.
-- `config` holds only public defaults (`name`, `production`, `$ip`, `trust_proxy`, `oauth_base_url`). Passwords, OAuth secrets and assistant keys are never in it: they are entered in the app and stored encrypted in `database/`.
+- `config` holds only public defaults (`name`, `production`, `$ip`, `trust_proxy`, `trust_proxy_from`, `oauth_base_url`). Passwords, OAuth secrets and assistant keys are never in it: they are entered in the app and stored encrypted in `database/`.
 
 ## Where each thing lives
 

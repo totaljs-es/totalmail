@@ -159,7 +159,7 @@ exports.address = function($) { return clientip($); };
 
 var clientip = function($) {
 	var ctrl = $.controller || $;
-	return require('./clientip')(ctrl.headers, (ctrl.req && ctrl.req.socket && ctrl.req.socket.remoteAddress), String(CONF.trust_proxy) !== 'false');
+	return require('./clientip')(ctrl.headers, (ctrl.req && ctrl.req.socket && ctrl.req.socket.remoteAddress), String(CONF.trust_proxy) !== 'false', CONF.trust_proxy_from);
 };
 
 exports.allowLogin = function($, email) {
