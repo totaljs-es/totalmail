@@ -27,6 +27,7 @@ let grant = {
 	email: 'ana@example.test',
 	username: 'ana@example.test',
 	name: 'Ana Ruiz',
+	provider: 'google',
 	oauth: { provider: 'google' },
 	access: 'token'
 };
@@ -59,4 +60,10 @@ test('a sign-in of a person who was disabled or removed meanwhile saves nothing'
 	let f = fixture(undefined, false);
 	await assert.rejects(Oauth.complete({ id: 'google' }, grant), /invalid_state/);
 	assert.equal(f.saved.length, 0);
+});
+test('a sign-in finished at the callback of another provider is refused', async () => {
+	let f = fixture();
+	await assert.rejects(Oauth.complete({ id: 'microsoft' }, grant), /invalid_state/);
+	assert.equal(f.saved.length, 0);
+	assert.equal(f.remembered.length, 0);
 });

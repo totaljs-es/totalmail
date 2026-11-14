@@ -17,6 +17,9 @@ exports.complete = async function(provider, grant) {
 	// The person may have been disabled or removed while they signed in at the provider.
 	if (!MODS.security.identities.get(grant.userId))
 		throw Error('invalid_state');
+	// The tokens came from the provider the sign-in was started for; the address of the callback must name that same one.
+	if (!provider || grant.provider !== provider.id)
+		throw Error('invalid_state');
 	var store = MODS.users.forUser({ id: grant.userId }),
 		servers = MODS.providers.serversFor(provider, grant.email);
 	if (grant.accountId) {
