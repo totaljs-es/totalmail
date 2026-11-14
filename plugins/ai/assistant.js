@@ -30,7 +30,7 @@ var styles = {
 	friendly: 'Make the tone warmer and friendlier, still professional.'
 };
 
-exports.tasks = ['summarize', 'translate', 'reply', 'tone', 'proofread'];
+exports.tasks = ['summarize', 'translate', 'reply', 'tone', 'proofread', 'compose'];
 exports.targets = Object.keys(targets);
 exports.providers = ['openai', 'anthropic'];
 exports.defaults = { maxChars: 12000, timeout: 90, maxTokens: 2000, anthropic: 'https://api.anthropic.com/v1' };

@@ -56,14 +56,14 @@ function settings(provider) {
 	};
 }
 
-// The token endpoint: Total.js's own request (RESTBuilder), no redirects, a ceiling on the size of the answer.
+// The token endpoint: Total.js's own request (RESTBuilder), no redirects. It is the provider's own host (Google, Microsoft), and total5@0.0.19
+// ignores maxlength(), so no ceiling on the size of the answer is claimed here.
 function form(host, path, params) {
 	return new Promise(function(resolve, reject) {
 		RESTBuilder.POST('https://' + host + path)
 			.urlencoded(params)
 			.header('accept', 'application/json')
 			.timeout(10000)
-			.maxlength(64)
 			.redirect(false)
 			.callback(function(err, response, output) {
 				var status = (output && output.status) || 0;

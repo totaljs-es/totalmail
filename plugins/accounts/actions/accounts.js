@@ -33,6 +33,9 @@ NEWACTION('Accounts|save', {
 				if (!Number.isInteger(port) || port < 1 || port > 65535)
 					throw Error('@(Enter a port between 1 and 65535.)');
 			}
+			// The schema fills a missing text with '', so the request itself tells whether a field was sent.
+			var sent = $.body && typeof $.body === 'object' ? $.body.data || $.body : {};
+			var mentioned = function(name) { return Object.prototype.hasOwnProperty.call(sent, name); };
 			var account = {
 				id: model.id || '',
 				name: model.name.trim(),
@@ -62,21 +65,20 @@ NEWACTION('Accounts|save', {
 				}
 			};
 				// Left out when the request does not mention it, so an update from elsewhere keeps the saved signature.
-				// (the schema fills a missing text with '', so the request itself tells whether it was sent)
-			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'signature'))
+			if (mentioned('signature'))
 				account.signature = String(model.signature)
 					.replace(/\r\n?/g, '\n')
 					.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '')
 					.trim();
 				// Same for the aliases: only a request that mentions them changes them.
-			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'aliases')) {
+			if (mentioned('aliases')) {
 				var parsed = PLUGINS.mail.aliases.parse(model.aliases, account.email);
 				if (parsed.error)
 					throw Error('@(Other addresses must be plain email addresses, ten at most, separated by commas.)');
 				account.aliases = parsed.list;
 			}
 			// Same for the assistant switch.
-			if (Object.prototype.hasOwnProperty.call($.body && typeof $.body === 'object' ? $.body.data || $.body : {}, 'assistant'))
+			if (mentioned('assistant'))
 				account.assistant = model.assistant === true;
 				// A generated ID is new; only explicit IDs can update a user's existing account.
 			var store = PLUGINS.mail.mailboxes.forUser($.user);

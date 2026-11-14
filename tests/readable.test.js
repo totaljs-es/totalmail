@@ -92,5 +92,5 @@ test('translation and spelling are closed tasks: a known language, the text wrap
 	let fix = ai.build('proofread', { text: 'Ths is a drfat' });
 	assert.match(fix[1].content, /<draft>\nThs is a drfat\n<\/draft>/);
 	assert.match(fix[1].content, /change only what is wrong/);
-	assert.deepEqual(ai.tasks, ['summarize', 'translate', 'reply', 'tone', 'proofread'], 'the catalogue is closed');
+	assert.deepEqual(ai.tasks, ['summarize', 'translate', 'reply', 'tone', 'proofread', 'compose'], 'the catalogue is closed');
 });
