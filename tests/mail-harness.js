@@ -12,6 +12,7 @@ var order = [
 	'plugins/mail/public/format.js',
 	'plugins/mail/public/display.js',
 	'plugins/mail/public/undo.js',
+	'plugins/mail/public/notify.js',
 	'plugins/mail/public/query.js',
 	'plugins/mail/public/mail.js'
 ];

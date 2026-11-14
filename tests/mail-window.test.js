@@ -427,3 +427,31 @@ test('the bar that offers to undo goes away by itself, and the Z key uses it', a
 	await h.settle();
 	Assert.equal(h.db.messages.find((m) => m.id === 'm3').folder, 'inbox');
 });
+
+test('mail that arrives while the window is open is announced to a screen reader', async () => {
+	var h = await start();
+	Assert.equal(h.mail().ui.announce, '', 'nothing arrived yet');
+	h.db.messages.push({ id: 'n1', accountId: 'a1', folder: 'inbox', unread: true, sender: 'Rosa', email: 'rosa@example.test', subject: 'Surprise', body: 'b', date: '2026-11-14T09:00:00Z' });
+	await h.plugin.reload();
+	await h.flush();
+	Assert.equal(h.mail().ui.announce, 'New message: Rosa · Surprise');
+	h.db.messages.push(
+		{ id: 'n2', accountId: 'a1', folder: 'inbox', unread: true, sender: 'A', email: 'a@example.test', subject: 'One', body: 'b', date: '2026-11-14T09:10:00Z' },
+		{ id: 'n3', accountId: 'a1', folder: 'inbox', unread: true, sender: 'B', email: 'b@example.test', subject: 'Two', body: 'b', date: '2026-11-14T09:11:00Z' }
+	);
+	await h.plugin.reload();
+	await h.flush();
+	Assert.equal(h.mail().ui.announce, 'New messages: 2');
+	// What was already there is not announced again.
+	await h.plugin.reload();
+	await h.flush();
+	Assert.equal(h.mail().ui.announce, 'New messages: 2');
+});
+
+test('the notification switch says why it cannot work in this browser', async () => {
+	var h = await start();
+	Assert.equal(h.get('mail.notifyHint'), 'This browser does not support notifications.');
+	Assert.equal(h.mail().ui.notifications, false);
+	await h.plugin.togglenotifications();
+	Assert.equal(h.mail().ui.notifications, false);
+});

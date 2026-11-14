@@ -1554,7 +1554,7 @@ PLUGIN('mail', function(exports) {
 				renderlist();
 				// Nothing is opened (and nothing marked as read) until the person chooses a message.
 				threadlabel();
-				notifylabel();
+				notify.label();
 				SET('mail.themeOptions', [
 					{ id: 'auto', name: TRANSLATE('@(Match the system)') },
 					{ id: 'light', name: TRANSLATE('@(Light)') },
@@ -1574,8 +1574,8 @@ PLUGIN('mail', function(exports) {
 					} catch {}
 					window.totalmailtheme && window.totalmailtheme();
 				});
-				if (notificationsenabled())
-					startnotifications();
+				if (notify.enabled())
+					notify.start();
 				renderreader();
 				var signin = new URLSearchParams(location.search).get('oauth');
 				if (signin) {
@@ -1625,66 +1625,13 @@ PLUGIN('mail', function(exports) {
 				)
 		});
 	}
-	// System notifications (Total.js j-NativeNotifications), only when the person turned them on in this browser.
-	function notificationsenabled() {
-		try {
-			return localStorage.getItem('totalmail-notify-' + (state.user && state.user.id)) === '1' && (window.Notification && window.Notification.permission) === 'granted';
-		} catch {
-			return false;
-		}
-	}
-	function notifylabel() {
-
-		var denied = (window.Notification && window.Notification.permission) === 'denied';
-		ui({ notifications: notificationsenabled() });
-		SET(
-			'mail.notifyHint',
-			TRANSLATE(
-				!window.Notification
-					? '@(This browser does not support notifications.)'
-					: denied
-						? '@(Blocked in the browser. Allow notifications for this site to turn them on.)'
-						: '@(A system notice when new mail arrives while this window is not in front.)'
-			)
-		);
-	}
-	function startnotifications() {
-		// The component asks for the permission when it is created, so it is created from the person's click.
-		SET('mail.notifyOn', true);
-	}
-	function unreadinbox() {
-		return new Set(state.messages.filter(function(m) { return m.folder === 'inbox' && m.unread && !m.welcome; }).map(function(m) { return m.id; }));
-	}
-	// Mail that arrived since the previous load is announced when the window is not in front of the person.
-	// A screen reader hears new mail in a polite status line, with or without system notifications.
-	function say(text) {
-		ui({ announce: '' });
-		setTimeout(function() { return ui({ announce: text }); }, 50);
-	}
-	function announce(before) {
-
-		var fresh = state.messages.filter(function(m) { return m.folder === 'inbox' && m.unread && !m.welcome && !before.has(m.id); });
-		if (!fresh.length)
-			return;
-		var first = fresh[0],
-			text =
-				fresh.length === 1
-					? (first.sender || first.email || '') + (first.subject ? ' · ' + first.subject : '')
-					: TRANSLATE('@(New messages)') + ': ' + fresh.length;
-		say((fresh.length === 1 ? TRANSLATE('@(New message)') + ': ' : '') + text);
-		if (!notificationsenabled() || (!document.hidden && document.hasFocus()))
-			return;
-		SETTER('nativenotifications/show', fresh.length === 1 ? TRANSLATE('@(New message)') : TRANSLATE('@(New mail)'), text, function() {
-			if (fresh.length === 1)
-				selectmessage(first.id);
-		});
-	}
+	var notify = totalmailnotify({ state, ui, toast, open: function(id) { return selectmessage(id); } });
 	async function reloadmail() {
 
 		var selected = state.selected,
-			before = unreadinbox();
+			before = notify.unread();
 		Object.assign(state, await api('bootstrap'));
-		announce(before);
+		notify.announce(before);
 		PLUGINS.accounts.refresh();
 		if (!state.messages.some(function(m) { return m.id === selected; }))
 			state.selected = '';
@@ -1892,24 +1839,7 @@ PLUGIN('mail', function(exports) {
 		renderlist();
 		renderreader();
 	};
-	exports.togglenotifications = async function() {
-
-		if (!window.Notification)
-			return notifylabel();
-		var on = notificationsenabled();
-		try {
-			if (on)
-				localStorage.setItem('totalmail-notify-' + state.user.id, '0');
-			else {
-				startnotifications();
-				var permission = window.Notification.permission === 'granted' ? 'granted' : await window.Notification.requestPermission();
-				localStorage.setItem('totalmail-notify-' + state.user.id, permission === 'granted' ? '1' : '0');
-				if (permission !== 'granted')
-					toast(TRANSLATE('@(Allow notifications for this site in the browser to turn them on.)'));
-			}
-		} catch {}
-		notifylabel();
-	};
+	exports.togglenotifications = notify.toggle;
 	exports.operation = perform;
 	exports.reload = reloadmail;
 	exports.store = state;
@@ -1917,7 +1847,7 @@ PLUGIN('mail', function(exports) {
 	exports.upload = function(url, form) { return totalmailrequest.upload(url, form); };
 	exports.notify = toast;
 	// What the assistant writes goes into the composer only when the person chooses it.
-	exports.say = say;
+	exports.say = notify.say;
 	exports.writebody = function(text) {
 		SET('mail.compose.body', text);
 		SETTER('mailbody/focus');
