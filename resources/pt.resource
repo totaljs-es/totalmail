@@ -803,3 +803,4 @@ T3az20r : Limpar pesquisa
 Tosmo8z : Definições
 Tz4dbwb : Uma mensagem desta conta pode ter sido enviada. Verifique as Enviadas e descarte o seu rascunho antes de remover a conta.
 T157usso : Deixe a chave vazia para manter a guardada para este endereço do servidor; um endereço novo precisa da chave outra vez. É guardada cifrada e nunca volta a ser mostrada. O Claude precisa de uma. Use um modelo que responda diretamente: os modelos que pensam em voz alta são lentos aqui.
+Tf1zrs5 : Esta secção tem alterações por guardar. Sair sem as guardar?

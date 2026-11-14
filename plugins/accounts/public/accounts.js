@@ -425,6 +425,7 @@ PLUGIN('accounts', function(exports) {
 					mailbox.refresh();
 					SET('accounts.form.password', '');
 					SET('accounts.form.id', account.id);
+					mailbox.saved('account-setup');
 					// The saved account is now the one being edited.
 					editing = state.accounts.find(function(a) { return a.id === account.id; }) || null;
 					selected = guess(editing);

@@ -803,3 +803,4 @@ T3az20r : Clear search
 Tosmo8z : Settings
 Tz4dbwb : A message of this account may have been sent. Check Sent and discard its draft before removing the account.
 T157usso : Leave the key empty to keep the one saved for this server address; a new address needs the key again. It is stored encrypted and never shown again. Claude needs one. Use a model that answers directly: models that think aloud are slow here.
+Tf1zrs5 : This section has changes that are not saved. Leave without saving them?

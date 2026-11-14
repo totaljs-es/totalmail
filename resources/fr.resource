@@ -803,3 +803,4 @@ T3az20r : Effacer la recherche
 Tosmo8z : Paramètres
 Tz4dbwb : Un message de ce compte a peut-être été envoyé. Vérifiez les Envoyés et supprimez son brouillon avant de retirer le compte.
 T157usso : Laissez la clé vide pour conserver celle enregistrée pour cette adresse de serveur ; une nouvelle adresse demande à nouveau la clé. Elle est stockée chiffrée et n’est plus jamais affichée. Claude en nécessite une. Utilisez un modèle qui répond directement : les modèles qui réfléchissent à voix haute sont lents ici.
+Tf1zrs5 : Cette section contient des modifications non enregistrées. Quitter sans les enregistrer ?

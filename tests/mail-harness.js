@@ -37,6 +37,7 @@ function walk(tree, path, create) {
 exports.create = async function(options) {
 
 	options = options || {};
+	var execs = [], asked = [];
 	var calls = [], toasts = [], setters = [], timers = [], watchers = {}, store = {}, plugins = {}, storage = {}, pending = [];
 	var handlers = Object.assign({}, options.api);
 	var clock = 0;
@@ -57,7 +58,8 @@ exports.create = async function(options) {
 			addEventListener() {},
 			hidden: false
 		},
-		window: {},
+		window: { confirm: (text) => (asked.push(text), harness.confirming) },
+		EXEC: function(name) { execs.push(name); },
 		location: { href: 'http://localhost/', search: '', pathname: '/', assign() {} },
 		history: { replaceState() {} },
 		navigator: {},
@@ -87,8 +89,14 @@ exports.create = async function(options) {
 				last = parts.pop();
 			var parent = parts.length ? walk(store, parts.join('.'), true) : store;
 			parent[last] = value;
-			for (var list = Array.from(watchers[path] || []), i = 0; i < list.length; i++)
-				list[i](value, path);
+			// As jComponent does: whoever watches the path or one of its parents hears of it, with the value it watches, flags and the
+			// path that changed (the whole form when the code sets it, one field when the person types).
+			for (var watched = Object.keys(watchers), w = 0; w < watched.length; w++) {
+				if (watched[w] !== path && path.indexOf(watched[w] + '.') !== 0)
+					continue;
+				for (var list = Array.from(watchers[watched[w]]), i = 0; i < list.length; i++)
+					list[i](walk(store, watched[w]), {}, path);
+			}
 		},
 		WATCH: function(path, fn) { (watchers[path] = watchers[path] || []).push(fn); },
 		WAIT: function(condition, fn) {
@@ -147,6 +155,10 @@ exports.create = async function(options) {
 		Vm.runInContext(Fs.readFileSync(Path.join(root, order[i]), 'utf8'), context, { filename: order[i] });
 
 	var harness = {
+		execs,
+		asked,
+		// What the person answers to a confirmation: true leaves, false stays.
+		confirming: true,
 		calls,
 		toasts,
 		setters,

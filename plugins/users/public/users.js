@@ -53,7 +53,7 @@ PLUGIN('users', function(exports) {
 			}
 			function closeprofile() {
 
-				if (profilebusy)
+				if (profilebusy || !mailbox.leave())
 					return;
 				SET('users.profileform.currentPassword', '');
 				SET('users.profileform.newPassword', '');

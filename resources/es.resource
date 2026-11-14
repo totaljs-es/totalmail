@@ -803,3 +803,4 @@ T3az20r : Limpiar búsqueda
 Tosmo8z : Ajustes
 Tz4dbwb : Puede que un mensaje de esta cuenta se haya enviado. Revisa Enviados y descarta su borrador antes de quitar la cuenta.
 T157usso : Deja la clave vacía para conservar la guardada para esta dirección del servidor; una dirección nueva necesita la clave otra vez. Se almacena cifrada y no se vuelve a mostrar. Claude necesita una. Usa un modelo que responda directamente: los que razonan en voz alta son lentos aquí.
+Tf1zrs5 : Esta sección tiene cambios sin guardar. ¿Salir sin guardarlos?

@@ -803,3 +803,4 @@ T3az20r : Vymazať vyhľadávanie
 Tosmo8z : Nastavenia
 Tz4dbwb : Správa z tohto účtu sa možno odoslala. Skontrolujte Odoslané a pred odstránením účtu zahoďte jej koncept.
 T157usso : Ak chcete ponechať kľúč uložený pre túto adresu servera, nechajte pole prázdne; nová adresa potrebuje kľúč znova. Je uložený šifrovane a už sa nezobrazí. Claude ho potrebuje. Použite model, ktorý odpovedá priamo: modely, ktoré rozmýšľajú nahlas, sú tu pomalé.
+Tf1zrs5 : Táto sekcia má neuložené zmeny. Odísť bez ich uloženia?

@@ -803,3 +803,4 @@ T3az20r : Suche löschen
 Tosmo8z : Einstellungen
 Tz4dbwb : Eine Nachricht dieses Kontos wurde möglicherweise gesendet. Prüfen Sie „Gesendet“ und verwerfen Sie ihren Entwurf, bevor Sie das Konto entfernen.
 T157usso : Lassen Sie den Schlüssel leer, um den für diese Serveradresse gespeicherten zu behalten; eine neue Adresse braucht den Schlüssel erneut. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Claude benötigt einen. Verwenden Sie ein Modell, das direkt antwortet: Modelle, die laut nachdenken, sind hier langsam.
+Tf1zrs5 : Dieser Bereich hat Änderungen, die nicht gespeichert sind. Ohne Speichern verlassen?

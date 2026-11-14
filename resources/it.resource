@@ -803,3 +803,4 @@ T3az20r : Cancella ricerca
 Tosmo8z : Impostazioni
 Tz4dbwb : Un messaggio di questo account potrebbe essere stato inviato. Controlli Inviati e scarti la sua bozza prima di rimuovere l’account.
 T157usso : Lasci vuota la chiave per mantenere quella salvata per questo indirizzo del server; un nuovo indirizzo richiede di nuovo la chiave. È conservata cifrata e non viene più mostrata. Claude ne richiede una. Usi un modello che risponde direttamente: i modelli che ragionano ad alta voce qui sono lenti.
+Tf1zrs5 : Questa sezione ha modifiche non salvate. Uscire senza salvarle?

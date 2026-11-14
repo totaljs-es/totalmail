@@ -581,3 +581,40 @@ test('the sync button of the account form syncs that account\'s inbox', async ()
 	await h.plugin.syncaccount('a2');
 	Assert.deepEqual(h.called('account_sync').map((c) => c.data), [{ accountId: 'a2', path: 'INBOX' }]);
 });
+
+test('leaving a section with unsaved changes asks first; what the code filled in or saved does not count', async () => {
+	var h = await start();
+	h.set('mail.window', 'profile');
+	h.set('users.profileform', { name: 'Ana Ruiz', email: 'ana@example.test' });
+	h.plugin.closewindow();
+	Assert.equal(h.mail().window, '', 'nothing was typed: it closes without asking');
+	Assert.equal(h.asked.length, 0);
+	h.set('mail.window', 'profile');
+	h.set('users.profileform', { name: 'Ana Ruiz', email: 'ana@example.test' });
+	h.set('users.profileform.name', 'Ana R.');
+	h.confirming = false;
+	h.plugin.closewindow();
+	Assert.equal(h.mail().window, 'profile', 'the person chose to stay');
+	Assert.equal(h.asked.length, 1);
+	h.plugin.section([{ dataset: { open: 'devices/open' }, getAttribute: () => null }]);
+	Assert.deepEqual(h.execs, [], 'another section is not opened either');
+	h.confirming = true;
+	h.plugin.section([{ dataset: { open: 'devices/open' }, getAttribute: () => null }]);
+	Assert.deepEqual(h.execs, ['devices/open'], 'the person chose to leave');
+});
+
+test('a section that saves says so, and the section that is open is not opened again', async () => {
+	var h = await start();
+	h.set('mail.window', 'account-setup');
+	h.set('accounts.form', { id: 'a1', name: 'Work' });
+	h.set('accounts.form.name', 'Office');
+	h.plugin.saved('account-setup');
+	h.plugin.closewindow();
+	Assert.equal(h.asked.length, 0, 'saved: nothing to lose');
+	Assert.equal(h.mail().window, '');
+	h.set('mail.window', 'account-setup');
+	h.plugin.section([{ dataset: { open: 'accounts/open' }, getAttribute: () => 'page' }]);
+	Assert.deepEqual(h.execs, [], 'the open section is left alone');
+	h.plugin.section([{ dataset: { open: 'settings' }, getAttribute: () => null }]);
+	Assert.equal(h.mail().window, 'settings');
+});
