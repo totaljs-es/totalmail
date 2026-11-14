@@ -212,6 +212,10 @@ COMPONENT('addresssuggest', function(self, config) {
 		active = -1,
 		input = null;
 	var parts = function(value) { return String(value || '').split(/[,;]/); };
+	// One option for each contact: the name and the address (or just the address); every value is encoded by the template.
+	var suggestions = Tangular.compile(
+		'{{ foreach c in items }}<button type="button" role="option" id="{{ id }}-{{ $index }}" tabindex="-1" aria-selected="{{ $index === 0 }}" class="contact-option{{ if $index === 0 }} active{{ fi }}" data-email="{{ c.email }}">{{ if c.name }}<strong>{{ c.name }}</strong><small>{{ c.email }}</small>{{ else }}<strong>{{ c.email }}</strong>{{ fi }}</button>{{ end }}'
+	);
 	function hide() {
 
 		menu.attr('hidden', '');
@@ -263,29 +267,7 @@ COMPONENT('addresssuggest', function(self, config) {
 			return hide();
 		items = found;
 		active = 0;
-		menu.html(
-			found
-				.map(
-					function(c, i) {
-						return '<button type="button" role="option" id="' +
-							menu.attr('id') +
-							'-' +
-							i +
-							'" tabindex="-1" aria-selected="' +
-							(i === 0) +
-							'" class="contact-option' +
-							(i === 0 ? ' active' : '') +
-							'" data-email="' +
-							Thelpers.encode(c.email) +
-							'"><strong>' +
-							Thelpers.encode(c.name || c.email) +
-							'</strong>' +
-							(c.name ? '<small>' + Thelpers.encode(c.email) + '</small>' : '') +
-							'</button>';
-					}
-				)
-				.join('')
-		);
+		menu.html(suggestions({ id: menu.attr('id'), items: found }));
 		var box = input.getBoundingClientRect();
 		menu.css({ left: box.left + 'px', top: box.bottom + 2 + 'px', width: box.width + 'px' });
 		menu.removeAttr('hidden');
