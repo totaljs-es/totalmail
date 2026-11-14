@@ -636,7 +636,6 @@ T1evyqqz : Texto sustituido.
 T1cqbuy7 : Recuperar mi texto
 T1emazv7 : Claude necesita una clave.
 T7qcvz5 : Claude, o cualquier servidor que hable el protocolo de chat de OpenAI: Ollama, llama.cpp, LM Studio, vLLM o un servicio alojado. Elige uno para rellenar su dirección habitual.
-T1wb31gr : Deja la clave vacía para conservar la guardada. Se almacena cifrada y no se vuelve a mostrar. Claude necesita una. Usa un modelo que responda directamente: los que razonan en voz alta son lentos aquí.
 T1lpp94f : Compatible con OpenAI
 T1jqodyw : Protocolo
 T172pqq5 : Colecciones que el asistente puede leer
@@ -802,3 +801,5 @@ T6hc3ox : Quitar cuenta
 T1x1fhtq : ¿Quitar esta cuenta de TotalMail? Aquí se borran su correo guardado y sus borradores. El buzón de tu servidor de correo no se toca.
 T3az20r : Limpiar búsqueda
 Tosmo8z : Ajustes
+Tz4dbwb : Puede que un mensaje de esta cuenta se haya enviado. Revisa Enviados y descarta su borrador antes de quitar la cuenta.
+T157usso : Deja la clave vacía para conservar la guardada para esta dirección del servidor; una dirección nueva necesita la clave otra vez. Se almacena cifrada y no se vuelve a mostrar. Claude necesita una. Usa un modelo que responda directamente: los que razonan en voz alta son lentos aquí.

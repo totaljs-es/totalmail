@@ -636,7 +636,6 @@ T1evyqqz : Testo sostituito.
 T1cqbuy7 : Ripristina il mio testo
 T1emazv7 : Claude richiede una chiave.
 T7qcvz5 : Claude, o qualsiasi server che parla il protocollo chat di OpenAI: Ollama, llama.cpp, LM Studio, vLLM o un servizio ospitato. Ne scelga uno per compilare il suo indirizzo abituale.
-T1wb31gr : Lasci vuota la chiave per mantenere quella salvata. È conservata cifrata e non viene più mostrata. Claude ne richiede una. Usi un modello che risponde direttamente: i modelli che ragionano ad alta voce qui sono lenti.
 T1lpp94f : Compatibile con OpenAI
 T1jqodyw : Protocollo
 T172pqq5 : Raccolte che l’assistente può leggere
@@ -802,3 +801,5 @@ T6hc3ox : Rimuovi account
 T1x1fhtq : Rimuovere questo account da TotalMail? La sua posta salvata e le sue bozze vengono rimosse qui. La casella sul suo server di posta non viene toccata.
 T3az20r : Cancella ricerca
 Tosmo8z : Impostazioni
+Tz4dbwb : Un messaggio di questo account potrebbe essere stato inviato. Controlli Inviati e scarti la sua bozza prima di rimuovere l’account.
+T157usso : Lasci vuota la chiave per mantenere quella salvata per questo indirizzo del server; un nuovo indirizzo richiede di nuovo la chiave. È conservata cifrata e non viene più mostrata. Claude ne richiede una. Usi un modello che risponde direttamente: i modelli che ragionano ad alta voce qui sono lenti.

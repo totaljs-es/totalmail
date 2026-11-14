@@ -617,6 +617,9 @@ exports.create = function(storage) {
 				var drafts = next.drafts.filter(function(d) { return d.accountId === id; });
 				if (drafts.some(function(d) { return d.status === 'sending'; }))
 					throw new Error('@(A message of this account is being sent. Check Sent before removing it.)');
+				// A message that may have left is the only trace of it until the person has looked in Sent: they discard it first.
+				if (drafts.some(function(d) { return d.status === 'unknown'; }))
+					throw new Error('@(A message of this account may have been sent. Check Sent and discard its draft before removing the account.)');
 				var files = drafts.flatMap(function(d) { return (d.attachments || []).map(function(item) { return item.id; }); });
 				next.accounts.splice(index, 1);
 				next.messages = next.messages.filter(function(m) { return m.accountId !== id; });

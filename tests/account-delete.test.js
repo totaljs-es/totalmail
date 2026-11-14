@@ -73,6 +73,8 @@ test('a message that was being sent when the process stopped is of unknown deliv
 	data.drafts[0].status = 'sending';
 	var { store } = fixture(t, data);
 	Assert.equal(store.snapshot().drafts[0].status, 'unknown');
+	await Assert.rejects(() => store.deleteAccount('a'), /may have been sent/, 'the only trace of it is not removed with the account');
+	await store.deleteDraft(store.snapshot().drafts[0].id);
 	await store.deleteAccount('a');
-	Assert.equal(store.snapshot().accounts.length, 1, 'the account no longer stays forever because of it');
+	Assert.equal(store.snapshot().accounts.length, 1, 'once the person has discarded it, the account can go');
 });

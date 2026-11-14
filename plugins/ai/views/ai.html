@@ -47,7 +47,7 @@
 					<ui-component name="input" path="ai.form.model" config="label:@(Model);placeholder:claude-haiku-5-5;maxlength:120;$delay:1"></ui-component
 					><ui-component name="input" path="ai.form.key" config="label:@(Key, if the server needs one);type:password;maxlength:500;$delay:1"></ui-component>
 				</div>
-				<p class="settings-note">@(Leave the key empty to keep the one saved. It is stored encrypted and never shown again. Claude needs one. Use a model that answers directly: models that think aloud are slow here.)</p>
+				<p class="settings-note">@(Leave the key empty to keep the one saved for this server address; a new address needs the key again. It is stored encrypted and never shown again. Claude needs one. Use a model that answers directly: models that think aloud are slow here.)</p>
 				<ui-component name="input" path="ai.form.maxChars" config="label:@(Characters of a conversation sent to the model);type:number;$delay:1"></ui-component>
 				<p class="settings-note" role="status"><ui-bind path="ai.status" config="text:value"></ui-bind></p>
 				<div class="providers-actions">

@@ -636,7 +636,6 @@ T1evyqqz : Text replaced.
 T1cqbuy7 : Restore my text
 T1emazv7 : Claude needs a key.
 T7qcvz5 : Claude, or any server that speaks the OpenAI chat protocol: Ollama, llama.cpp, LM Studio, vLLM or a hosted service. Choose one to fill in its usual address.
-T1wb31gr : Leave the key empty to keep the one saved. It is stored encrypted and never shown again. Claude needs one. Use a model that answers directly: models that think aloud are slow here.
 T1lpp94f : OpenAI-compatible
 T1jqodyw : Protocol
 T172pqq5 : Collections the assistant may read
@@ -802,3 +801,5 @@ T6hc3ox : Remove account
 T1x1fhtq : Remove this account from TotalMail? Its saved mail and drafts are removed here. The mailbox on your mail server is not touched.
 T3az20r : Clear search
 Tosmo8z : Settings
+Tz4dbwb : A message of this account may have been sent. Check Sent and discard its draft before removing the account.
+T157usso : Leave the key empty to keep the one saved for this server address; a new address needs the key again. It is stored encrypted and never shown again. Claude needs one. Use a model that answers directly: models that think aloud are slow here.

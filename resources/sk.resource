@@ -636,7 +636,6 @@ T1evyqqz : Text bol nahradený.
 T1cqbuy7 : Obnoviť môj text
 T1emazv7 : Claude potrebuje kľúč.
 T7qcvz5 : Claude alebo akýkoľvek server, ktorý používa chatový protokol OpenAI: Ollama, llama.cpp, LM Studio, vLLM alebo hostovaná služba. Výberom doplníte jeho obvyklú adresu.
-T1wb31gr : Ak chcete ponechať uložený kľúč, nechajte pole prázdne. Je uložený šifrovane a už sa nezobrazí. Claude ho potrebuje. Použite model, ktorý odpovedá priamo: modely, ktoré rozmýšľajú nahlas, sú tu pomalé.
 T1lpp94f : Kompatibilný s OpenAI
 T1jqodyw : Protokol
 T172pqq5 : Zbierky, ktoré môže asistent čítať
@@ -802,3 +801,5 @@ T6hc3ox : Odstrániť účet
 T1x1fhtq : Odstrániť tento účet z TotalMailu? Uložená pošta a koncepty sa tu odstránia. Schránka na vašom poštovom serveri sa nezmení.
 T3az20r : Vymazať vyhľadávanie
 Tosmo8z : Nastavenia
+Tz4dbwb : Správa z tohto účtu sa možno odoslala. Skontrolujte Odoslané a pred odstránením účtu zahoďte jej koncept.
+T157usso : Ak chcete ponechať kľúč uložený pre túto adresu servera, nechajte pole prázdne; nová adresa potrebuje kľúč znova. Je uložený šifrovane a už sa nezobrazí. Claude ho potrebuje. Použite model, ktorý odpovedá priamo: modely, ktoré rozmýšľajú nahlas, sú tu pomalé.

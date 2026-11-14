@@ -636,7 +636,6 @@ T1evyqqz : Texte remplacé.
 T1cqbuy7 : Rétablir mon texte
 T1emazv7 : Claude nécessite une clé.
 T7qcvz5 : Claude ou tout serveur parlant le protocole de chat OpenAI : Ollama, llama.cpp, LM Studio, vLLM ou un service hébergé. Choisissez-en un pour renseigner son adresse habituelle.
-T1wb31gr : Laissez la clé vide pour conserver celle qui est enregistrée. Elle est stockée chiffrée et n’est plus jamais affichée. Claude en nécessite une. Utilisez un modèle qui répond directement : les modèles qui réfléchissent à voix haute sont lents ici.
 T1lpp94f : Compatible OpenAI
 T1jqodyw : Protocole
 T172pqq5 : Collections que l’assistant peut lire
@@ -802,3 +801,5 @@ T6hc3ox : Retirer le compte
 T1x1fhtq : Retirer ce compte de TotalMail ? Son courrier enregistré et ses brouillons sont supprimés ici. La boîte aux lettres de votre serveur de messagerie n’est pas modifiée.
 T3az20r : Effacer la recherche
 Tosmo8z : Paramètres
+Tz4dbwb : Un message de ce compte a peut-être été envoyé. Vérifiez les Envoyés et supprimez son brouillon avant de retirer le compte.
+T157usso : Laissez la clé vide pour conserver celle enregistrée pour cette adresse de serveur ; une nouvelle adresse demande à nouveau la clé. Elle est stockée chiffrée et n’est plus jamais affichée. Claude en nécessite une. Utilisez un modèle qui répond directement : les modèles qui réfléchissent à voix haute sont lents ici.

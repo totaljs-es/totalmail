@@ -636,7 +636,6 @@ T1evyqqz : Texto substituído.
 T1cqbuy7 : Repor o meu texto
 T1emazv7 : O Claude precisa de uma chave.
 T7qcvz5 : O Claude, ou qualquer servidor que fale o protocolo de chat da OpenAI: Ollama, llama.cpp, LM Studio, vLLM ou um serviço alojado. Escolha um para preencher o respetivo endereço habitual.
-T1wb31gr : Deixe a chave vazia para manter a guardada. É guardada cifrada e nunca volta a ser mostrada. O Claude precisa de uma. Use um modelo que responda diretamente: os modelos que pensam em voz alta são lentos aqui.
 T1lpp94f : Compatível com OpenAI
 T1jqodyw : Protocolo
 T172pqq5 : Coleções que o assistente pode ler
@@ -802,3 +801,5 @@ T6hc3ox : Remover conta
 T1x1fhtq : Remover esta conta do TotalMail? O correio guardado e os rascunhos são removidos aqui. A caixa de correio no seu servidor de correio não é tocada.
 T3az20r : Limpar pesquisa
 Tosmo8z : Definições
+Tz4dbwb : Uma mensagem desta conta pode ter sido enviada. Verifique as Enviadas e descarte o seu rascunho antes de remover a conta.
+T157usso : Deixe a chave vazia para manter a guardada para este endereço do servidor; um endereço novo precisa da chave outra vez. É guardada cifrada e nunca volta a ser mostrada. O Claude precisa de uma. Use um modelo que responda diretamente: os modelos que pensam em voz alta são lentos aqui.
