@@ -1416,18 +1416,6 @@ PLUGIN('mail', function(exports) {
 			SET('mail.window', 'settings');
 		else if (name === 'account-setup')
 			await PLUGINS.accounts.open();
-		else if (name === 'users')
-			await PLUGINS.users.open();
-		else if (name === 'providers')
-			await PLUGINS.providers.open();
-		else if (name === 'ai')
-			await PLUGINS.ai.open();
-		else if (name === 'discover-account')
-			await PLUGINS.accounts.discover();
-		else if (name === 'save-account')
-			await PLUGINS.accounts.save();
-		else if (name === 'create-user')
-			await PLUGINS.users.create();
 		else if (name === 'close-settings') {
 			SET('mail.window', '');
 			SET('accounts.form.password', '');

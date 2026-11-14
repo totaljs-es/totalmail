@@ -101,7 +101,7 @@
 				</div>
 				<ui-bind path="accounts.ui" config="hide:value.known" class="block">
 					<ui-bind path="accounts.ui" config="disabled:value.discovering">
-						<button class="secondary-button exec" data-exec="mail/click" data-command="discover-account">
+						<button class="secondary-button exec" data-exec="accounts/discover">
 							<i class="ti ti-search" aria-hidden="true"></i>@(Discover servers)
 						</button>
 					</ui-bind>
@@ -237,7 +237,7 @@
 				><ui-bind path="accounts.ui" config="show:value.again" class="contents"
 					><button class="secondary-button exec" data-exec="accounts/oauth" data-again="1"><i class="ti ti-refresh" aria-hidden="true"></i>@(Sign in again)</button></ui-bind
 				><ui-bind path="accounts.ui" config="hide:value.signin;disabled:value.blocked||value.saving" class="contents"
-					><button class="primary-button exec" data-exec="mail/click" data-command="save-account"><i class="ti ti-check" aria-hidden="true"></i>@(Save account)</button></ui-bind
+					><button class="primary-button exec" data-exec="accounts/save"><i class="ti ti-check" aria-hidden="true"></i>@(Save account)</button></ui-bind
 				>
 			</div>
 		</div></ui-component
