@@ -83,7 +83,7 @@ h1 { font-size: 23px; letter-spacing: -.8px; line-height: 1.3; margin: 9px 0 7px
 .message-meta { display: flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 11px; color: var(--muted-ink)}
 .color-dot { width: 5px; height: 5px; border-radius: 50%}
 .message-label { margin-left: auto; background: var(--chip); color: var(--muted-ink); border-radius: 3px; padding: 2px 5px}
-.mini-star { color: #8f7a35; margin-left: 5px}
+.mini-star { color: var(--star); margin-left: 5px}
 .mini-star .ti { width: 12px; height: 12px}
 .list-footer { padding: 10px 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; align-items: stretch; font-size: 11px; color: var(--muted-ink)}
 .list-status { display: flex; gap: 6px; align-items: center; padding: 3px 8px}
@@ -244,7 +244,7 @@ ui-component[name=repeater],ui-component[name=template] { display: block}
 .access-form { display: contents}
 /* A ui-bind that only wraps something (a button in a row of buttons) takes no box of its own. */
 ui-bind.contents { display: contents}
-.icon-button.starred { color: #b59c56}
+.icon-button.starred { color: var(--star)}
 ui-bind.contents.hidden { display: none}
 .access-card .primary-button { width: 100%; justify-content: center; margin-top: 20px}
 .access-card #access-error { font-size: 12px; margin: 15px 0 0}
@@ -627,8 +627,8 @@ ui-bind.admin-link-block { margin-top: 10px}
 /* Colour scheme. Every surface, text and line colour of the app is a variable; "dark" redefines them. The page sets data-mode
    (light or dark) on <html> from the person's choice or the system's, before it paints (see views/head.html). jComponent's own
    inputs, lists and pickers switch with the ui-dark class that goes with it. */
-:root { color-scheme: light; --surface: #FFFFFF; --surface-soft: #F8F8F8; --surface-hover: #F0F0F0; --tint: #EEF3FF; --tint-soft: #F4F7FF; --tint-line: #C7D6FB; --ink-2: #404040; --muted-ink: #606060; --line-strong: #C8C8C8; --chip: #E0E0E0; --avatar-ink: #7A5744; --danger-text: #a35164; --ok: #15803d; --warn: #b45309; --fail: #b91c1c; --hover-tint: #E6ECFB}
-:root[data-mode='dark'] { color-scheme: dark; --surface: #1A1E26; --surface-soft: #12151B; --surface-hover: #262C37; --tint: #1B2842; --tint-soft: #172033; --tint-line: #2C3F66; --ink: #E7EAF0; --ink-2: #CDD3DD; --muted-ink: #A6AFBD; --muted: #8A94A3; --line: #2F3643; --line-strong: #434C5C; --chip: #2F3643; --avatar-ink: #E8D9CF; --danger-text: #f2a7ba; --ok: #4ade80; --warn: #fbbf24; --fail: #f87171; --hover-tint: #26344f; --sidebar: #0D1015; --color-text: color-mix(in srgb, var(--color) 55%, #fff)}
+:root { color-scheme: light; --surface: #FFFFFF; --surface-soft: #F8F8F8; --surface-hover: #F0F0F0; --tint: #EEF3FF; --tint-soft: #F4F7FF; --tint-line: #C7D6FB; --ink-2: #404040; --muted-ink: #606060; --line-strong: #C8C8C8; --chip: #E0E0E0; --avatar-ink: #7A5744; --danger-text: #a35164; --ok: #15803d; --warn: #b45309; --fail: #b91c1c; --hover-tint: #E6ECFB; --star: #8f7a35}
+:root[data-mode='dark'] { color-scheme: dark; --surface: #1A1E26; --surface-soft: #12151B; --surface-hover: #262C37; --tint: #1B2842; --tint-soft: #172033; --tint-line: #2C3F66; --ink: #E7EAF0; --ink-2: #CDD3DD; --muted-ink: #A6AFBD; --muted: #8A94A3; --line: #2F3643; --line-strong: #434C5C; --chip: #2F3643; --avatar-ink: #E8D9CF; --danger-text: #f2a7ba; --ok: #4ade80; --warn: #fbbf24; --fail: #f87171; --hover-tint: #26344f; --star: #c9ad62; --sidebar: #0D1015; --color-text: color-mix(in srgb, var(--color) 55%, #fff)}
 .hub-theme { padding: 14px 0 0}
 
 /* The review step shows the message as it will arrive */
@@ -774,7 +774,7 @@ img.flag {
 @media (max-width: 730px) {
 	.settings-body:has(> .settings-nav) { display: block}
 	.settings-nav { position: static; flex-direction: row; overflow-x: auto; gap: 4px; padding: 10px 14px; border-right: 0; border-bottom: 1px solid var(--line)}
-	.settings-nav > button { width: auto; flex-shrink: 0; white-space: nowrap}
+	.settings-nav button { width: auto; flex-shrink: 0; white-space: nowrap}
 	.settings-nav-label, .settings-nav-gap { display: none}
 	.settings-nav .contents { display: contents}
 	.settings-body:has(> .settings-nav) .modal-body-content { padding: 14px 20px 26px}

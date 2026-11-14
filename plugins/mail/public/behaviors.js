@@ -192,8 +192,11 @@ COMPONENT('modalguard', function(self, config) {
 				remembered = document.activeElement;
 			shell.inert = true;
 			requestAnimationFrame(function() {
-				var el = document.querySelector('#' + name + ' button');
+				// In a section of the settings the place to start is the section itself, in the list on the left.
+				var el = document.querySelector('#' + name + ' [aria-current="page"]') || document.querySelector('#' + name + ' button');
 				el && el.focus();
+				// On a narrow screen the list is a row that scrolls: the section must be in view, also after the window's animation.
+				el && el.scrollIntoView && setTimeout(function() { el.scrollIntoView({ block: 'nearest', inline: 'center' }); }, 350);
 			});
 		} else {
 			shell.inert = false;
