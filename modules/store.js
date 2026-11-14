@@ -32,20 +32,7 @@ exports.create = function(storage) {
 		if (stale[s].status === 'sending')
 			stale[s].status = 'unknown';
 
-	var queue = Promise.resolve();
-	function update(mutate) {
-
-		var result = queue.then(async function() {
-
-			var next = structuredClone(state);
-			var value = mutate(next);
-			await storage.mirror.save(next);
-			state = next;
-			return structuredClone(value);
-		});
-		queue = result.catch(function() {});
-		return result;
-	}
+	var update = Mirror.writer(storage, function() { return state; }, function(next) { state = next; });
 	function message(next, id) {
 
 		var value = next.messages.find(function(item) { return item.id === id; });

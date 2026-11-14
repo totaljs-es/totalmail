@@ -1,4 +1,4 @@
-// OAuth sign-in to mail providers. Used as MODS.oauth
+// OAuth sign-in to mail providers. Used as MODS.oauth.
 // OAuth 2.0 authorization-code flow with PKCE for mail providers that no longer accept passwords.
 // Only the refresh token is stored (encrypted, per account); access tokens live in memory until they expire.
 // What differs between providers; the rest of the flow is the same. `valid` is the shape of an application ID.

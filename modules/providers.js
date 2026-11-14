@@ -1,5 +1,5 @@
 // The catalogue of mail providers (the ones that ship in the plugins and the ones the administrator added). Used as
-// MODS.providers
+// MODS.providers.
 // Mail provider catalogue. Each provider is a JSON file in plugins/<name>/providers/; copying a file adds a provider.
 // Files are validated on load: an invalid file is skipped, never half-applied.
 var Dns = Total.Dns.promises,

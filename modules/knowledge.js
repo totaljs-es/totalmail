@@ -1,4 +1,4 @@
-// The documents the assistant may read to draft a reply. Used as MODS.knowledge
+// The documents the assistant may read to draft a reply. Used as MODS.knowledge.
 // The knowledge base of the installation: documents the administrator adds (Word, PDF, Excel, text...) so the assistant
 // can draft a reply from them. Everything is internal to TotalMail: the NoSQL database next to the other data (through Mirror), no other service.
 //
@@ -141,22 +141,8 @@ exports.open = async function(options) {
 exports.create = function(storage) {
 
 	var state = Object.assign({ collections: [], docs: [] }, structuredClone(storage.state));
-	var queue = Promise.resolve(),
-		indexes = new Map();
-	function update(mutate) {
-
-		var result = queue.then(async function() {
-
-			var next = structuredClone(state);
-			var value = mutate(next);
-			await storage.mirror.save(next);
-			state = next;
-			indexes.clear();
-			return structuredClone(value);
-		});
-		queue = result.catch(function() {});
-		return result;
-	}
+	var indexes = new Map();
+	var update = Mirror.writer(storage, function() { return state; }, function(next) { state = next; }, { swapped: function() { indexes.clear(); } });
 	function indexof(id) {
 		if (!indexes.has(id))
 			indexes.set(id, build(state.docs.filter(function(d) { return d.collectionid === id; })));

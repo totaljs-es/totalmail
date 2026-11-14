@@ -30,7 +30,7 @@ exports.create = function(directory, storage) {
 		});
 	var key = fs.readFileSync(keyfile);
 	var state = structuredClone(storage.state),
-		queue = Promise.resolve();
+		serial = Mirror.serial();
 	var publicuser = function(u) {
 		return u
 			? {
@@ -77,7 +77,7 @@ exports.create = function(directory, storage) {
 			throw Error('@(Use a password of 12 to 128 characters.)');
 		var salt = crypto.randomBytes(32).toString('hex'),
 			password = await hash(model.password, salt);
-		var operation = queue.then(async function() {
+		return serial(async function() {
 
 			if (first && state.users.length)
 				throw Error('@(Setup has already been completed.)');
@@ -99,13 +99,11 @@ exports.create = function(directory, storage) {
 			state = next;
 			return publicuser(user);
 		});
-		queue = operation.catch(function() {});
-		return operation;
 	}
 	// Applies one change to a copy of the users and publishes it only after the atomic write.
 	function change(mutate) {
 
-		var operation = queue.then(async function() {
+		return serial(async function() {
 
 			var next = structuredClone(state);
 			var result = await mutate(next);
@@ -113,8 +111,6 @@ exports.create = function(directory, storage) {
 			state = next;
 			return result;
 		});
-		queue = operation.catch(function() {});
-		return operation;
 	}
 	// An installation always keeps someone who can administer it.
 	function activeadmin(next) {
@@ -123,7 +119,7 @@ exports.create = function(directory, storage) {
 	}
 	async function updateprofile(id, model) {
 
-		var operation = queue.then(async function() {
+		return serial(async function() {
 
 			var previous = state.users.find(function(u) { return u.id === id; });
 			if (!previous)
@@ -161,8 +157,6 @@ exports.create = function(directory, storage) {
 			state = next;
 			return { user: publicuser(user), credentialsChanged: changed };
 		});
-		queue = operation.catch(function() {});
-		return operation;
 	}
 	return {
 		configured: function() { return !!state.users.length; },

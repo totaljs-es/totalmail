@@ -1,5 +1,6 @@
-// The mail itself: what is read from and sent to the mail servers. Used as MODS.live
-var Lazy = require('./lazy'),
+// The mail itself: what is read from and sent to the mail servers. Used as MODS.live.
+var Credential = require('./credential'),
+	Lazy = require('./lazy'),
 	Network = require('./network'),
 	Rules = require('./rules'),
 	Diagnose = require('./diagnose'),
@@ -18,21 +19,7 @@ exports.create = function(dependencies = {}) {
 		files = dependencies.files || (function(user) { return MODS.users.files(user); }),
 		decrypt = dependencies.decrypt || (function(value) { return MODS.security.identities.decrypt(value); });
 	// For OAuth accounts the "password" handed to IMAP and SMTP is a fresh access token.
-	async function credential(store, id) {
-
-		var account = store.account(id);
-		if (account.authType === 'oauth2')
-			return {
-				account,
-				password: await oauth.accessToken(account, store)
-			};
-		if (!account.secret)
-			throw Error('@(Save a mail password or app password before connecting.)');
-		return {
-			account,
-			password: decrypt(account.secret)
-		};
-	}
+	var credential = Credential.create({ oauth, decrypt });
 	// A rejected sign-in usually means the provider needs another kind of credential: say which.
 	async function explain(account, err) {
 

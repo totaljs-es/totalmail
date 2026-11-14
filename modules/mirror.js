@@ -44,6 +44,45 @@ async function read(spec) {
 	return { state, found, orders };
 }
 
+// Runs one operation after the other: what a store does to its state never overlaps with another change in flight.
+// An operation that fails does not stop the ones behind it.
+exports.serial = function() {
+
+	var queue = Promise.resolve();
+	return function(operation) {
+
+		var result = queue.then(operation);
+		queue = result.catch(function() {});
+		return result;
+	};
+};
+
+// The way every store changes: update(mutate) applies `mutate` to a copy of the state, writes the copy to the database and only then
+// makes it the current state, so a write that fails changes nothing. The value that `mutate` returns is handed back as a copy.
+// read() gives the current state and write(next) replaces it. hooks.before(next) runs after the mutation and before the write,
+// hooks.after(next) after the write and before the swap, hooks.swapped() once the state is the new one.
+exports.writer = function(storage, read, write, hooks) {
+
+	hooks = hooks || {};
+	var serial = exports.serial();
+	return function(mutate) {
+		return serial(async function() {
+
+			var next = structuredClone(read());
+			var value = mutate(next);
+			if (hooks.before)
+				hooks.before(next);
+			await storage.mirror.save(next);
+			if (hooks.after)
+				hooks.after(next);
+			write(next);
+			if (hooks.swapped)
+				hooks.swapped();
+			return structuredClone(value);
+		});
+	};
+};
+
 exports.create = function(spec, state, persisted = true, saved = {}) {
 
 	var signatures = {},

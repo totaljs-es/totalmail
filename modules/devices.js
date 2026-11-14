@@ -24,7 +24,6 @@ var text = function(value, fallback = '') {
 exports.create = function(storage) {
 
 	var state = structuredClone(storage.state);
-	var queue = Promise.resolve();
 	// Keep revocations effective while an older write is waiting on disk. The queued
 	// removal persists them; only then can these temporary markers be forgotten.
 	var revoked = new Set();
@@ -50,21 +49,7 @@ exports.create = function(storage) {
 			return result;
 		});
 	}
-	function update(mutate) {
-
-		var result = queue.then(async function() {
-
-			var next = structuredClone(state);
-			var value = mutate(next);
-			excludeRevoked(next);
-			await storage.mirror.save(next);
-			excludeRevoked(next);
-			state = next;
-			return structuredClone(value);
-		});
-		queue = result.catch(function() {});
-		return result;
-	}
+	var update = Mirror.writer(storage, function() { return state; }, function(next) { state = next; }, { before: excludeRevoked, after: excludeRevoked });
 	// What a window may see: never the hash, never the token.
 	function view(d) {
 		return {

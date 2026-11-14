@@ -1,5 +1,5 @@
 // The settings of this installation: the sign-in application of each OAuth provider, the account types the administrator
-// added, the writing assistant and what it costs. Used as MODS.instance
+// added, the writing assistant and what it costs. Used as MODS.instance.
 // Settings that belong to one TotalMail installation (not to the shared code): the sign-in application of each
 // OAuth provider, the account types the administrator added, which shipped ones are hidden and the default type.
 // Kept in the instance_* tables of the NoSQL database, with the client secret encrypted like every other credential.
@@ -39,20 +39,7 @@ function item_provider(value) {
 exports.create = function(crypto, storage) {
 
 	var state = Object.assign({}, defaults, structuredClone(storage.state));
-	var queue = Promise.resolve();
-	function update(mutate) {
-
-		var result = queue.then(async function() {
-
-			var next = structuredClone(state);
-			var value = mutate(next);
-			await storage.mirror.save(next);
-			state = next;
-			return structuredClone(value);
-		});
-		queue = result.catch(function() {});
-		return result;
-	}
+	var update = Mirror.writer(storage, function() { return state; }, function(next) { state = next; });
 	return {
 		// Internal use only: includes the decrypted secret.
 		oauth(provider) {
