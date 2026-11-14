@@ -800,64 +800,8 @@ PLUGIN('mail', function(exports) {
 		return text ? '\n\n-- \n' + text : '';
 	}
 	// Undo after moving mail out of the inbox. A server message gets a new id when it moves, so it is found again by its Message-ID.
-	var undoitems = [],
-		undotimer = null;
-	function hideundo() {
-
-		clearTimeout(undotimer);
-		undoitems = [];
-		ui({ undoShown: false });
-	}
-	function offerundo(items, text) {
-
-		if (!items.length)
-			return false;
-		undoitems = items;
-		ui({ undoText: text, undoShown: true });
-		clearTimeout(undotimer);
-		undotimer = setTimeout(hideundo, 9000);
-		return true;
-	}
-	var undobusy = false;
-	async function undomove() {
-
-		var items = undoitems;
-		if (!items.length || undobusy)
-			return;
-		// The bar stays up, saying what is happening, until the messages are back.
-		undobusy = true;
-		clearTimeout(undotimer);
-		ui({ undoText: TRANSLATE('@(Putting it back…)'), undoBusy: true });
-		try {
-			await perform(async function() {
-				try {
-					for (var list = Array.from(items), i = 0; i < list.length; i++) {
-						var item = list[i];
-						var found = state.messages.find(
-							function(x) {
-								return x.accountId === item.accountid &&
-									x.folder === item.folder &&
-									(item.messageid ? x.messageId === item.messageid : x.id === item.id);
-							}
-						);
-						if (found)
-							await api('message_change', { id: found.id, operation: 'restore', enabled: false });
-					}
-				} finally {
-					await reloadmail();
-				}
-			});
-			toast(TRANSLATE('@(Moved back to the inbox.)'));
-		} finally {
-			undobusy = false;
-			ui({ undoBusy: false });
-			hideundo();
-		}
-	}
-	exports.undo = function() { return undomove().catch(function(e) { return toast(e.message); }); };
-	function undoentry(t, folder) {
-		return { id: t.id, accountid: t.accountId, messageid: t.messageId || '', folder };
-	}
+	var undo = totalmailundo({ state, ui, api, toast, perform, reloadmail });
+	exports.undo = function() { return undo.undo().catch(function(e) { return toast(e.message); }); };
 	// Several messages at once: a real checkbox on every line (Shift for a range, Ctrl/⌘ to add one), and a bar with the
 	// actions that make sense in bulk. The same operations as the single-message buttons, applied to every selected line.
 	var checked = new Set(),
@@ -987,7 +931,7 @@ PLUGIN('mail', function(exports) {
 						);
 						done++;
 						if (!erasing && ['archive', 'trash'].includes(operation) && t.folder === 'inbox')
-							moved.push(undoentry(t, operation));
+							moved.push(undo.entry(t, operation));
 					} catch {
 						left++;
 					}
@@ -1005,7 +949,7 @@ PLUGIN('mail', function(exports) {
 			.replace('{done}', function() { return done; })
 			.replace('{left}', function() { return left; });
 		// What came out of the inbox can be put back.
-		if (!offerundo(moved, text))
+		if (!undo.offer(moved, text))
 			toast(text);
 	}
 	function showmore() {
@@ -1059,8 +1003,8 @@ PLUGIN('mail', function(exports) {
 			SETTER('page/focus', '.ui-searchinput input');
 		else if (key === 'j' || key === 'k')
 			movecurrent(key === 'j' ? 1 : -1);
-		else if (key === 'z' && undoitems.length)
-			undomove();
+		else if (key === 'z' && undo.available())
+			undo.undo();
 		else if (key === 'Escape') {
 			if (!clearchecked())
 				return false;
@@ -1458,8 +1402,8 @@ PLUGIN('mail', function(exports) {
 					!(
 						origin === 'inbox' &&
 						operation !== 'restore' &&
-						offerundo(
-							list.map(function(t) { return undoentry(t, destination); }),
+						undo.offer(
+							list.map(function(t) { return undo.entry(t, destination); }),
 							TRANSLATE(operation === 'archive' ? '@(Archived.)' : '@(Moved to the trash.)')
 						)
 					)

@@ -412,3 +412,18 @@ test('an operation cannot start while another one runs', async () => {
 	await running;
 	Assert.equal(h.mail().ui.busy, false);
 });
+
+test('the bar that offers to undo goes away by itself, and the Z key uses it', async () => {
+	var h = await start();
+	await h.click({ message: 'm2' });
+	await h.click({ command: 'trash' });
+	Assert.equal(h.mail().ui.undoShown, true);
+	await h.flush();
+	Assert.equal(h.mail().ui.undoShown, false, 'after nine seconds');
+	await h.click({ message: 'm3' });
+	await h.click({ command: 'trash' });
+	Assert.equal(h.mail().ui.undoShown, true);
+	h.plugin.keys({ key: 'z', target: { tagName: 'BODY', matches: () => false }, preventDefault() {} });
+	await h.settle();
+	Assert.equal(h.db.messages.find((m) => m.id === 'm3').folder, 'inbox');
+});
